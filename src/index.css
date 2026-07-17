@@ -187,25 +187,68 @@ body {
   border-right: 1px solid var(--line);
 }
 
+/*
+ * `min-inline-size: 0` overrides a UA-stylesheet default, and without it the
+ * nowrap/ellipsis below does nothing at all.
+ *
+ * A fieldset ships with `min-inline-size: min-content`, which no other element
+ * has, and its min-content includes the legend's — so a nowrap legend makes the
+ * fieldset refuse to shrink below the summary's full text. Measured: selecting
+ * seven languages grew this box from 269px to 343px inside a 304px panel, and
+ * the ellipsis never fired because there was no overflow to trim. Resetting the
+ * floor is what lets `.facet-summary` overflow, and therefore truncate.
+ */
 .facet {
+  min-inline-size: 0;
   margin: 0 0 0.85rem;
   padding: 0.55rem 0.65rem;
   border: 1px solid var(--line);
   border-radius: 7px;
 }
 
+/*
+ * The legend is pinned to exactly one line.
+ *
+ * Without this the summary grows the legend from one line to two the moment you
+ * select a second value ("~unlimited, ~unknown · not ~limited"), which pushed
+ * the fieldset from 64.6px to 82.6px and shifted every row below it down by
+ * 18px — so the panel jumped out from under the pointer mid-click. The full
+ * text stays reachable via the title attribute.
+ */
 .facet legend {
+  display: flex;
+  gap: 0.35rem;
+  align-items: baseline;
+  max-width: 100%;
   padding: 0 0.3rem;
   color: var(--muted);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
+.facet-legend-label {
+  flex: none;
+}
+
+/*
+ * `min-width: 0` is what actually makes the ellipsis fire.
+ *
+ * A flex item defaults to `min-width: auto`, which refuses to shrink below its
+ * own content — so `text-overflow` never has an overflow to trim, and the
+ * legend grows the panel anyway. The nowrap above only stops the second line;
+ * this stops the widening.
+ */
 .facet-summary {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   text-transform: none;
   letter-spacing: 0;
   color: var(--accent);
+  white-space: nowrap;
 }
 
 .facet-hint {
@@ -222,11 +265,20 @@ body {
 
 /* ---------- tri-state ---------- */
 
+/*
+ * A fixed height, not a min-height.
+ *
+ * The requirement is that a row sits in the exact same place to be clicked no
+ * matter its state, so nothing inside it may influence its size: a glyph whose
+ * font falls back differently per machine, or a long name wrapping to a second
+ * line, would both move every row below it mid-click.
+ */
 .tri {
   display: flex;
   gap: 0.45rem;
   align-items: center;
-  padding: 0.22rem 0.35rem;
+  height: 1.85rem;
+  padding: 0 0.35rem;
   border: 0;
   border-radius: 5px;
   background: none;
@@ -245,8 +297,19 @@ body {
   cursor: default;
 }
 
+/*
+ * ☐ / ✓ / ✕ come from three different Unicode blocks and routinely resolve to
+ * three different fallback fonts, so their natural boxes differ per machine.
+ * Pinning the box and centring the glyph inside it makes the row's geometry
+ * independent of whatever font the glyph happened to land in.
+ */
 .tri-glyph {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
   width: 1em;
+  height: 1em;
+  line-height: 1;
 }
 
 .tri-include .tri-glyph {
@@ -259,11 +322,18 @@ body {
 
 .tri-name {
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+
 .tri-count {
+  flex: none;
   color: var(--muted);
   font-size: 0.75rem;
+  /* Tabular figures keep the count column from reflowing as digits change. */
   font-variant-numeric: tabular-nums;
 }
 

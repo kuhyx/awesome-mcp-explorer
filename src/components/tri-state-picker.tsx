@@ -80,7 +80,10 @@ export function TriStatePicker<T extends string>({
   return (
     <fieldset className="facet">
       <legend>
-        {label} <span className="facet-summary">{summarize(value, format)}</span>
+        <span className="facet-legend-label">{label}</span>
+        <span className="facet-summary" title={summarize(value, format)}>
+          {summarize(value, format)}
+        </span>
       </legend>
       <div className="facet-options">
         {options.map((option) => {
