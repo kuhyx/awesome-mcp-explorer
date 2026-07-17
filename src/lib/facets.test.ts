@@ -150,7 +150,8 @@ describe("pushedValues", () => {
   });
 
   it("omits an unparseable date rather than emitting NaN", () => {
-    expect(pushedValues([server({ gh: facts({ pushedAt: "" }) })])).toEqual([]);
+    const undated = server({ gh: facts({ pushedAt: "" }) });
+    expect(pushedValues([undated])).toEqual([]);
   });
 });
 

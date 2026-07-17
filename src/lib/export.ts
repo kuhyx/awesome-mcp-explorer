@@ -69,7 +69,7 @@ function toCsv(servers: readonly Server[]): string {
 
 /** Escapes the pipe that would otherwise break out of a Markdown table cell. */
 function mdCell(value: string): string {
-  return value.replaceAll("|", "\\|");
+  return value.replaceAll("|", String.raw`\|`);
 }
 
 function toMarkdown(servers: readonly Server[]): string {

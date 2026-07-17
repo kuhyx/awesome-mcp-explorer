@@ -149,12 +149,32 @@ describe("passesFilters", () => {
 
   it("filters on inferred cost and rate limiting", () => {
     const paid = server({ cost: { source: "inferred", value: "likely-paid" } });
-    expect(passesFilters(paid, filter({ cost: "likely-paid" }))).toBe(true);
-    expect(passesFilters(paid, filter({ cost: "likely-free" }))).toBe(false);
+    expect(passesFilters(paid, filter({ cost: { excludes: [], includes: ["likely-paid"] } }))).toBe(true);
+    expect(passesFilters(paid, filter({ cost: { excludes: [], includes: ["likely-free"] } }))).toBe(false);
 
     const limited = server({ rateLimited: { source: "override", value: "yes" } });
-    expect(passesFilters(limited, filter({ rateLimited: "yes" }))).toBe(true);
-    expect(passesFilters(limited, filter({ rateLimited: "no" }))).toBe(false);
+    expect(passesFilters(limited, filter({ rateLimited: { excludes: [], includes: ["yes"] } }))).toBe(true);
+    expect(passesFilters(limited, filter({ rateLimited: { excludes: [], includes: ["no"] } }))).toBe(false);
+  });
+
+  it("accepts several cost values at once", () => {
+    // The common case: roughly half the list is cost-unknown, so "free OR
+    // unknown" is what you actually want to ask for.
+    const both = { excludes: [], includes: ["likely-free", "unknown"] } as const;
+    const free = server({ cost: { source: "inferred", value: "likely-free" } });
+    const unknown = server({ cost: { source: "inferred", value: "unknown" } });
+    const paid = server({ cost: { source: "inferred", value: "likely-paid" } });
+    expect(passesFilters(free, filter({ cost: both }))).toBe(true);
+    expect(passesFilters(unknown, filter({ cost: both }))).toBe(true);
+    expect(passesFilters(paid, filter({ cost: both }))).toBe(false);
+  });
+
+  it("excludes a cost value", () => {
+    const notPaid = { excludes: ["likely-paid"], includes: [] } as const;
+    const paid = server({ cost: { source: "inferred", value: "likely-paid" } });
+    const free = server({ cost: { source: "inferred", value: "likely-free" } });
+    expect(passesFilters(paid, filter({ cost: notPaid }))).toBe(false);
+    expect(passesFilters(free, filter({ cost: notPaid }))).toBe(true);
   });
 });
 
@@ -204,8 +224,26 @@ describe("passesFilters on grades", () => {
 
 describe("passesFilters on github facts", () => {
   it("filters on foss", () => {
-    expect(passesFilters(server(), filter({ foss: "yes" }))).toBe(true);
-    expect(passesFilters(server(), filter({ foss: "no" }))).toBe(false);
+    expect(passesFilters(server(), filter({ foss: { excludes: [], includes: ["yes"] } }))).toBe(true);
+    expect(passesFilters(server(), filter({ foss: { excludes: [], includes: ["no"] } }))).toBe(false);
+  });
+
+  it("accepts FOSS or unclear together", () => {
+    const both = { excludes: [], includes: ["yes", "unknown"] } as const;
+    const unclear = server({ gh: facts({ isFoss: "unknown" }) });
+    const proprietary = server({ gh: facts({ isFoss: "no" }) });
+    expect(passesFilters(server(), filter({ foss: both }))).toBe(true);
+    expect(passesFilters(unclear, filter({ foss: both }))).toBe(true);
+    expect(passesFilters(proprietary, filter({ foss: both }))).toBe(false);
+  });
+
+  it("drops a repo with no github data from a licence allowlist", () => {
+    const gone = server({ gh: null });
+    expect(passesFilters(gone, filter({ foss: { excludes: [], includes: ["yes"] } }))).toBe(false);
+    // ...but a denylist keeps it: "not proprietary" is true of an unknown.
+    expect(
+      passesFilters(gone, filter({ foss: { excludes: ["no"], includes: [] } })),
+    ).toBe(true);
   });
 
   it("hides archived repos only when asked", () => {

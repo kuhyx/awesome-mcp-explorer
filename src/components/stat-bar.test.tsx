@@ -50,6 +50,12 @@ describe("StatBar", () => {
     );
   });
 
+  it("flips ascending back to descending", async () => {
+    const { onSort } = renderBar({ sort: { dir: "asc", key: "stars" } });
+    await userEvent.click(screen.getByRole("button", { name: /Sort ascending/ }));
+    expect(onSort).toHaveBeenCalledWith({ dir: "desc", key: "stars" });
+  });
+
   it("offers Reset only when a filter is active", async () => {
     renderBar();
     expect(screen.queryByRole("button", { name: "Reset" })).not.toBeInTheDocument();

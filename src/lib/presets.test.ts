@@ -24,7 +24,7 @@ function fakeStorage(initial: null | string = null): Storage {
     setItem: vi.fn((_key: string, next: string) => {
       value = next;
     }),
-  } as unknown as Storage;
+  };
 }
 
 function throwingStorage(): Storage {
@@ -150,7 +150,7 @@ describe("applyPreset", () => {
   it("expands a preset back into filter state", () => {
     const { filter } = applyPreset({ name: "x", search: "aaa=1&foss=yes" });
     expect(filter.tripleA).toBe(true);
-    expect(filter.foss).toBe("yes");
+    expect(filter.foss).toEqual({ excludes: [], includes: ["yes"] });
   });
 
   it("round-trips add -> apply", () => {
@@ -171,7 +171,14 @@ describe("BUILTIN_PRESETS", () => {
     const byName = (name: string): Preset =>
       BUILTIN_PRESETS.find((p) => p.name === name)!;
     expect(applyPreset(byName("Triple-A only")).filter.tripleA).toBe(true);
-    expect(applyPreset(byName("Triple-A + FOSS")).filter.foss).toBe("yes");
+    expect(applyPreset(byName("Triple-A + FOSS")).filter.foss.includes).toEqual([
+      "yes",
+    ]);
+    // Multi-select in a preset: the reason cost stopped being pick-one.
+    expect(applyPreset(byName("Free or unknown cost")).filter.cost.includes).toEqual([
+      "likely-free",
+      "unknown",
+    ]);
     expect(applyPreset(byName("Official implementations")).filter.official).toBe(true);
     expect(applyPreset(byName("Local-only, no cloud")).filter.scope).toEqual({
       excludes: ["cloud"],

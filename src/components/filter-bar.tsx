@@ -4,15 +4,17 @@
  */
 import type { Facets } from "../lib/facets.ts";
 import type { FilterState } from "../lib/filter-sort.ts";
-import type { Cost, Tri } from "../lib/server.ts";
+import type { Cost, Language, Tri } from "../lib/server.ts";
 
 import { LANGUAGES, OPERATING_SYSTEMS, SCOPES } from "../../scripts/lib/parse-readme.ts";
-import { formatStars } from "./server-row.tsx";
+import { nth } from "../lib/quantile.ts";
 import { GradeFilter } from "./grade-filter.tsx";
 import { RangeSlider } from "./range-slider.tsx";
+import { formatStars } from "./server-row.tsx";
 import { TriStatePicker } from "./tri-state-picker.tsx";
 
-const LANGUAGE_NAMES: Readonly<Record<string, string>> = {
+/** Keyed by Language, so a new language is a compile error, not a fallback. */
+const LANGUAGE_NAMES: Readonly<Record<Language, string>> = {
   cpp: "C/C++",
   csharp: "C#",
   go: "Go",
@@ -23,23 +25,30 @@ const LANGUAGE_NAMES: Readonly<Record<string, string>> = {
   typescript: "TS/JS",
 };
 
-const FOSS_OPTIONS: readonly { label: string; value: Tri }[] = [
-  { label: "FOSS", value: "yes" },
-  { label: "Not FOSS", value: "no" },
-  { label: "Unclear", value: "unknown" },
-];
+// Licence, cost and rate limit are tri-state pickers rather than pick-one
+// chips: "FOSS or unclear" and "free or unknown" are ordinary things to want,
+// and roughly half of each of the inferred fields is `unknown`, so forcing a
+// single choice made those filters nearly unusable.
+const FOSS_OPTIONS: readonly Tri[] = ["yes", "no", "unknown"];
+const FOSS_NAMES: Readonly<Record<Tri, string>> = {
+  no: "Not FOSS",
+  unknown: "Unclear",
+  yes: "FOSS",
+};
 
-const COST_OPTIONS: readonly { label: string; value: Cost }[] = [
-  { label: "~free", value: "likely-free" },
-  { label: "~paid", value: "likely-paid" },
-  { label: "~unknown", value: "unknown" },
-];
+const COST_OPTIONS: readonly Cost[] = ["likely-free", "likely-paid", "unknown"];
+const COST_NAMES: Readonly<Record<Cost, string>> = {
+  "likely-free": "~free",
+  "likely-paid": "~paid",
+  unknown: "~unknown",
+};
 
-const RATE_OPTIONS: readonly { label: string; value: Tri }[] = [
-  { label: "~limited", value: "yes" },
-  { label: "~unlimited", value: "no" },
-  { label: "~unknown", value: "unknown" },
-];
+const RATE_OPTIONS: readonly Tri[] = ["yes", "no", "unknown"];
+const RATE_NAMES: Readonly<Record<Tri, string>> = {
+  no: "~unlimited",
+  unknown: "~unknown",
+  yes: "~limited",
+};
 
 export interface FilterBarProps {
   readonly categories: readonly string[];
@@ -49,43 +58,6 @@ export interface FilterBarProps {
   readonly pushedValues: readonly number[];
   readonly starValues: readonly number[];
   readonly ungraded: number;
-}
-
-/** A one-of-N chip row that toggles back to null when the active chip is clicked. */
-function ChipRow<T extends string>({
-  counts,
-  label,
-  onSelect,
-  options,
-  value,
-}: {
-  readonly counts: ReadonlyMap<T, number>;
-  readonly label: string;
-  readonly onSelect: (next: null | T) => void;
-  readonly options: readonly { label: string; value: T }[];
-  readonly value: null | T;
-}): React.JSX.Element {
-  return (
-    <fieldset className="facet">
-      <legend>{label}</legend>
-      <div className="coverage-row">
-        {options.map((option) => (
-          <button
-            aria-pressed={value === option.value}
-            className={`chip${value === option.value ? " on" : ""}`}
-            key={option.value}
-            onClick={(): void => {
-              onSelect(value === option.value ? null : option.value);
-            }}
-            type="button"
-          >
-            {option.label}{" "}
-            <span className="tri-count">{counts.get(option.value) ?? 0}</span>
-          </button>
-        ))}
-      </div>
-    </fieldset>
-  );
 }
 
 export function FilterBar({
@@ -136,7 +108,7 @@ export function FilterBar({
 
       <TriStatePicker
         counts={facets.languages}
-        format={(language): string => LANGUAGE_NAMES[language] ?? language}
+        format={(language): string => LANGUAGE_NAMES[language]}
         label="Language"
         onChange={(languages): void => {
           onChange({ ...filter, languages });
@@ -165,30 +137,33 @@ export function FilterBar({
         value={filter.os}
       />
 
-      <ChipRow
+      <TriStatePicker
         counts={facets.foss}
+        format={(value): string => FOSS_NAMES[value]}
         label="Licence"
-        onSelect={(foss): void => {
+        onChange={(foss): void => {
           onChange({ ...filter, foss });
         }}
         options={FOSS_OPTIONS}
         value={filter.foss}
       />
 
-      <ChipRow
+      <TriStatePicker
         counts={facets.cost}
+        format={(value): string => COST_NAMES[value]}
         label="Cost (inferred)"
-        onSelect={(cost): void => {
+        onChange={(cost): void => {
           onChange({ ...filter, cost });
         }}
         options={COST_OPTIONS}
         value={filter.cost}
       />
 
-      <ChipRow
+      <TriStatePicker
         counts={facets.rateLimited}
+        format={(value): string => RATE_NAMES[value]}
         label="Rate limit (inferred)"
-        onSelect={(rateLimited): void => {
+        onChange={(rateLimited): void => {
           onChange({ ...filter, rateLimited });
         }}
         options={RATE_OPTIONS}
@@ -207,24 +182,30 @@ export function FilterBar({
         max={starMax}
         min={starMin}
         onChange={(lo, hi): void => {
+          // A bound at the distribution's edge means "no constraint". nth
+          // rather than `?? 0`: the slider only calls back when it has two or
+          // more values, so a default here would be an unreachable branch.
           onChange({
             ...filter,
-            maxStars: hi >= (starValues.at(-1) ?? 0) ? null : hi,
-            minStars: lo <= (starValues[0] ?? 0) ? null : lo,
+            maxStars: hi >= nth(starValues, starValues.length - 1) ? null : hi,
+            minStars: lo <= nth(starValues, 0) ? null : lo,
           });
         }}
         values={starValues}
       />
 
       <RangeSlider
-        format={(t): string => new Date(t).toISOString().slice(0, 7)}
+        format={(t): string => {
+          const date = new Date(t);
+          return date.toISOString().slice(0, 7);
+        }}
         label="Last push"
         max={pushedValues.at(-1) ?? 0}
         min={filter.pushedAfter ?? pushedValues[0] ?? 0}
         onChange={(lo): void => {
           onChange({
             ...filter,
-            pushedAfter: lo <= (pushedValues[0] ?? 0) ? null : lo,
+            pushedAfter: lo <= nth(pushedValues, 0) ? null : lo,
           });
         }}
         values={pushedValues}

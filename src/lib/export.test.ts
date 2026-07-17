@@ -80,7 +80,7 @@ describe("exportServers csv", () => {
     // The description is not a CSV column, so use a field that is: the id.
     const withComma = exportServers([server({ id: 'a,b"c' })], "csv");
     expect(withComma).toContain('"a,b""c"');
-    expect(csv.split("\n")[0]).toContain("id,url");
+    expect(csv.split("\n", 1)[0]).toContain("id,url");
   });
 
   it("leaves github columns empty for a repo that 404'd", () => {
@@ -91,7 +91,7 @@ describe("exportServers csv", () => {
 
   it("leaves grade columns empty for an unindexed server", () => {
     const csv = exportServers([server({ glama: null })], "csv");
-    const cells = csv.split("\n")[1]!.split(",");
+    const cells = csv.split("\n", 2)[1]!.split(",");
     expect(cells).toContain("");
   });
 
@@ -118,7 +118,7 @@ describe("exportServers markdown", () => {
 
   it("escapes a pipe so it cannot break out of a cell", () => {
     const md = exportServers([server({ description: "a | b" })], "markdown");
-    expect(md).toContain("a \\| b");
+    expect(md).toContain(String.raw`a \| b`);
   });
 
   it("shows ? for unknown stars and 'none' for no licence", () => {

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
@@ -61,7 +61,7 @@ describe("PresetMenu", () => {
     const save = screen.getByRole("button", { name: "Save" });
     expect(save).toBeDisabled();
 
-    await userEvent.type(screen.getByLabelText("Preset name"), "   ");
+    await userEvent.type(screen.getByLabelText("Preset name"), ' '.repeat(3));
     expect(save).toBeDisabled();
     expect(onSave).not.toHaveBeenCalled();
   });
@@ -75,6 +75,14 @@ describe("PresetMenu", () => {
   it("does not submit a whitespace-only name via Enter", async () => {
     const { onSave } = renderMenu();
     await userEvent.type(screen.getByLabelText("Preset name"), " {Enter}");
+    expect(onSave).not.toHaveBeenCalled();
+  });
+
+  it("guards a direct empty submit, not just the disabled button", () => {
+    // The button being disabled is the first line of defence; the form can
+    // still be submitted programmatically, so the handler guards too.
+    const { onSave } = renderMenu();
+    fireEvent.submit(screen.getByLabelText("Preset name").closest("form")!);
     expect(onSave).not.toHaveBeenCalled();
   });
 });

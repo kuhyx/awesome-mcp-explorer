@@ -79,7 +79,7 @@ describe("useKeyboard", () => {
       useKeyboard(handlers as never);
     });
     globalThis.dispatchEvent(new KeyboardEvent("keydown", { key: "a" }));
-    expect(handlers["onToggleTripleA"]).toHaveBeenCalledOnce();
+    expect(handlers.onToggleTripleA).toHaveBeenCalledOnce();
   });
 
   it("ignores an unmapped key", () => {
@@ -100,6 +100,6 @@ describe("useKeyboard", () => {
     });
     unmount();
     globalThis.dispatchEvent(new KeyboardEvent("keydown", { key: "a" }));
-    expect(handlers["onToggleTripleA"]).not.toHaveBeenCalled();
+    expect(handlers.onToggleTripleA).not.toHaveBeenCalled();
   });
 });

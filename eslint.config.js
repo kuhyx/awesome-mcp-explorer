@@ -64,6 +64,12 @@ export default tseslint.config(
 
       // Kebab-case files exporting PascalCase components: house convention.
       "unicorn/filename-case": ["error", { case: "kebabCase" }],
+
+      // Keep the rule, drop one replacement: `props` is React's own word.
+      // `interface FilterBarProps` is the convention every React codebase and
+      // every reader expects; `FilterBarProperties` would be unidiomatic in
+      // service of a generic dictionary. Every other replacement stays on.
+      "unicorn/name-replacements": ["error", { replacements: { props: false } }],
     },
   },
 
@@ -75,6 +81,13 @@ export default tseslint.config(
   // reportUnusedDisableDirectives then turns the disables into their own debt.
   {
     rules: {
+      // Directly contradicts unicorn/consistent-class-member-order: one wants
+      // a private field before the getter that reads it, the other wants the
+      // getter first, and satisfying either re-triggers the other. unicorn's
+      // wins because "declare the field before the code that uses it" is a
+      // reason, whereas alphabetical order within a class is not.
+      "perfectionist/sort-classes": "off",
+
       // Sorts Map entries by key. The marker table in parse-readme.ts is keyed
       // by emoji codepoint, so "sorted" would mean ordered by
       // U+1F396 < U+1F3CE < ... — meaningless to a reader, and it would shred
@@ -119,13 +132,33 @@ export default tseslint.config(
     },
   },
 
+  {
+    rules: {
+      // Caps a try block at ONE statement. Unfollowable where the whole point
+      // is that several steps can throw: loadPresets must wrap getItem (throws
+      // in private browsing), JSON.parse (throws on junk) and the shape check
+      // together, because any of them failing means the same thing — fall back
+      // to no presets. Splitting them into three try blocks would be strictly
+      // worse code. The rule has no maximum option, so it is all or nothing.
+      "unicorn/try-complexity": "off",
+    },
+  },
+
   // Tests: relax the rules that fight with mocking and fixtures.
   {
     files: ["**/*.test.{ts,tsx}", "src/test/**", "scripts/**/__fixtures__/**"],
     rules: {
+      "@typescript-eslint/no-empty-function": "off",
       "@typescript-eslint/no-non-null-assertion": "off",
+      "@typescript-eslint/require-await": "off",
       "@typescript-eslint/unbound-method": "off",
       "sonarjs/no-duplicate-string": "off",
+      // Test helpers live beside the tests that use them; hoisting every
+      // fixture factory to module scope to satisfy a scoping rule would
+      // scatter each test's setup away from the test.
+      "unicorn/consistent-function-scoping": "off",
+      // A no-op stub is the point of a stub.
+      "unicorn/no-empty-file": "off",
     },
   },
 
@@ -136,6 +169,9 @@ export default tseslint.config(
   {
     files: ["src/test/setup.ts"],
     rules: {
+      // The stubs are property getters installed on DOM prototypes, so `this`
+      // is the element being measured — there is no class to put them in.
+      "unicorn/no-this-outside-of-class": "off",
       "unicorn/no-top-level-assignment-in-function": "off",
       "unicorn/no-top-level-side-effects": "off",
     },

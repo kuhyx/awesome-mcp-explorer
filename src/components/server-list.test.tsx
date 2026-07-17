@@ -32,7 +32,7 @@ function server(index: number): Server {
     repo: `repo-${index}`,
     scope: ["cloud"],
     url: `https://github.com/owner/repo-${index}`,
-    ...{},
+    
   };
 }
 

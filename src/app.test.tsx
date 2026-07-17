@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -43,13 +43,19 @@ const DATA: Server[] = [
     languages: ["rust"],
     repo: "bbb-server",
   }),
-  server({ glama: null, id: "acme/ccc-server", repo: "ccc-server" }),
+  // A second category so the category sort comparator actually runs.
+  server({
+    categories: ["Search & Data Extraction"],
+    glama: null,
+    id: "acme/ccc-server",
+    repo: "ccc-server",
+  }),
 ];
 
 function stubFetch(data: Server[] = DATA): void {
   vi.stubGlobal(
     "fetch",
-    vi.fn(() => Promise.resolve(new Response(JSON.stringify(data), { status: 200 }))),
+    vi.fn(() => Promise.resolve(Response.json(data, { status: 200 }))),
   );
 }
 
@@ -71,7 +77,7 @@ async function renderApp(): Promise<void> {
 
 describe("App loading", () => {
   it("shows a loading state", () => {
-    vi.stubGlobal("fetch", vi.fn(() => new Promise(() => undefined)));
+    vi.stubGlobal("fetch", vi.fn(() => new Promise(() => {})));
     render(<App />);
     expect(screen.getByText("Loading servers…")).toBeInTheDocument();
   });
@@ -99,7 +105,12 @@ describe("App filtering", () => {
   it("filters to triple-A and writes it to the URL", async () => {
     stubFetch();
     await renderApp();
-    await userEvent.click(screen.getByRole("button", { name: /Triple-A only/ }));
+    // Scoped to the sidebar fieldset (a fieldset+legend is an accessible
+    // group), because the preset menu has a button of the same name.
+    const grades = screen.getByRole("group", { name: /Glama grade/ });
+    await userEvent.click(
+      within(grades).getByRole("button", { name: /Triple-A only/ }),
+    );
     await waitFor(() => {
       expect(screen.getByRole("status")).toHaveTextContent("Showing 1 of 3");
     });
@@ -207,15 +218,13 @@ describe("App actions", () => {
   });
 
   it("exports the filtered set", async () => {
-    const click = vi.fn();
-    vi.spyOn(document, "createElement").mockImplementation(((tag: string) => {
-      if (tag !== "a") return document.createElementNS("http://www.w3.org/1999/xhtml", tag);
-      return { click, download: "", href: "" } as unknown as HTMLAnchorElement;
-    }) as typeof document.createElement);
-    vi.stubGlobal("URL", {
-      createObjectURL: vi.fn(() => "blob:x"),
-      revokeObjectURL: vi.fn(),
-    });
+    // Spy on the anchor's click, not on document.createElement: React needs the
+    // real createElement to render at all.
+    const click = vi
+      .spyOn(HTMLAnchorElement.prototype, "click")
+      .mockImplementation(() => {});
+    const createObjectURL = vi.fn(() => "blob:x");
+    vi.stubGlobal("URL", { createObjectURL, revokeObjectURL: vi.fn() });
     stubFetch();
     await renderApp();
     await userEvent.selectOptions(

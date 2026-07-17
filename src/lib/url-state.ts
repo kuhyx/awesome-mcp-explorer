@@ -163,9 +163,9 @@ export function encodeFilter(
     ["scope", tri(filter.scope)],
     ["os", tri(filter.os)],
     ["cat", tri(filter.categories)],
-    ["foss", filter.foss],
-    ["cost", filter.cost],
-    ["rl", filter.rateLimited],
+    ["foss", tri(filter.foss)],
+    ["cost", tri(filter.cost)],
+    ["rl", tri(filter.rateLimited)],
     ["cov", filter.gradeCoverage],
     [
       "min",
@@ -196,8 +196,8 @@ export function decodeFilter(search: string): {
   return {
     filter: {
       categories: decodeCategoryTri(get("cat")),
-      cost: oneOf(get("cost"), COSTS),
-      foss: oneOf(get("foss"), TRIS),
+      cost: decodeTri<Cost>(get("cost"), COSTS),
+      foss: decodeTri<Tri>(get("foss"), TRIS),
       gradeCoverage: oneOf(get("cov"), COVERAGES),
       hideArchived: get("live") === "1",
       languages: decodeTri<Language>(get("lang"), LANGUAGES),
@@ -208,7 +208,7 @@ export function decodeFilter(search: string): {
       os: decodeTri<Os>(get("os"), OPERATING_SYSTEMS),
       pushedAfter: positiveInt(get("since")),
       query: get("q") ?? DEFAULT_FILTER.query,
-      rateLimited: oneOf(get("rl"), TRIS),
+      rateLimited: decodeTri<Tri>(get("rl"), TRIS),
       scope: decodeTri<Scope>(get("scope"), SCOPES),
       tripleA: get("aaa") === "1",
     },

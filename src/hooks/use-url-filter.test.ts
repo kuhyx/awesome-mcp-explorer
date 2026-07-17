@@ -19,7 +19,7 @@ describe("useUrlFilter", () => {
     globalThis.history.replaceState(null, "", "/?aaa=1&foss=yes&sort=name");
     const { result } = renderHook(() => useUrlFilter());
     expect(result.current.filter.tripleA).toBe(true);
-    expect(result.current.filter.foss).toBe("yes");
+    expect(result.current.filter.foss.includes).toEqual(["yes"]);
     expect(result.current.sort.key).toBe("name");
   });
 
@@ -80,6 +80,6 @@ describe("useUrlFilter", () => {
     act(() => {
       result.current.setFilter({ ...DEFAULT_FILTER, query: "ab" });
     });
-    expect(globalThis.history.length).toBe(before);
+    expect(globalThis.history).toHaveLength(before);
   });
 });

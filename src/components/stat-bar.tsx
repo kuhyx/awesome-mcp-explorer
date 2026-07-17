@@ -14,11 +14,11 @@ const SORT_LABELS: Readonly<Record<SortKey, string>> = {
 };
 
 export interface StatBarProps {
+  readonly filterActive: boolean;
   readonly onExport: (format: ExportFormat) => void;
   readonly onReset: () => void;
   readonly onShare: () => void;
   readonly onSort: (next: SortState) => void;
-  readonly filterActive: boolean;
   readonly shown: number;
   readonly sort: SortState;
   readonly total: number;

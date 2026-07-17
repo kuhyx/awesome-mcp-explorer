@@ -22,12 +22,12 @@ const GLYPHS: Readonly<Record<TriValue, string>> = {
 export interface TriStatePickerProps<T extends string> {
   /** Count of matching servers per option, from the currently filtered set. */
   readonly counts: ReadonlyMap<T, number>;
+  /** Renders an option's display name; defaults to the raw value. */
+  readonly format?: (option: T) => string;
   readonly label: string;
   readonly onChange: (next: TriSelect<T>) => void;
   readonly options: readonly T[];
   readonly value: TriSelect<T>;
-  /** Renders an option's display name; defaults to the raw value. */
-  readonly format?: (option: T) => string;
 }
 
 export function stateOf<T extends string>(select: TriSelect<T>, option: T): TriValue {
@@ -37,10 +37,15 @@ export function stateOf<T extends string>(select: TriSelect<T>, option: T): TriV
 }
 
 /** off -> include -> exclude -> off, rebuilding both lists from the new state. */
+/** The cycle order, as a table rather than nested ternaries. */
+const NEXT_STATE: Readonly<Record<TriValue, TriValue>> = {
+  exclude: "off",
+  include: "exclude",
+  off: "include",
+};
+
 export function cycle<T extends string>(select: TriSelect<T>, option: T): TriSelect<T> {
-  const current = stateOf(select, option);
-  const next: TriValue =
-    current === "off" ? "include" : current === "include" ? "exclude" : "off";
+  const next = NEXT_STATE[stateOf(select, option)];
 
   const includes = select.includes.filter((v) => v !== option);
   const excludes = select.excludes.filter((v) => v !== option);
@@ -55,9 +60,11 @@ export function summarize<T extends string>(
   format: (option: T) => string,
 ): string {
   const parts: string[] = [];
-  if (select.includes.length > 0) parts.push(select.includes.map(format).join(", "));
+  if (select.includes.length > 0) {
+    parts.push(select.includes.map((v) => format(v)).join(", "));
+  }
   if (select.excludes.length > 0) {
-    parts.push(`not ${select.excludes.map(format).join(", ")}`);
+    parts.push(`not ${select.excludes.map((v) => format(v)).join(", ")}`);
   }
   return parts.length === 0 ? "Any" : parts.join(" · ");
 }

@@ -59,8 +59,8 @@ describe("round trip", () => {
 
   it("survives every scalar filter", () => {
     const f = filter({
-      cost: "likely-free",
-      foss: "yes",
+      cost: { excludes: [], includes: ["likely-free", "unknown"] },
+      foss: { excludes: ["no"], includes: ["yes"] },
       gradeCoverage: "graded-all",
       hideArchived: true,
       maxStars: 5000,
@@ -68,7 +68,7 @@ describe("round trip", () => {
       official: true,
       pushedAfter: 1_700_000_000_000,
       query: "postgres",
-      rateLimited: "no",
+      rateLimited: { excludes: [], includes: ["no"] },
       tripleA: true,
     });
     expect(roundTrip(f).filter).toEqual(f);
@@ -120,9 +120,22 @@ describe("decodeFilter on hostile input", () => {
   });
 
   it("ignores a value outside the vocabulary", () => {
-    expect(decodeFilter("foss=maybe").filter.foss).toBeNull();
-    expect(decodeFilter("cost=cheap").filter.cost).toBeNull();
+    expect(decodeFilter("foss=maybe").filter.foss).toEqual({
+      excludes: [],
+      includes: [],
+    });
+    expect(decodeFilter("cost=cheap").filter.cost).toEqual({
+      excludes: [],
+      includes: [],
+    });
     expect(decodeFilter("cov=sort-of").filter.gradeCoverage).toBeNull();
+  });
+
+  it("reads several licence values from one param", () => {
+    expect(decodeFilter("foss=yes,unknown").filter.foss).toEqual({
+      excludes: [],
+      includes: ["yes", "unknown"],
+    });
   });
 
   it("drops unknown members of a tri-state but keeps valid ones", () => {

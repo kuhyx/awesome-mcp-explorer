@@ -23,6 +23,7 @@ const STORAGE_KEY = "awesome-mcp-explorer:presets";
 export const BUILTIN_PRESETS: readonly Preset[] = [
   { name: "Triple-A only", search: "aaa=1" },
   { name: "Triple-A + FOSS", search: "aaa=1&foss=yes" },
+  { name: "Free or unknown cost", search: "cost=likely-free,unknown" },
   { name: "Official implementations", search: "official=1" },
   { name: "Local-only, no cloud", search: "scope=local,!cloud" },
   { name: "Actively maintained", search: "live=1&sort=pushed" },

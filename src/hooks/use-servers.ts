@@ -20,16 +20,16 @@ export function useServers(url = "servers.json"): ServersState {
   const [state, setState] = useState<ServersState>({ kind: "loading" });
 
   useEffect(() => {
-    let cancelled = false;
+    let isCancelled = false;
 
     async function load(): Promise<void> {
       try {
         const response = await fetch(url);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const servers = (await response.json()) as Server[];
-        if (!cancelled) setState({ kind: "ready", servers });
+        if (!isCancelled) setState({ kind: "ready", servers });
       } catch (error) {
-        if (!cancelled) {
+        if (!isCancelled) {
           setState({
             kind: "error",
             message: Error.isError(error) ? error.message : String(error),
@@ -40,7 +40,7 @@ export function useServers(url = "servers.json"): ServersState {
 
     void load();
     return (): void => {
-      cancelled = true;
+      isCancelled = true;
     };
   }, [url]);
 

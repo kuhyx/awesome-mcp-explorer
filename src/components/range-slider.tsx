@@ -12,7 +12,12 @@
  */
 import { useCallback, useRef } from "react";
 
-import { fractionFromPointer, quantileValue, valueQuantile } from "../lib/quantile.ts";
+import {
+  fractionFromPointer,
+  nth,
+  quantileValue,
+  valueQuantile,
+} from "../lib/quantile.ts";
 
 export interface RangeSliderProps {
   /** Formats a value for display, e.g. star counts or dates. */
@@ -38,13 +43,21 @@ export function RangeSlider({
   min,
   onChange,
   values,
-}: RangeSliderProps): React.JSX.Element | null {
-  const trackRef = useRef<HTMLDivElement>(null);
+}: RangeSliderProps): null | React.JSX.Element {
+  const trackReference = useRef<HTMLDivElement>(null);
   const dragging = useRef<"hi" | "lo" | null>(null);
+
+  // One callback per thumb rather than a curried factory: the factory was
+  // created during render and closed over the ref, which the React Compiler
+  // (rightly) reads as touching a ref during render.
+  const startDrag = useCallback((thumb: "hi" | "lo", event: React.PointerEvent): void => {
+    dragging.current = thumb;
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }, []);
 
   const handleMove = useCallback(
     (clientX: number): void => {
-      const track = trackRef.current;
+      const track = trackReference.current;
       if (track === null || dragging.current === null) return;
       const fraction = fractionFromPointer(track.getBoundingClientRect(), clientX);
       const value = quantileValue(values, fraction);
@@ -57,15 +70,15 @@ export function RangeSlider({
   // Fewer than two distinct values means there is nothing to range over.
   if (values.length < 2) return null;
 
-  const lowest = values[0] ?? 0;
-  const highest = values.at(-1) ?? 0;
+  // Safe indexing, not `?? 0`: the guard above guarantees two or more values,
+  // so a default would be an untestable branch that hides a real bug if the
+  // guard ever changes.
+  const lowest = nth(values, 0);
+  const highest = nth(values, values.length - 1);
   const loFraction = valueQuantile(values, min);
   const hiFraction = valueQuantile(values, max);
 
-  const startDrag = (thumb: "hi" | "lo") => (event: React.PointerEvent): void => {
-    dragging.current = thumb;
-    event.currentTarget.setPointerCapture(event.pointerId);
-  };
+
 
   return (
     <div className="facet">
@@ -83,7 +96,7 @@ export function RangeSlider({
         onPointerUp={(): void => {
           dragging.current = null;
         }}
-        ref={trackRef}
+        ref={trackReference}
       >
         <div
           className="slider-fill"
@@ -98,7 +111,9 @@ export function RangeSlider({
           aria-valuemin={lowest}
           aria-valuenow={min}
           className="slider-thumb"
-          onPointerDown={startDrag("lo")}
+          onPointerDown={(event): void => {
+            startDrag("lo", event);
+          }}
           role="slider"
           style={{ left: `${loFraction * 100}%` }}
           tabIndex={0}
@@ -110,7 +125,9 @@ export function RangeSlider({
           aria-valuemin={lowest}
           aria-valuenow={max}
           className="slider-thumb"
-          onPointerDown={startDrag("hi")}
+          onPointerDown={(event): void => {
+            startDrag("hi", event);
+          }}
           role="slider"
           style={{ left: `${hiFraction * 100}%` }}
           tabIndex={0}

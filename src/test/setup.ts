@@ -21,7 +21,7 @@ beforeEach(() => {
 // every access in try/catch precisely because private browsing throws too. This
 // stub is so tests exercise the working path rather than only the fallback.)
 class MemoryStorage implements Storage {
-  #items = new Map<string, string>();
+  readonly #items = new Map<string, string>();
 
   get length(): number {
     return this.#items.size;
@@ -36,7 +36,7 @@ class MemoryStorage implements Storage {
   }
 
   key(index: number): null | string {
-    return [...this.#items.keys()][index] ?? null;
+    return this.#items.keys().toArray()[index] ?? null;
   }
 
   removeItem(key: string): void {
@@ -124,7 +124,7 @@ Object.defineProperty(Element.prototype, "getBoundingClientRect", {
       width: 1200,
       x: 0,
       y: 0,
-    } as DOMRect;
+    };
   },
 });
 

@@ -6,7 +6,14 @@
  * prop-drilling shape rather than a store — with one owner and one level of
  * children, a store would be ceremony.
  */
-import { useCallback, useDeferredValue, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useDeferredValue,
+
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import type { ExportFormat } from "./lib/export.ts";
 import type { Preset } from "./lib/presets.ts";
@@ -18,9 +25,9 @@ import { StatBar } from "./components/stat-bar.tsx";
 import { useKeyboard } from "./hooks/use-keyboard.ts";
 import { useServers } from "./hooks/use-servers.ts";
 import { useUrlFilter } from "./hooks/use-url-filter.ts";
+import { exportServers, FILE_EXTENSIONS, MIME_TYPES } from "./lib/export.ts";
 import { computeFacets, pushedValues, starValues, ungradedCount } from "./lib/facets.ts";
 import { applyFilterSort, DEFAULT_FILTER, isFilterActive } from "./lib/filter-sort.ts";
-import { exportServers, FILE_EXTENSIONS, MIME_TYPES } from "./lib/export.ts";
 import { addPreset, applyPreset, loadPresets, removePreset, savePresets } from "./lib/presets.ts";
 
 export function App(): React.JSX.Element {
@@ -30,16 +37,16 @@ export function App(): React.JSX.Element {
     loadPresets(globalThis.localStorage),
   );
   const [showHelp, setShowHelp] = useState(false);
-  const searchRef = useRef<HTMLInputElement>(null);
+  const searchReference = useRef<HTMLInputElement>(null);
 
   useKeyboard(
     useMemo(
       () => ({
         onClear: (): void => {
           setShowHelp(false);
-          searchRef.current?.blur();
+          searchReference.current?.blur();
         },
-        onFocusSearch: (): void => searchRef.current?.focus(),
+        onFocusSearch: (): void => searchReference.current?.focus(),
         onToggleHelp: (): void => {
           setShowHelp((open) => !open);
         },
@@ -68,10 +75,18 @@ export function App(): React.JSX.Element {
   const pushed = useMemo(() => pushedValues(servers), [servers]);
   const ungraded = useMemo(() => ungradedCount(results), [results]);
   const categories = useMemo(
-    () => [...new Set(servers.flatMap((s) => s.categories))].sort((a, b) => a.localeCompare(b)),
+    () =>
+      [...new Set(servers.flatMap((s) => s.categories))].toSorted((a, b) =>
+        a.localeCompare(b),
+      ),
     [servers],
   );
-  const now = useMemo(() => Date.now(), []);
+  // Read once, via a lazy initialiser rather than useMemo or an effect.
+  // Date.now() is impure, and the React Compiler is entitled to re-run or
+  // memoise render as it pleases; a useState initialiser is the one place React
+  // guarantees exactly-once. Row ages are relative to page load, which is what
+  // "3d ago" should mean anyway.
+  const [now] = useState(() => Date.now());
 
   const handleExport = useCallback(
     (format: ExportFormat) => {
@@ -145,7 +160,7 @@ export function App(): React.JSX.Element {
             setFilter({ ...filter, query: event.target.value });
           }}
           placeholder="Fuzzy search name or description…  (/)"
-          ref={searchRef}
+          ref={searchReference}
           type="search"
           value={filter.query}
         />

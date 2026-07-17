@@ -12,7 +12,7 @@
  *    read as "no such servers exist".
  */
 import type { FilterState } from "../lib/filter-sort.ts";
-import type { Grade, GradeAxis, GradeCoverage } from "../lib/grade.ts";
+import type { GradeAxis, GradeCoverage } from "../lib/grade.ts";
 
 import { GRADE_AXES, GRADES } from "../lib/grade.ts";
 
@@ -26,9 +26,9 @@ export interface GradeFilterProps {
   readonly coverageCounts: ReadonlyMap<GradeCoverage, number>;
   readonly filter: FilterState;
   readonly onChange: (next: FilterState) => void;
+  readonly tripleACount: number;
   /** Servers in the current result set that Glama has never graded. */
   readonly ungraded: number;
-  readonly tripleACount: number;
 }
 
 export function GradeFilter({
@@ -38,7 +38,7 @@ export function GradeFilter({
   tripleACount,
   ungraded,
 }: GradeFilterProps): React.JSX.Element {
-  const gradeFilterActive =
+  const isGradeFilterActive =
     filter.tripleA ||
     filter.gradeCoverage !== null ||
     Object.keys(filter.minGrades).length > 0;
@@ -71,10 +71,18 @@ export function GradeFilter({
             <span>{axis} ≥</span>
             <select
               onChange={(event): void => {
-                const value = event.target.value;
-                const next = { ...filter.minGrades };
-                if (value === "") delete next[axis];
-                else next[axis] = value as Grade;
+                // Rebuilt from entries rather than a dynamic delete: "any"
+                // means the axis is absent, not present-and-empty, and an
+                // empty-string grade would fail every comparison silently.
+                const chosen = event.target.value;
+                const next = Object.fromEntries(
+                  GRADE_AXES.flatMap((a) => {
+                    const grade = a === axis ? chosen : filter.minGrades[a];
+                    return grade === undefined || grade === ""
+                      ? []
+                      : [[a, grade] as const];
+                  }),
+                );
                 onChange({ ...filter, minGrades: next });
               }}
               value={filter.minGrades[axis] ?? ""}
@@ -110,7 +118,7 @@ export function GradeFilter({
         ))}
       </div>
 
-      {gradeFilterActive && ungraded > 0 && (
+      {isGradeFilterActive && ungraded > 0 && (
         <p className="warn" role="status">
           {ungraded} matching server{ungraded === 1 ? " has" : "s have"} no Glama grade
           at all and cannot satisfy a grade filter. An empty result here means “none

@@ -43,8 +43,9 @@ export interface SortState {
 
 export interface FilterState {
   readonly categories: TriSelect<string>;
-  readonly cost: Cost | null;
-  readonly foss: null | Tri;
+  /** Multi-select: "likely-free OR unknown" is a normal thing to want. */
+  readonly cost: TriSelect<Cost>;
+  readonly foss: TriSelect<Tri>;
   readonly gradeCoverage: GradeCoverage | null;
   /** Hide repos GitHub reports as archived. */
   readonly hideArchived: boolean;
@@ -59,7 +60,7 @@ export interface FilterState {
   readonly pushedAfter: null | number;
   /** Fuzzy subsequence query over name, owner and description. */
   readonly query: string;
-  readonly rateLimited: null | Tri;
+  readonly rateLimited: TriSelect<Tri>;
   readonly scope: TriSelect<Scope>;
   /** Require all three axes to be exactly A — the headline filter. */
   readonly tripleA: boolean;
@@ -67,8 +68,8 @@ export interface FilterState {
 
 export const DEFAULT_FILTER: FilterState = {
   categories: EMPTY_TRI,
-  cost: null,
-  foss: null,
+  cost: EMPTY_TRI,
+  foss: EMPTY_TRI,
   gradeCoverage: null,
   hideArchived: false,
   languages: EMPTY_TRI,
@@ -79,7 +80,7 @@ export const DEFAULT_FILTER: FilterState = {
   os: EMPTY_TRI,
   pushedAfter: null,
   query: "",
-  rateLimited: null,
+  rateLimited: EMPTY_TRI,
   scope: EMPTY_TRI,
   tripleA: false,
 };
@@ -148,7 +149,12 @@ function passesGrades(server: Server, filter: FilterState): boolean {
 }
 
 function passesGithub(server: Server, filter: FilterState): boolean {
-  if (filter.foss !== null && server.gh?.isFoss !== filter.foss) return false;
+  // A repo GitHub could not read has no licence answer at all: an empty list
+  // fails an allowlist but passes a denylist, the same reading the other
+  // pickers give a server with no markers.
+  if (!passesTri(server.gh === null ? [] : [server.gh.isFoss], filter.foss)) {
+    return false;
+  }
   if (filter.hideArchived && server.gh?.archived === true) return false;
   if (filter.minStars !== null && (server.gh?.stars ?? 0) < filter.minStars) {
     return false;
@@ -171,10 +177,8 @@ export function passesFilters(server: Server, filter: FilterState): boolean {
   if (!passesTri(server.scope, filter.scope)) return false;
   if (!passesTri(server.os, filter.os)) return false;
   if (!passesTri(server.categories, filter.categories)) return false;
-  if (filter.cost !== null && server.cost.value !== filter.cost) return false;
-  if (filter.rateLimited !== null && server.rateLimited.value !== filter.rateLimited) {
-    return false;
-  }
+  if (!passesTri([server.cost.value], filter.cost)) return false;
+  if (!passesTri([server.rateLimited.value], filter.rateLimited)) return false;
   if (!passesGrades(server, filter)) return false;
   return passesGithub(server, filter);
 }

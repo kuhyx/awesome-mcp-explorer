@@ -43,7 +43,9 @@ export interface UrlFilter {
 }
 
 export function useUrlFilter(): UrlFilter {
-  const search = useSyncExternalStore(subscribe, getSearch, () => "");
+  // No getServerSnapshot: this app never renders on a server, and passing
+  // one would add a function that can never run.
+  const search = useSyncExternalStore(subscribe, getSearch);
   const { filter, sort } = decodeFilter(search);
 
   const write = useCallback((next: FilterState, nextSort: SortState): void => {

@@ -9,7 +9,12 @@
 import type { GradeCoverage } from "./grade.ts";
 import type { Cost, Language, Os, Scope, Server, Tri } from "./server.ts";
 
-import { gradeCoverage } from "./grade.ts";
+import { gradeCoverage, isTripleA as isAllA } from "./grade.ts";
+
+/** Triple-A, tolerating an unindexed server. */
+function isTripleA(grades: Server["glama"]): boolean {
+  return grades !== null && isAllA(grades);
+}
 
 export interface Facets {
   readonly categories: ReadonlyMap<string, number>;
@@ -53,13 +58,7 @@ export function computeFacets(servers: readonly Server[]): Facets {
     // inflating any bucket.
     if (server.gh !== null) tally(foss, server.gh.isFoss);
     if (server.official) official += 1;
-    if (
-      server.glama?.license === "A" &&
-      server.glama.quality === "A" &&
-      server.glama.maintenance === "A"
-    ) {
-      tripleA += 1;
-    }
+    if (isTripleA(server.glama)) tripleA += 1;
   }
 
   return {
@@ -86,7 +85,7 @@ export function computeFacets(servers: readonly Server[]): Facets {
 export function starValues(servers: readonly Server[]): number[] {
   return servers
     .flatMap((s) => (s.gh === null ? [] : [s.gh.stars]))
-    .sort((a, b) => a - b);
+    .toSorted((a, b) => a - b);
 }
 
 /** Ascending last-push timestamps (epoch ms), for the recency slider. */
@@ -97,7 +96,7 @@ export function pushedValues(servers: readonly Server[]): number[] {
       const t = Date.parse(s.gh.pushedAt);
       return Number.isNaN(t) ? [] : [t];
     })
-    .sort((a, b) => a - b);
+    .toSorted((a, b) => a - b);
 }
 
 /**

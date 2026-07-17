@@ -15,14 +15,14 @@ function stubFetch(impl: () => Promise<Response>): void {
 
 describe("useServers", () => {
   it("starts loading", () => {
-    stubFetch(() => new Promise(() => undefined));
+    stubFetch(() => new Promise(() => {}));
     const { result } = renderHook(() => useServers());
     expect(result.current.kind).toBe("loading");
   });
 
   it("returns the servers once loaded", async () => {
     stubFetch(() =>
-      Promise.resolve(new Response(JSON.stringify(SERVERS), { status: 200 })),
+      Promise.resolve(Response.json(SERVERS, { status: 200 })),
     );
     const { result } = renderHook(() => useServers());
     await waitFor(() => {
@@ -60,22 +60,31 @@ describe("useServers", () => {
   });
 
   it("fetches the given url", () => {
-    stubFetch(() => new Promise(() => undefined));
+    stubFetch(() => new Promise(() => {}));
     renderHook(() => useServers("other.json"));
     expect(globalThis.fetch).toHaveBeenCalledWith("other.json");
   });
 
+  it("does not set state after unmount when the fetch rejects late", async () => {
+    // The mirror of the success path: a component torn down before the request
+    // fails must not try to render an error into a dead tree.
+    const { promise, reject } = Promise.withResolvers<Response>();
+    stubFetch(() => promise);
+    const { result, unmount } = renderHook(() => useServers());
+    unmount();
+    reject(new Error("late failure"));
+    await waitFor(() => {
+      expect(globalThis.fetch).toHaveBeenCalled();
+    });
+    expect(result.current.kind).toBe("loading");
+  });
+
   it("does not set state after unmount", async () => {
-    let resolve: ((response: Response) => void) | undefined;
-    stubFetch(
-      () =>
-        new Promise<Response>((r) => {
-          resolve = r;
-        }),
-    );
+    const { promise, resolve } = Promise.withResolvers<Response>();
+    stubFetch(() => promise);
     const { unmount } = renderHook(() => useServers());
     unmount();
-    resolve?.(new Response(JSON.stringify(SERVERS), { status: 200 }));
+    resolve(Response.json(SERVERS, { status: 200 }));
     // A late setState on an unmounted component would warn; none should appear.
     await waitFor(() => {
       expect(globalThis.fetch).toHaveBeenCalled();
