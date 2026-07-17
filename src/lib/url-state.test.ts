@@ -94,6 +94,46 @@ describe("round trip", () => {
     expect(roundTrip(DEFAULT_FILTER, s).sort).toEqual(s);
   });
 
+  it("survives a category containing a COMMA, the separator itself", () => {
+    // Regression: "Biology, Medicine and Bioinformatics" is the only one of 54
+    // categories with a comma. Its own comma used to be written literally, so
+    // it split into "Biology" and " Medicine and Bioinformatics", matched
+    // nothing, and the sidebar promised 8 servers while the list showed none.
+    const bio = "Biology, Medicine and Bioinformatics";
+    const f = filter({ categories: { excludes: [], includes: [bio] } });
+    expect(roundTrip(f).filter.categories.includes).toEqual([bio]);
+  });
+
+  it("keeps a comma-bearing value distinct from two values", () => {
+    const one = filter({
+      categories: { excludes: [], includes: ["Biology, Medicine"] },
+    });
+    const two = filter({
+      categories: { excludes: [], includes: ["Biology", "Medicine"] },
+    });
+    expect(encodeFilter(one, DEFAULT_SORT)).not.toBe(
+      encodeFilter(two, DEFAULT_SORT),
+    );
+    expect(roundTrip(one).filter.categories.includes).toEqual(["Biology, Medicine"]);
+    expect(roundTrip(two).filter.categories.includes).toEqual(["Biology", "Medicine"]);
+  });
+
+  it("survives an excluded category containing a comma", () => {
+    const bio = "Biology, Medicine and Bioinformatics";
+    const f = filter({ categories: { excludes: [bio], includes: [] } });
+    expect(roundTrip(f).filter.categories.excludes).toEqual([bio]);
+  });
+
+  it("decodes the exact URL the sidebar produces for that category", () => {
+    const { filter: decoded } = decodeFilter(
+      "aaa=1&cat=Biology%2C%20Medicine%20and%20Bioinformatics",
+    );
+    expect(decoded.tripleA).toBe(true);
+    expect(decoded.categories.includes).toEqual([
+      "Biology, Medicine and Bioinformatics",
+    ]);
+  });
+
   it("survives a category containing a space and an ampersand", () => {
     const f = filter({
       categories: { excludes: [], includes: ["Search & Data Extraction"] },
@@ -117,6 +157,15 @@ describe("decodeFilter on hostile input", () => {
 
   it("ignores unknown params", () => {
     expect(decodeFilter("nonsense=1&whatever=2").filter).toEqual(DEFAULT_FILTER);
+  });
+
+  it("reads a bare key with no '=' as an empty value", () => {
+    // `?aaa` is a legal query string, and a flag reads as set only on "1", so a
+    // valueless flag stays off rather than throwing on the missing separator.
+    expect(decodeFilter("aaa").filter.tripleA).toBe(false);
+    expect(decodeFilter("q").filter.query).toBe("");
+    // A bare key alongside a real one must not swallow its neighbour.
+    expect(decodeFilter("live&aaa=1").filter.tripleA).toBe(true);
   });
 
   it("ignores a value outside the vocabulary", () => {
@@ -158,6 +207,12 @@ describe("decodeFilter on hostile input", () => {
       includes: [],
     });
     expect(decodeFilter("cat=a,,b").filter.categories.includes).toEqual(["a", "b"]);
+  });
+
+  it("ignores a token with a stray percent rather than throwing", () => {
+    // decodeURIComponent throws on a lone '%'; a hand-edited link must still open.
+    expect(decodeFilter("cat=%zz").filter.categories.includes).toEqual([]);
+    expect(decodeFilter("q=%zz").filter.query).toBe("");
   });
 
   it("ignores a malformed minimum grade", () => {

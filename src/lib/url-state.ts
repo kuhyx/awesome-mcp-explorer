@@ -46,6 +46,19 @@ const COVERAGES: readonly GradeCoverage[] = [
 const EXCLUDE_MARK = "!";
 
 /**
+ * Encodes one member of a tri-state list.
+ *
+ * A comma inside a value MUST stay percent-encoded, because a bare comma is
+ * this format's separator. Exactly one of the 54 categories contains one —
+ * "Biology, Medicine and Bioinformatics" — and leaving its comma literal split
+ * it into two tokens that matched nothing, so the sidebar promised 8 servers
+ * and the list then showed none.
+ */
+function encodeToken(value: string): string {
+  return encodeURIComponent(value);
+}
+
+/**
  * A tri-state as one param.
  *
  * One param rather than two (`langIn`/`langEx`) so a filter reads as a single
@@ -53,20 +66,39 @@ const EXCLUDE_MARK = "!";
  */
 function encodeTri<T extends string>(select: TriSelect<T>): string {
   return [
-    ...select.includes,
-    ...select.excludes.map((v) => `${EXCLUDE_MARK}${v}`),
+    ...select.includes.map((v) => encodeToken(v)),
+    ...select.excludes.map((v) => `${EXCLUDE_MARK}${encodeToken(v)}`),
   ].join(",");
 }
 
+/**
+ * Splits a **raw**, still-percent-encoded value, decoding each token after the
+ * split. The order matters: URLSearchParams decodes eagerly, which turns a
+ * value's own `%2C` back into a comma before there is any way to tell it apart
+ * from a separator.
+ */
 function splitTri(raw: string): { excludes: string[]; includes: string[] } {
   const includes: string[] = [];
   const excludes: string[] = [];
   for (const token of raw.split(",")) {
     if (token === "" || token === EXCLUDE_MARK) continue;
-    if (token.startsWith(EXCLUDE_MARK)) excludes.push(token.slice(1));
-    else includes.push(token);
+    const isExcluded = token.startsWith(EXCLUDE_MARK);
+    const value = decodeToken(isExcluded ? token.slice(1) : token);
+    if (value === "") continue;
+    (isExcluded ? excludes : includes).push(value);
   }
   return { excludes, includes };
+}
+
+/** Decodes a token, tolerating malformed input from a hand-edited URL. */
+function decodeToken(token: string): string {
+  try {
+    return decodeURIComponent(token);
+  } catch {
+    // A stray '%' makes decodeURIComponent throw; a shared link should degrade
+    // to ignoring that token, never to a blank page.
+    return "";
+  }
 }
 
 function decodeTri<T extends string>(
@@ -103,7 +135,7 @@ function decodeMinGrades(raw: null | string): FilterState["minGrades"] {
   if (raw === null || raw === "") return {};
   const out: Partial<Record<GradeAxis, Grade>> = {};
   for (const token of raw.split(",")) {
-    const [axis, grade] = token.split(":", 2);
+    const [axis, grade] = decodeToken(token).split(":", 2);
     if (!GRADE_AXES.includes(axis as GradeAxis)) continue;
     if (!GRADES.includes(grade as Grade)) continue;
     out[axis as GradeAxis] = grade as Grade;
@@ -123,18 +155,34 @@ function positiveInt(raw: null | string): null | number {
 }
 
 /**
- * Percent-encodes a value, then restores the delimiters this encoding uses.
+ * Percent-encodes a scalar value.
  *
- * `URLSearchParams.toString()` would escape `,` `!` and `:` into `%2C` `%21`
- * `%3A`, turning a shareable link into `lang=%2Crust%2C%21python`. Those three
- * characters are legal in a query string, and readability is the entire point
- * of putting the state in the URL — a link you can eyeball and hand-edit.
+ * Unlike {@link encodeTri}'s output, which is already encoded per token, this
+ * escapes everything — a scalar has no internal structure to preserve.
  */
 function encodeValue(value: string): string {
-  return encodeURIComponent(value)
-    .replaceAll("%2C", ",")
-    .replaceAll("%21", "!")
-    .replaceAll("%3A", ":");
+  return encodeURIComponent(value);
+}
+
+/**
+ * The query string's params with their values left **encoded**.
+ *
+ * Hand-rolled instead of URLSearchParams, which decodes on read: a category's
+ * own `%2C` would come back as a comma and be indistinguishable from the
+ * separator between two categories. Splitting first and decoding second is the
+ * only order that can tell them apart.
+ */
+function rawParameters(search: string): Map<string, string> {
+  const parameters = new Map<string, string>();
+  for (const pair of search.replace(/^\?/, "").split("&")) {
+    if (pair === "") continue;
+    const eq = pair.indexOf("=");
+    // A bare key with no `=` (`?aaa`) is a valid query string; it contributes an
+    // empty value rather than being skipped, so `?aaa` and `?aaa=` agree.
+    const key = eq === -1 ? pair : pair.slice(0, eq);
+    parameters.set(decodeToken(key), eq === -1 ? "" : pair.slice(eq + 1));
+  }
+  return parameters;
 }
 
 /** A flag contributes its key only when set. */
@@ -180,9 +228,16 @@ export function encodeFilter(
     ["dir", sort.dir === DEFAULT_SORT.dir ? null : sort.dir],
   ];
 
+  // Tri-state and min-grade values arrive pre-encoded per token, so they are
+  // passed through; everything else is a scalar with no internal structure.
+  const PRE_ENCODED = new Set(["cat", "cost", "foss", "lang", "min", "os", "rl", "scope"]);
   return fields
     .filter((field) => field[1] !== null)
-    .map(([key, value]) => `${key}=${encodeValue(String(value))}`)
+    .map(([key, value]) =>
+      PRE_ENCODED.has(key)
+        ? `${key}=${String(value)}`
+        : `${key}=${encodeValue(String(value))}`,
+    )
     .join("&");
 }
 
@@ -190,26 +245,32 @@ export function decodeFilter(search: string): {
   filter: FilterState;
   sort: { dir: SortDirection; key: SortKey };
 } {
-  const parameters = new URLSearchParams(search);
-  const get = (key: string): null | string => parameters.get(key);
+  const parameters = rawParameters(search);
+  /** Raw (still encoded) — for values this format splits before decoding. */
+  const raw = (key: string): null | string => parameters.get(key) ?? null;
+  /** Decoded — for scalars. */
+  const get = (key: string): null | string => {
+    const value = parameters.get(key);
+    return value === undefined ? null : decodeToken(value);
+  };
 
   return {
     filter: {
-      categories: decodeCategoryTri(get("cat")),
-      cost: decodeTri<Cost>(get("cost"), COSTS),
-      foss: decodeTri<Tri>(get("foss"), TRIS),
+      categories: decodeCategoryTri(raw("cat")),
+      cost: decodeTri<Cost>(raw("cost"), COSTS),
+      foss: decodeTri<Tri>(raw("foss"), TRIS),
       gradeCoverage: oneOf(get("cov"), COVERAGES),
       hideArchived: get("live") === "1",
-      languages: decodeTri<Language>(get("lang"), LANGUAGES),
+      languages: decodeTri<Language>(raw("lang"), LANGUAGES),
       maxStars: positiveInt(get("maxStars")),
-      minGrades: decodeMinGrades(get("min")),
+      minGrades: decodeMinGrades(raw("min")),
       minStars: positiveInt(get("minStars")),
       official: get("official") === "1",
-      os: decodeTri<Os>(get("os"), OPERATING_SYSTEMS),
+      os: decodeTri<Os>(raw("os"), OPERATING_SYSTEMS),
       pushedAfter: positiveInt(get("since")),
       query: get("q") ?? DEFAULT_FILTER.query,
-      rateLimited: decodeTri<Tri>(get("rl"), TRIS),
-      scope: decodeTri<Scope>(get("scope"), SCOPES),
+      rateLimited: decodeTri<Tri>(raw("rl"), TRIS),
+      scope: decodeTri<Scope>(raw("scope"), SCOPES),
       tripleA: get("aaa") === "1",
     },
     sort: {
