@@ -16,7 +16,7 @@ set -euo pipefail
 # by readonly's own exit status (shellcheck SC2155).
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly SCRIPT_DIR
-readonly REQUIRED_NODE_MAJOR=22
+readonly REQUIRED_NODE_MAJOR=24
 
 PORT=5178
 REFRESH_DATA=false
@@ -45,21 +45,93 @@ die() {
     exit 1
 }
 
-# --- dependency checks -------------------------------------------------------
+# --- node --------------------------------------------------------------------
 #
-# Node and pnpm are the only things this script cannot install for you: Node is
-# a system package (use nvm/pacman), and pnpm ships with Node's corepack. The
-# project's own dependencies are installed below without asking.
+# The floor is node 24: the codebase uses Error.isError, which needs V8 13.6+.
+#
+# A too-old `node` on PATH is the normal case, not the broken one. nvm pins one
+# version per shell and it is routinely older than what the machine already has
+# sitting on disk — so refusing to start because `node -v` says 22, while a 24
+# and a 26 are both installed, is a bug in this script rather than a problem
+# with the machine. Look at every node on the box first; install only when none
+# of them qualifies.
+
+# Prints a node binary's major version, or 0 if it is missing or will not run.
+node_major_of() {
+    local binary="$1"
+    [[ -x "$binary" ]] || { echo 0; return; }
+    "$binary" -p 'process.versions.node.split(".")[0]' 2>/dev/null || echo 0
+}
+
+# Every node this machine has, version-manager copies first and newest-first
+# within them, so an nvm-managed 24 wins over a distro 26 only by being listed
+# first — both satisfy the floor and either is fine.
+list_node_candidates() {
+    local bin
+    for bin in "${NVM_DIR:-${HOME}/.nvm}/versions/node"/*/bin \
+               "${HOME}/.local/share/fnm/node-versions"/*/installation/bin; do
+        [[ -x "${bin}/node" ]] && printf '%s\n' "${bin}/node"
+    done | sort -Vr
+
+    command -v node 2>/dev/null || true
+    printf '%s\n' /usr/local/bin/node /usr/bin/node
+}
+
+# Echoes the first candidate meeting the floor; non-zero exit when there is none.
+find_usable_node() {
+    local candidate
+    while IFS= read -r candidate; do
+        if (( $(node_major_of "$candidate") >= REQUIRED_NODE_MAJOR )); then
+            printf '%s\n' "$candidate"
+            return 0
+        fi
+    done < <(list_node_candidates)
+    return 1
+}
+
+# Puts the chosen node ahead of whatever the shell had, for this run only. The
+# user's nvm default and system packages are deliberately left alone: running a
+# dev server is no reason to repoint someone's toolchain.
+use_node() {
+    local binary="$1"
+    PATH="$(dirname "$binary"):${PATH}"
+    export PATH
+    hash -r 2>/dev/null || true
+    echo "==> Using node $("$binary" -v) — ${binary}"
+}
+
+install_node_via_nvm() {
+    local nvm_sh="${NVM_DIR:-${HOME}/.nvm}/nvm.sh"
+    [[ -s "$nvm_sh" ]] || die "no node >= ${REQUIRED_NODE_MAJOR} and no nvm to install one with. Install nvm (https://github.com/nvm-sh/nvm) or run: sudo pacman -S nodejs"
+
+    echo "==> No node >= ${REQUIRED_NODE_MAJOR} found; installing the latest LTS via nvm"
+    # nvm is a shell function, so it exists only after sourcing — there is no
+    # binary to call. `set -u` is lifted across the source because nvm.sh reads
+    # several variables it does not itself define.
+    set +u
+    # shellcheck source=/dev/null
+    . "$nvm_sh"
+    nvm install --lts
+    set -u
+}
 
 check_node() {
-    command -v node >/dev/null 2>&1 || die "node is not installed (needs >= ${REQUIRED_NODE_MAJOR}). Try: pacman -S nodejs"
-
-    local major
-    major="$(node -p 'process.versions.node.split(".")[0]')"
-    if (( major < REQUIRED_NODE_MAJOR )); then
-        die "node ${major} is too old; this project needs >= ${REQUIRED_NODE_MAJOR} (it uses type stripping and Iterator Helpers)"
+    local binary
+    if binary="$(find_usable_node)"; then
+        use_node "$binary"
+        return
     fi
+
+    install_node_via_nvm
+    binary="$(find_usable_node)" \
+        || die "nvm install --lts finished but still no node >= ${REQUIRED_NODE_MAJOR}"
+    use_node "$binary"
 }
+
+# --- dependency checks -------------------------------------------------------
+#
+# pnpm ships with Node's corepack, and the project's own dependencies are
+# installed below without asking.
 
 check_pnpm() {
     if command -v pnpm >/dev/null 2>&1; then
