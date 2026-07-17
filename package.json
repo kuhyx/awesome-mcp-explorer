@@ -8,6 +8,7 @@
     "node": ">=24",
     "pnpm": ">=10"
   },
+  "packageManager": "pnpm@10.13.1",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

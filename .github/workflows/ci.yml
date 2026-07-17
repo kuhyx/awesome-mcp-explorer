@@ -22,9 +22,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # No version here on purpose: the action reads the pinned pnpm from
+      # package.json's packageManager field, the same source run.sh honours
+      # through corepack. One place to bump the version, and CI cannot drift to
+      # a newer 10.x than a developer has locally.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       # 24, not the newer default: it is the lowest version this code runs on.
       # Error.isError needs V8 13.6+, and Node 22 (V8 12.4) reports it as

@@ -23,6 +23,7 @@ REFRESH_DATA=false
 PRODUCTION_BUILD=false
 OPEN_BROWSER=true
 SERVER_PID=""
+COREPACK_SHIM_DIR=""
 
 cleanup() {
     if [[ -n "$SERVER_PID" ]] && kill -0 "$SERVER_PID" 2>/dev/null; then
@@ -30,6 +31,9 @@ cleanup() {
         echo "Stopping server (pid $SERVER_PID)..."
         kill "$SERVER_PID" 2>/dev/null || true
         wait "$SERVER_PID" 2>/dev/null || true
+    fi
+    if [[ -n "$COREPACK_SHIM_DIR" && -d "$COREPACK_SHIM_DIR" ]]; then
+        rm -rf "$COREPACK_SHIM_DIR"
     fi
 }
 
@@ -133,12 +137,36 @@ check_node() {
 # pnpm ships with Node's corepack, and the project's own dependencies are
 # installed below without asking.
 
-check_pnpm() {
-    if command -v pnpm >/dev/null 2>&1; then
-        return
-    fi
-    echo "pnpm not found; enabling it via corepack..."
-    corepack enable pnpm 2>/dev/null || die "could not enable pnpm. Try: npm install -g pnpm"
+# pnpm's version is pinned by package.json's `packageManager` field and honoured
+# through corepack, so the version here is identical to CI's. This is not
+# fussiness: node_modules records which pnpm installed it, and a different
+# *major* (a stray corepack default of 11.x, or a global install) refuses to
+# reuse the directory and aborts wanting to purge it -- the
+# ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY that bites when a wrong-major pnpm
+# happens to sit first on PATH. Routing through corepack removes the guesswork:
+# whatever is on PATH, the pinned version is what runs.
+setup_pnpm() {
+    command -v corepack >/dev/null 2>&1 \
+        || die "corepack not found; it ships with Node >= ${REQUIRED_NODE_MAJOR}. Reinstall Node, or: npm install -g pnpm@10"
+
+    # A run-scoped shim dir, prepended to PATH. Writing the shim here rather
+    # than into a Node bin means we never need write access to a system Node
+    # under /usr, and never mutate the user's global corepack state. The shim is
+    # corepack's dispatcher, which reads `packageManager` and runs exactly that
+    # version, shadowing any standalone pnpm further down PATH.
+    COREPACK_SHIM_DIR="$(mktemp -d)"
+    corepack enable --install-directory "$COREPACK_SHIM_DIR" pnpm \
+        || die "could not enable pnpm via corepack"
+    PATH="${COREPACK_SHIM_DIR}:${PATH}"
+    export PATH
+    hash -r 2>/dev/null || true
+
+    # Fetch the pinned version now so the first real command is not silently
+    # downloading mid-install. The env var keeps that download non-interactive
+    # (no "Is it ok to download pnpm@x?" prompt to hang an unattended run).
+    export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+    corepack install >/dev/null 2>&1 || true
+    echo "==> Using pnpm $(pnpm --version) (pinned in package.json)"
 }
 
 install_dependencies() {
@@ -250,7 +278,7 @@ main() {
     cd "$SCRIPT_DIR"
 
     check_node
-    check_pnpm
+    setup_pnpm
     install_dependencies
     ensure_dataset
     serve
