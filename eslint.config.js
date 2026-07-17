@@ -1,0 +1,133 @@
+// Maximally aggressive, type-aware flat config.
+//
+// Baseline is typescript-eslint's *type-checked* strict + stylistic presets, so
+// anything they flag is an error, not a warning. On top of that: unicorn (all),
+// sonarjs (cognitive complexity / duplicate logic), perfectionist (sorting), and
+// react-hooks. Unused disable directives are themselves errors, so every
+// `eslint-disable` in this repo must be load-bearing.
+//
+// Deliberately absent:
+//   - eslint-plugin-react   : 7.37.x still calls context.getFilename(), removed in
+//                             ESLint 10, so it crashes the run.
+//   - eslint-plugin-jsx-a11y: 6.10.2 declares peer ESLint "^3 || ... || ^9" — no
+//                             ESLint 10 support yet. a11y is enforced by review +
+//                             testing-library queries (getByLabelText) instead.
+//
+// TypeScript is pinned to 6.0.x, not 7.x: typescript-eslint requires
+// "typescript >=4.8.4 <6.1.0", and losing every type-aware rule would be a far
+// bigger regression than gaining the Go-native compiler.
+import js from "@eslint/js";
+import perfectionist from "eslint-plugin-perfectionist";
+import reactHooks from "eslint-plugin-react-hooks";
+import sonarjs from "eslint-plugin-sonarjs";
+import unicorn from "eslint-plugin-unicorn";
+import tseslint from "typescript-eslint";
+
+export default tseslint.config(
+  { ignores: ["dist", "coverage", "data/cache", "public/servers.json"] },
+  { linterOptions: { reportUnusedDisableDirectives: "error" } },
+
+  js.configs.recommended,
+  ...tseslint.configs.strictTypeChecked,
+  ...tseslint.configs.stylisticTypeChecked,
+  unicorn.configs.all,
+  sonarjs.configs.recommended,
+  perfectionist.configs["recommended-natural"],
+
+  {
+    files: ["**/*.{ts,tsx}"],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    plugins: { "react-hooks": reactHooks },
+    rules: {
+      ...reactHooks.configs.recommended.rules,
+
+      // Numbers in template literals are unambiguous and pervasive here
+      // (counts, star totals, grades).
+      "@typescript-eslint/restrict-template-expressions": [
+        "error",
+        { allowNumber: true },
+      ],
+
+      // Kebab-case files exporting PascalCase components: house convention.
+      "unicorn/filename-case": ["error", { case: "kebabCase" }],
+    },
+  },
+
+  // House overrides, applied to every file including this config itself.
+  //
+  // Each rule below is switched off deliberately: these are the cases where
+  // "more aggressive" makes the code worse rather than safer. A rule you must
+  // disable at every use site is worse than no rule at all, because
+  // reportUnusedDisableDirectives then turns the disables into their own debt.
+  {
+    rules: {
+      // Sorts Map entries by key. The marker table in parse-readme.ts is keyed
+      // by emoji codepoint, so "sorted" would mean ordered by
+      // U+1F396 < U+1F3CE < ... — meaningless to a reader, and it would shred
+      // the legend's own grouping (official, languages, scope, OS) into noise.
+      "perfectionist/sort-maps": "off",
+
+      // Alphabetises declarations within a file, which actively fights reading
+      // order: it would scatter `GRADES -> gradeRank -> isTripleA` into
+      // `compositeRank -> GRADES -> gradeCoverage`. Alphabetical order is not
+      // narrative order. Every *other* perfectionist rule stays on — sorting
+      // imports, union members and object keys destroys no narrative.
+      "perfectionist/sort-modules": "off",
+
+      // Wants JSDoc blocks written without leading `*`, which is neither the
+      // TypeScript convention nor what editors/typedoc render.
+      "unicorn/no-asterisk-prefix-in-documentation-comments": "off",
+
+      // Flags hand-wrapped comment prose. Comments here are wrapped to 80
+      // columns on purpose; the rule would force one long line per paragraph.
+      "unicorn/no-manually-wrapped-comments": "off",
+
+      // `null` is load-bearing here and cannot be replaced by `undefined`:
+      //   1. The pipeline's output is JSON, and JSON has no `undefined`. A
+      //      `glama: null` field is unavoidable in servers.json.
+      //   2. The two values mean different things in this domain — `null` is
+      //      "Glama never indexed this server", `undefined` is "indexed, but
+      //      this axis was not graded". Collapsing them would lose information
+      //      the UI displays differently (not-indexed vs graded-partial).
+      "unicorn/no-null": "off",
+
+      // The domain vocabulary is abbreviated on purpose: `os`, `spdx`, `repo`,
+      // `env` are the names the source data uses, and expanding them to
+      // `operatingSystem` / `repository` would obscure the mapping.
+      "unicorn/prevent-abbreviations": "off",
+    },
+  },
+
+  // Tests: relax the rules that fight with mocking and fixtures.
+  {
+    files: ["**/*.test.{ts,tsx}", "src/test/**", "scripts/**/__fixtures__/**"],
+    rules: {
+      "@typescript-eslint/no-non-null-assertion": "off",
+      "@typescript-eslint/unbound-method": "off",
+      "sonarjs/no-duplicate-string": "off",
+    },
+  },
+
+  // The vitest setup file exists *to* perform top-level side effects: it patches
+  // globals (ResizeObserver, layout metrics, pointer capture) that jsdom lacks,
+  // before any test imports run. These two rules cannot be satisfied by a file
+  // whose entire contract is "mutate the environment on import".
+  {
+    files: ["src/test/setup.ts"],
+    rules: {
+      "unicorn/no-top-level-assignment-in-function": "off",
+      "unicorn/no-top-level-side-effects": "off",
+    },
+  },
+
+  // Plain JS config files get no type-aware linting.
+  {
+    extends: [tseslint.configs.disableTypeChecked],
+    files: ["**/*.{js,mjs,cjs}"],
+  },
+);

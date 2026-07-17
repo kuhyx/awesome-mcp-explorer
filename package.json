@@ -1,0 +1,46 @@
+{
+  "name": "awesome-mcp-explorer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Power-user filter/sort explorer for punkpeye/awesome-mcp-servers, enriched with Glama grades and GitHub metadata.",
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "tsc --noEmit && eslint .",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage",
+    "build:data": "node --experimental-strip-types scripts/build-dataset.ts"
+  },
+  "dependencies": {
+    "@tanstack/react-virtual": "^3.14.6",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^26.1.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "@vitest/coverage-v8": "^4.1.10",
+    "eslint": "^10.7.0",
+    "eslint-plugin-perfectionist": "^5.10.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-sonarjs": "^4.2.0",
+    "eslint-plugin-unicorn": "^72.0.0",
+    "jsdom": "^29.1.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.64.0",
+    "vite": "^8.1.5",
+    "vitest": "^4.1.10"
+  }
+}
