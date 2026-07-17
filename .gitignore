@@ -2,3 +2,8 @@ node_modules/
 dist/
 coverage/
 data/cache/
+
+# Build artifact: rebuilt by `pnpm run build:data` (run.sh does it for you when
+# missing). Kept out of history because it is a 2.3 MB blob that churns wholly
+# on every refresh.
+public/servers.json

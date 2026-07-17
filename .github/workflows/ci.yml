@@ -1,0 +1,52 @@
+# Mirrors the local gate exactly, so green-local means green-CI:
+#   pnpm run lint      -> tsc --noEmit && eslint .
+#   pnpm run coverage  -> vitest, which fails below 100%
+#   pnpm run build     -> tsc -b && vite build
+#
+# The dataset is NOT built here. Tests run against committed fixtures, and
+# building it would need ~2,981 GitHub calls against a 1,000/hour limit for the
+# built-in GITHUB_TOKEN.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      # 24, not the newer default: it is the lowest version this code runs on.
+      # Error.isError needs V8 13.6+, and Node 22 (V8 12.4) reports it as
+      # undefined -- pinning CI to the floor is what stops a Node-26-only API
+      # from passing here and failing for someone on the LTS.
+      - uses: actions/setup-node@v4
+        with:
+          cache: pnpm
+          node-version: 24
+
+      # --frozen-lockfile: CI must fail on a lockfile that does not match
+      # package.json rather than silently resolving something else.
+      - run: pnpm install --frozen-lockfile
+
+      - name: Lint (typecheck + eslint)
+        run: pnpm run lint
+
+      - name: Shellcheck run.sh
+        run: shellcheck run.sh
+
+      - name: Tests + 100% coverage
+        run: pnpm run coverage
+
+      - name: Build
+        run: pnpm run build

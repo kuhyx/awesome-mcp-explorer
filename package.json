@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Power-user filter/sort explorer for punkpeye/awesome-mcp-servers, enriched with Glama grades and GitHub metadata.",
   "engines": {
-    "node": ">=22",
+    "node": ">=24",
     "pnpm": ">=10"
   },
   "scripts": {
