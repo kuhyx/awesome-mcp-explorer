@@ -1,19 +1,25 @@
 /**
  * Glama grade vocabulary and ordering.
  *
- * The scale was derived empirically from 627 glyph definitions across a
- * 110-badge sample of the live Glama badge endpoint: only A, A-, B, B-, C, D
- * and F were ever observed. In particular **no `+` glyph exists anywhere**,
- * which is what makes `isTripleA` safe to define as a literal `=== "A"` check:
- * there is no higher grade for it to silently exclude.
+ * The scale was derived empirically from the live badge endpoint: 627 glyph
+ * definitions across a 110-badge sample yielded only A, B, C, D and F, and
+ * **no `+` or `-` modifier exists**. The dash glyph that appears on some badges
+ * is not a modifier — it is a grey placeholder meaning "this axis was never
+ * graded" (see decode-badge.ts), verified against the rendered pages for
+ * Muvon/octocode and sooperset/mcp-atlassian, both of which show a dash in the
+ * quality slot and no quality grade at all in their HTML.
  *
- * `E` and the `+` variants are *presumed* absent rather than proven impossible,
- * so the badge decoder treats an unrecognised glyph as a hard error instead of
+ * That absence of modifiers is what makes {@link isTripleA} safe to define as a
+ * literal `=== "A"` check: there is no higher or intermediate grade for it to
+ * silently exclude.
+ *
+ * `E` and any modifier are *presumed* absent rather than proven impossible, so
+ * the badge decoder treats an unrecognised glyph as a hard error rather than
  * defaulting it into this scale.
  */
 
 /** Best to worst. Index doubles as the rank, so order here is load-bearing. */
-export const GRADES = ["A", "A-", "B", "B-", "C", "C-", "D", "F"] as const;
+export const GRADES = ["A", "B", "C", "D", "F"] as const;
 
 export type Grade = (typeof GRADES)[number];
 
@@ -40,21 +46,15 @@ export function isAtLeast(grade: Grade, min: Grade): boolean {
 }
 
 /**
- * The headline filter: all three axes graded, and all three exactly `A`.
+ * The headline filter: all three axes graded, and all three `A`.
  *
- * Deliberately strict — a server with `A-` on any axis is not triple-A. Use
- * {@link isABand} for the looser reading.
+ * There is no looser "A band" variant because the scale has no `A-`: with
+ * modifiers absent, "A or A-" would be the same set as this, so a second
+ * control would be a button that does nothing different. Callers wanting a
+ * softer bar should use {@link isAtLeast} per axis instead.
  */
 export function isTripleA(grades: Grades): boolean {
   return GRADE_AXES.every((axis) => grades[axis] === "A");
-}
-
-/** Looser triple-A: all three axes graded and all within the A band (A or A-). */
-export function isABand(grades: Grades): boolean {
-  return GRADE_AXES.every((axis) => {
-    const grade = grades[axis];
-    return grade !== undefined && isAtLeast(grade, "A-");
-  });
 }
 
 /** How completely Glama graded a server. */

@@ -24,8 +24,30 @@ export default defineConfig({
         statements: 100,
       },
     },
-    environment: "jsdom",
-    globals: true,
-    setupFiles: ["./src/test/setup.ts"],
+    // Two environments, because this repo holds two programs: a browser app and
+    // a Node build pipeline. The pipeline must not run under jsdom — jsdom
+    // rewrites import.meta.url (breaking fixture loading) and the DOM stubs in
+    // src/test/setup.ts reference HTMLElement, which does not exist in Node.
+    projects: [
+      {
+        extends: true,
+        test: {
+          environment: "jsdom",
+          globals: true,
+          include: ["src/**/*.test.{ts,tsx}"],
+          name: "app",
+          setupFiles: ["./src/test/setup.ts"],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          environment: "node",
+          globals: true,
+          include: ["scripts/**/*.test.ts"],
+          name: "pipeline",
+        },
+      },
+    ],
   },
 });

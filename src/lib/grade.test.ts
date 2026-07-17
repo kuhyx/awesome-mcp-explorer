@@ -6,7 +6,6 @@ import {
   compositeRank,
   gradeCoverage,
   gradeRank,
-  isABand,
   isAtLeast,
   isTripleA,
 } from "./grade.ts";
@@ -21,12 +20,12 @@ const grades = (over: Grades = {}): Grades => ({
 describe("gradeRank", () => {
   it("ranks A best and F worst", () => {
     expect(gradeRank("A")).toBe(0);
-    expect(gradeRank("F")).toBe(7);
+    expect(gradeRank("F")).toBe(4);
   });
 
-  it("ranks a modifier below its bare letter", () => {
-    expect(gradeRank("A")).toBeLessThan(gradeRank("A-"));
-    expect(gradeRank("A-")).toBeLessThan(gradeRank("B"));
+  it("orders the whole scale", () => {
+    const ranks = (["A", "B", "C", "D", "F"] as const).map((g) => gradeRank(g));
+    expect(ranks).toEqual(ranks.toSorted((a, b) => a - b));
   });
 });
 
@@ -42,34 +41,23 @@ describe("isAtLeast", () => {
 });
 
 describe("isTripleA", () => {
-  it("accepts all three axes exactly A", () => {
+  it("accepts all three axes A", () => {
     expect(isTripleA(grades())).toBe(true);
   });
 
-  it("rejects A- on any axis", () => {
-    expect(isTripleA(grades({ quality: "A-" }))).toBe(false);
+  it("rejects B on any axis", () => {
+    expect(isTripleA(grades({ quality: "B" }))).toBe(false);
   });
 
   it("rejects a partially graded server", () => {
+    // An ungraded axis is unknown, not an A: sooperset/mcp-atlassian has
+    // license=A and maintenance=C with quality never graded, and must not
+    // sneak into a triple-A filter.
     expect(isTripleA({ license: "A", quality: "A" })).toBe(false);
   });
 
   it("rejects an ungraded server", () => {
     expect(isTripleA({})).toBe(false);
-  });
-});
-
-describe("isABand", () => {
-  it("accepts a mix of A and A-", () => {
-    expect(isABand(grades({ maintenance: "A-", quality: "A-" }))).toBe(true);
-  });
-
-  it("rejects B", () => {
-    expect(isABand(grades({ quality: "B" }))).toBe(false);
-  });
-
-  it("rejects a partially graded server", () => {
-    expect(isABand({ license: "A" })).toBe(false);
   });
 });
 
@@ -83,7 +71,7 @@ describe("gradeCoverage", () => {
   });
 
   it("reports graded-partial when an axis is missing", () => {
-    // mcp-atlassian is the real-world case: license + maintenance, no quality.
+    // The real sooperset/mcp-atlassian shape: a dash in the quality slot.
     expect(gradeCoverage({ license: "A", maintenance: "C" })).toBe(
       "graded-partial",
     );
@@ -101,12 +89,13 @@ describe("compositeRank", () => {
   });
 
   it("averages the ranks of graded axes", () => {
-    // A=0, B=2 -> mean of (0, 0, 2) = 0.666...
-    expect(compositeRank(grades({ quality: "B" }))).toBeCloseTo(2 / 3);
+    // A=0, A=0, B=1 -> 1/3
+    expect(compositeRank(grades({ quality: "B" }))).toBeCloseTo(1 / 3);
   });
 
   it("averages only the axes that are graded", () => {
-    expect(compositeRank({ license: "A", maintenance: "C" })).toBe(2);
+    // A=0, C=2, quality ungraded -> mean(0, 2) = 1
+    expect(compositeRank({ license: "A", maintenance: "C" })).toBe(1);
   });
 
   it("ranks a triple-A server better than a mixed one", () => {
