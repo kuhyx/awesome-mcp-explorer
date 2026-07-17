@@ -102,9 +102,17 @@ type Marker =
 const MAX_LINK_TEXT = 200;
 const MAX_URL = 400;
 
-/** `[![alt](img)](href)` — a badge image wrapped in a link. */
+/**
+ * `[![alt](src)](href)` — a badge image wrapped in a link.
+ *
+ * Group 1 is the image **src**, deliberately, not the anchor href. The src is
+ * the badge itself (`.../badges/score.svg`), while the href is a human link to
+ * the server page — and at least one entry has a broken one:
+ * `Muvon/octocode` links `https://glama.ai/mcp/servers/Muvon/` with the repo
+ * segment missing upstream, while its image src is correct.
+ */
 const BADGE_IMAGE = new RegExp(
-  String.raw`\[!\[[^\]]{0,${MAX_LINK_TEXT}}\]\([^)]{0,${MAX_URL}}\)\]\(([^)]{0,${MAX_URL}})\)`,
+  String.raw`\[!\[[^\]]{0,${MAX_LINK_TEXT}}\]\(([^)]{0,${MAX_URL}})\)\]\([^)]{0,${MAX_URL}}\)`,
   "g",
 );
 /** `[text](href)` — an ordinary inline link. */
@@ -180,17 +188,34 @@ function extractDescription(text: string): string {
     .trim();
 }
 
-/** Pulls the Glama badge href out of an entry, if present. */
+/**
+ * Pulls the Glama badge SVG URL out of an entry, if the README links one.
+ *
+ * Returns the image src as-is apart from normalising the `@` spelling: Glama
+ * serves both `/servers/@owner/repo` and `/servers/owner/repo` (verified
+ * identical), and 270 entries use the `@` form.
+ */
 function extractBadgeUrl(line: string): null | string {
   for (const match of line.matchAll(BADGE_IMAGE)) {
-    const href = match[1];
-    if (href?.includes("glama.ai/mcp/servers") === true) {
-      // Normalise the two spellings Glama uses: /servers/@owner/repo and
-      // /servers/owner/repo both address the same server.
-      return href.replace("/servers/@", "/servers/");
+    const source = match[1];
+    if (source?.includes("glama.ai/mcp/servers") === true) {
+      return source.replace("/servers/@", "/servers/");
     }
   }
   return null;
+}
+
+/**
+ * The badge URL for a repo, derived from its GitHub slug.
+ *
+ * Only ~55% of entries link a badge, but Glama indexes far more than that:
+ * sampling entries with no README badge found a graded badge at the derived URL
+ * for 16 of 20. Without this, "not indexed" would be reported for servers Glama
+ * has plainly graded — `upstash/context7` (A/A/B) among them — and the headline
+ * triple-A filter would silently miss roughly a thousand servers.
+ */
+export function derivedBadgeUrl(owner: string, repo: string): string {
+  return `https://glama.ai/mcp/servers/${owner}/${repo}/badges/score.svg`;
 }
 
 /**

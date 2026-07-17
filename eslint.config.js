@@ -53,6 +53,15 @@ export default tseslint.config(
         { allowNumber: true },
       ],
 
+      // Keep the rule, widen its vocabulary. `passesFilters(server, filter)`
+      // and `matchesQuery(...)` are predicates that read as English; forcing
+      // them to `isPassingFilters` would be worse prose in service of a prefix
+      // list. `passes`/`matches` are added, nothing is removed.
+      "unicorn/consistent-boolean-name": [
+        "error",
+        { prefixes: { matches: true, passes: true } },
+      ],
+
       // Kebab-case files exporting PascalCase components: house convention.
       "unicorn/filename-case": ["error", { case: "kebabCase" }],
     },
@@ -95,6 +104,13 @@ export default tseslint.config(
       //      this axis was not graded". Collapsing them would lose information
       //      the UI displays differently (not-indexed vs graded-partial).
       "unicorn/no-null": "off",
+
+      // `Temporal` does not exist in this project's runtime: Node 26 reports
+      // `typeof Temporal === "undefined"`. The rule is unfollowable until it
+      // ships. The inputs here are GitHub's ISO-8601 timestamps, which
+      // Date.parse handles identically across engines — the cross-engine
+      // inconsistency the rule warns about is for non-ISO strings.
+      "unicorn/prefer-temporal": "off",
 
       // The domain vocabulary is abbreviated on purpose: `os`, `spdx`, `repo`,
       // `env` are the names the source data uses, and expanding them to

@@ -15,7 +15,7 @@
     "lint": "tsc --noEmit && eslint .",
     "test": "vitest run",
     "coverage": "vitest run --coverage",
-    "build:data": "node --experimental-strip-types scripts/build-dataset.ts"
+    "build:data": "GITHUB_TOKEN=${GITHUB_TOKEN:-$(gh auth token)} node --experimental-strip-types scripts/build-dataset.ts"
   },
   "dependencies": {
     "@tanstack/react-virtual": "^3.14.6",

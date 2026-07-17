@@ -2,7 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import type { RawEntry } from "./parse-readme.ts";
 
-import { mergeEntries, parseReadme, parseRepoUrl } from "./parse-readme.ts";
+import {
+  derivedBadgeUrl,
+  mergeEntries,
+  parseReadme,
+  parseRepoUrl,
+} from "./parse-readme.ts";
 
 /** Wraps entry lines in the section heading the parser requires. */
 function md(...lines: string[]): string {
@@ -182,6 +187,14 @@ describe("parseReadme markers (real-world edge cases)", () => {
 // Modelled on modelcontextprotocol/servers-archived: one monorepo listed 9
 // times across 8 categories, with rows disagreeing about language because each
 // row describes a different sub-server.
+describe("derivedBadgeUrl", () => {
+  it("builds a badge URL from a GitHub slug", () => {
+    expect(derivedBadgeUrl("upstash", "context7")).toBe(
+      "https://glama.ai/mcp/servers/upstash/context7/badges/score.svg",
+    );
+  });
+});
+
 describe("mergeEntries", () => {
   it("unions categories, languages, scope and os across rows", () => {
     const rows = parseReadme(
@@ -214,7 +227,9 @@ describe("mergeEntries", () => {
       ),
     );
     expect(merged[0]!.description).toBe("First description.");
-    expect(merged[0]!.badgeUrl).toBe("https://glama.ai/mcp/servers/m/mono");
+    expect(merged[0]!.badgeUrl).toBe(
+      "https://glama.ai/mcp/servers/m/mono/badges/score.svg",
+    );
   });
 
   it("marks the repo official when any row is official", () => {
@@ -272,19 +287,19 @@ describe("parseReadme descriptions and badges", () => {
     expect(entry.description).toBe("mcp server for cert-manager management.");
   });
 
-  it("extracts a Glama badge url", () => {
+  it("takes the badge URL from the image src, not the anchor href", () => {
     const entry = only(
       "- [a/b](https://github.com/a/b) [![a/b MCP server](https://glama.ai/mcp/servers/a/b/badges/score.svg)](https://glama.ai/mcp/servers/a/b) 📇 - Desc.",
     );
-    expect(entry.badgeUrl).toBe("https://glama.ai/mcp/servers/a/b");
+    expect(entry.badgeUrl).toBe("https://glama.ai/mcp/servers/a/b/badges/score.svg");
     expect(entry.languages).toEqual(["typescript"]);
   });
 
-  it("normalises the @owner badge url spelling", () => {
+  it("normalises the @owner badge URL spelling", () => {
     const entry = only(
       "- [a/b](https://github.com/a/b) [![x](https://glama.ai/mcp/servers/@a/b/badges/score.svg)](https://glama.ai/mcp/servers/@a/b) 🐍 - Desc.",
     );
-    expect(entry.badgeUrl).toBe("https://glama.ai/mcp/servers/a/b");
+    expect(entry.badgeUrl).toBe("https://glama.ai/mcp/servers/a/b/badges/score.svg");
   });
 
   it("ignores a non-Glama badge", () => {

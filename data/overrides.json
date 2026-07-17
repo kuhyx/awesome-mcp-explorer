@@ -1,0 +1,20 @@
+{
+  "_readme": [
+    "Hand-written corrections for the only two fields nobody publishes: cost and rateLimited.",
+    "The pipeline infers both from the README's scope markers and description text, which is weak",
+    "by design -- see scripts/lib/classify.ts. Anything corrected here wins over the inference and",
+    "is shown in the UI as a fact rather than a guess.",
+    "",
+    "Keys under 'servers' are lowercase owner/repo. Fields:",
+    "  cost        'likely-free' | 'likely-paid' | 'unknown'",
+    "  rateLimited 'yes' | 'no' | 'unknown'",
+    "  note        free text, for readers of this file only"
+  ],
+  "servers": {
+    "forgemeshlabs/coinopai-mcp": {
+      "cost": "likely-paid",
+      "rateLimited": "unknown",
+      "note": "Charges per call via x402 USDC micropayments and needs a funded wallet key, so it is not free. The inference cannot see this: 'micropayments'/'USDC' are domain words that classify.ts deliberately ignores, since 92 entries mention USD because they are fintech servers, not because they cost money."
+    }
+  }
+}
