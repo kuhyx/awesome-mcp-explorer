@@ -4,42 +4,30 @@
  * class vocabulary here is small enough that a framework would be the largest
  * dependency in the project.
  */
+/* Tokens come from @kuhyx/web-ui (imported in main.tsx): the palette, spacing,
+ * radius, type scale, shadows and focus ring. Nothing bespoke is redefined
+ * here -- a local redefinition would shadow the shared value and silently
+ * un-migrate this repo.
+ *
+ * The grade colours map onto the shared categorical ramp. They are ordinal
+ * (A best -> F worst) and the ramp's lightness decreases monotonically, so
+ * mapping them in ramp order keeps that ordering legible in greyscale and
+ * under colour-vision deficiency -- which the old hand-picked green/olive
+ * pair (#2f8f5b vs #4f8f2f) was not.
+ *
+ * "Ungraded" is the absence of a category rather than a seventh one, so it
+ * stays on the muted text token instead of taking a ramp slot. */
 :root {
   color-scheme: light dark;
 
-  --bg: #fbfbfd;
-  --panel: #fff;
-  --ink: #16181d;
-  --muted: #666c77;
-  --line: #e2e5ea;
-  --accent: #2f6feb;
-
-  --grade-a: #2f8f5b;
-  --grade-b: #4f8f2f;
-  --grade-c: #b8860b;
-  --grade-d: #d9534f;
-  --grade-f: #c9302c;
-  --grade-none: #9aa1ac;
+  --grade-a: var(--cat-1);
+  --grade-b: var(--cat-2);
+  --grade-c: var(--cat-3);
+  --grade-d: var(--cat-4);
+  --grade-f: var(--cat-5);
+  --grade-none: var(--text-muted);
 
   --row-h: 132px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #101216;
-    --panel: #171a20;
-    --ink: #e7e9ee;
-    --muted: #97a0ae;
-    --line: #262b34;
-    --accent: #5b8cf5;
-
-    --grade-a: #37a169;
-    --grade-b: #6aa84f;
-    --grade-c: #f5a623;
-    --grade-d: #fe4a4b;
-    --grade-f: #fe4a4b;
-    --grade-none: #5d6673;
-  }
 }
 
 * {
@@ -49,7 +37,7 @@
 body {
   margin: 0;
   background: var(--bg);
-  color: var(--ink);
+  color: var(--text);
   font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
@@ -62,7 +50,7 @@ body {
 .app-msg {
   padding: 3rem;
   text-align: center;
-  color: var(--muted);
+  color: var(--text-muted);
 }
 
 /* ---------- top bar ---------- */
@@ -73,8 +61,8 @@ body {
   align-items: center;
   flex-wrap: wrap;
   padding: 0.6rem 1rem;
-  background: var(--panel);
-  border-bottom: 1px solid var(--line);
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--border);
 }
 
 .topbar h1 {
@@ -84,7 +72,7 @@ body {
 }
 
 .subtitle {
-  color: var(--muted);
+  color: var(--text-muted);
   font-weight: 400;
 }
 
@@ -92,7 +80,7 @@ body {
   /* Constant width: it must not resize as sibling controls come and go. */
   flex: 0 0 22rem;
   padding: 0.45rem 0.7rem;
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--bg);
   color: inherit;
@@ -123,7 +111,7 @@ body {
 .preset-save input {
   width: 9rem;
   padding: 0.25rem 0.45rem;
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
   border-radius: 5px;
   background: var(--bg);
   color: inherit;
@@ -138,8 +126,8 @@ body {
   align-items: center;
   flex-wrap: wrap;
   padding: 0.45rem 1rem;
-  background: var(--panel);
-  border-bottom: 1px solid var(--line);
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--border);
   font-size: 0.85rem;
 }
 
@@ -152,15 +140,15 @@ body {
   display: flex;
   gap: 0.35rem;
   align-items: center;
-  color: var(--muted);
+  color: var(--text-muted);
 }
 
 .sort select {
   padding: 0.2rem 0.35rem;
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
   border-radius: 5px;
   background: var(--bg);
-  color: var(--ink);
+  color: var(--text);
   font: inherit;
 }
 
@@ -183,8 +171,8 @@ body {
   flex: 0 0 19rem;
   overflow-y: auto;
   padding: 0.75rem;
-  background: var(--panel);
-  border-right: 1px solid var(--line);
+  background: var(--surface-1);
+  border-right: 1px solid var(--border);
 }
 
 /*
@@ -202,7 +190,7 @@ body {
   min-inline-size: 0;
   margin: 0 0 0.85rem;
   padding: 0.55rem 0.65rem;
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
   border-radius: 7px;
 }
 
@@ -221,7 +209,7 @@ body {
   align-items: baseline;
   max-width: 100%;
   padding: 0 0.3rem;
-  color: var(--muted);
+  color: var(--text-muted);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -253,7 +241,7 @@ body {
 
 .facet-hint {
   margin: 0.4rem 0 0;
-  color: var(--muted);
+  color: var(--text-muted);
   font-size: 0.72rem;
 }
 
@@ -331,7 +319,7 @@ body {
 
 .tri-count {
   flex: none;
-  color: var(--muted);
+  color: var(--text-muted);
   font-size: 0.75rem;
   /* Tabular figures keep the count column from reflowing as digits change. */
   font-variant-numeric: tabular-nums;
@@ -344,10 +332,10 @@ body {
   gap: 0.3rem;
   align-items: center;
   padding: 0.16rem 0.45rem;
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--bg);
-  color: var(--muted);
+  color: var(--text-muted);
   font: inherit;
   font-size: 0.74rem;
   cursor: pointer;
@@ -410,7 +398,7 @@ body {
   align-items: center;
   width: 100%;
   padding: 0.4rem 0.5rem;
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--bg);
   color: inherit;
@@ -451,16 +439,16 @@ body {
   display: flex;
   gap: 0.2rem;
   align-items: center;
-  color: var(--muted);
+  color: var(--text-muted);
   font-size: 0.72rem;
 }
 
 .grade-axis select {
   padding: 0.1rem;
-  border: 1px solid var(--line);
+  border: 1px solid var(--border);
   border-radius: 4px;
   background: var(--bg);
-  color: var(--ink);
+  color: var(--text);
   font: inherit;
 }
 
@@ -472,57 +460,7 @@ body {
   font-size: 0.72rem;
 }
 
-/* ---------- slider ---------- */
-
-.slider-head {
-  display: flex;
-  justify-content: space-between;
-  color: var(--muted);
-  font-size: 0.75rem;
-}
-
-.slider-value {
-  font-variant-numeric: tabular-nums;
-}
-
-.slider-track {
-  position: relative;
-  height: 22px;
-  margin-top: 0.4rem;
-  touch-action: none;
-}
-
-.slider-track::before {
-  content: "";
-  position: absolute;
-  top: 9px;
-  right: 0;
-  left: 0;
-  height: 4px;
-  border-radius: 2px;
-  background: var(--line);
-}
-
-.slider-fill {
-  position: absolute;
-  top: 9px;
-  height: 4px;
-  border-radius: 2px;
-  background: var(--accent);
-}
-
-.slider-thumb {
-  position: absolute;
-  top: 4px;
-  width: 14px;
-  height: 14px;
-  margin-left: -7px;
-  padding: 0;
-  border: 2px solid var(--accent);
-  border-radius: 50%;
-  background: var(--panel);
-  cursor: grab;
-}
+/* Slider styling ships with the component: @kuhyx/web-ui/range-slider.css */
 
 /* ---------- list ---------- */
 
@@ -535,7 +473,7 @@ body {
 .list-empty {
   flex: 1;
   padding: 3rem;
-  color: var(--muted);
+  color: var(--text-muted);
   text-align: center;
 }
 
@@ -556,7 +494,7 @@ body {
   gap: 1rem;
   align-items: flex-start;
   padding: 0.6rem 1rem;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--border);
 }
 
 .row-main {
@@ -583,7 +521,7 @@ body {
 
 .row-desc {
   margin: 0.2rem 0 0.35rem;
-  color: var(--muted);
+  color: var(--text-muted);
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -661,7 +599,7 @@ body {
   gap: 0.55rem;
   justify-content: flex-end;
   margin-top: 0.35rem;
-  color: var(--muted);
+  color: var(--text-muted);
   font-size: 0.74rem;
   font-variant-numeric: tabular-nums;
 }

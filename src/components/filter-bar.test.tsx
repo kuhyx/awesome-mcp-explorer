@@ -244,15 +244,22 @@ describe("FilterBar", () => {
   });
 });
 
-/** Drives the custom slider directly; jsdom has no pointer capture. */
+/**
+ * Drives the shared slider directly; jsdom has no pointer capture.
+ *
+ * The press goes to the *track*, not the thumb: @kuhyx/web-ui's RangeSlider
+ * grabs whichever thumb is nearer to the press, so a press anywhere on the
+ * track works. `index` therefore selects which slider to drive (each has two
+ * thumbs), and the press position decides which of its thumbs moves.
+ */
 function dragThumb(index: number, clientX: number): void {
-  const thumb = screen.getAllByRole("slider")[index]!;
-  thumb.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, pointerId: 1 }));
-  thumb
-    .closest(".slider-track")
-    ?.dispatchEvent(
-      new PointerEvent("pointermove", { bubbles: true, clientX, pointerId: 1 }),
-    );
+  const track = screen.getAllByRole("slider")[index]!.closest(".slider-track");
+  track?.dispatchEvent(
+    new PointerEvent("pointerdown", { bubbles: true, clientX, pointerId: 1 }),
+  );
+  track?.dispatchEvent(
+    new PointerEvent("pointermove", { bubbles: true, clientX, pointerId: 1 }),
+  );
 }
 
 describe("FilterBar sliders", () => {
@@ -301,7 +308,9 @@ describe("FilterBar sliders", () => {
 
   it("sets the last-push bound", () => {
     const { onChange } = renderBar();
-    dragThumb(2, 600);
+    // Press near the left end so the shared slider grabs the *low* thumb: the
+    // last-push filter only reads `lo` (there is no upper bound to set).
+    dragThumb(2, 300);
     const [next] = onChange.mock.calls[0] as [FilterState];
     expect(next.pushedAfter).toEqual(expect.any(Number));
   });

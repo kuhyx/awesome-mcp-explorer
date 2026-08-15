@@ -1,3 +1,5 @@
+import { nth, RangeSlider } from "@kuhyx/web-ui";
+
 /**
  * The whole filter sidebar: a fully controlled component whose only state is
  * what its parent hands it, matching dufs-cloud's FilterBar.
@@ -7,9 +9,7 @@ import type { FilterState } from "../lib/filter-sort.ts";
 import type { Cost, Language, Tri } from "../lib/server.ts";
 
 import { LANGUAGES, OPERATING_SYSTEMS, SCOPES } from "../../scripts/lib/parse-readme.ts";
-import { nth } from "../lib/quantile.ts";
 import { GradeFilter } from "./grade-filter.tsx";
-import { RangeSlider } from "./range-slider.tsx";
 import { formatStars } from "./server-row.tsx";
 import { TriStatePicker } from "./tri-state-picker.tsx";
 
@@ -178,9 +178,9 @@ export function FilterBar({
 
       <RangeSlider
         format={formatStars}
+        hi={starMax}
         label="Stars"
-        max={starMax}
-        min={starMin}
+        lo={starMin}
         onChange={(lo, hi): void => {
           // A bound at the distribution's edge means "no constraint". nth
           // rather than `?? 0`: the slider only calls back when it has two or
@@ -199,9 +199,9 @@ export function FilterBar({
           const date = new Date(t);
           return date.toISOString().slice(0, 7);
         }}
+        hi={pushedValues.at(-1) ?? 0}
         label="Last push"
-        max={pushedValues.at(-1) ?? 0}
-        min={filter.pushedAfter ?? pushedValues[0] ?? 0}
+        lo={filter.pushedAfter ?? pushedValues[0] ?? 0}
         onChange={(lo): void => {
           onChange({
             ...filter,

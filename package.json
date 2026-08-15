@@ -19,6 +19,7 @@
     "build:data": "GITHUB_TOKEN=${GITHUB_TOKEN:-$(gh auth token)} node --experimental-strip-types scripts/build-dataset.ts"
   },
   "dependencies": {
+    "@kuhyx/web-ui": "github:kuhyx/utils#web_ui-v0.2.0&path:/web_ui",
     "@tanstack/react-virtual": "^3.14.6",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"

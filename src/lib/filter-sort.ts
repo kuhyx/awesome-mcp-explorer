@@ -1,3 +1,5 @@
+import { fuzzyMatch } from "@kuhyx/web-ui";
+
 /**
  * The filter/sort engine: pure, React-free, and the whole reason the app can
  * hold a 100% coverage bar cheaply.
@@ -93,23 +95,6 @@ export function isFilterActive(filter: FilterState): boolean {
 }
 
 /**
- * Case-insensitive subsequence match: every query char appears in order.
- *
- * Hand-rolled rather than pulling in Fuse.js, matching the house posture of no
- * runtime dependencies for things this small.
- */
-export function matchesFuzzy(query: string, target: string): boolean {
-  if (query === "") return true;
-  const q = query.toLowerCase();
-  const t = target.toLowerCase();
-  let index = 0;
-  for (let index_ = 0; index_ < t.length && index < q.length; index_++) {
-    if (t[index_] === q[index]) index++;
-  }
-  return index === q.length;
-}
-
-/**
  * Applies one tri-state selection to a server's values.
  *
  * An allowlist requires at least one overlap; a denylist rejects any overlap.
@@ -171,7 +156,7 @@ function passesGithub(server: Server, filter: FilterState): boolean {
 
 export function passesFilters(server: Server, filter: FilterState): boolean {
   const haystack = `${server.id} ${server.description}`;
-  if (!matchesFuzzy(filter.query, haystack)) return false;
+  if (!fuzzyMatch(filter.query, haystack)) return false;
   if (filter.official && !server.official) return false;
   if (!passesTri(server.languages, filter.languages)) return false;
   if (!passesTri(server.scope, filter.scope)) return false;

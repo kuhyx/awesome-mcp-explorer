@@ -8,7 +8,6 @@ import {
   DEFAULT_FILTER,
   DEFAULT_SORT,
   isFilterActive,
-  matchesFuzzy,
   passesFilters,
   passesTri,
 } from "./filter-sort.ts";
@@ -54,28 +53,6 @@ const filter = (over: Partial<FilterState> = {}): FilterState => ({
 const sort = (over: Partial<SortState> = {}): SortState => ({
   ...DEFAULT_SORT,
   ...over,
-});
-
-describe("matchesFuzzy", () => {
-  it("matches an empty query", () => {
-    expect(matchesFuzzy("", "anything")).toBe(true);
-  });
-
-  it("matches a subsequence, not just a substring", () => {
-    expect(matchesFuzzy("pgsql", "postgresql")).toBe(true);
-  });
-
-  it("is case insensitive", () => {
-    expect(matchesFuzzy("SQL", "postgresql")).toBe(true);
-  });
-
-  it("rejects out-of-order characters", () => {
-    expect(matchesFuzzy("qsl", "sql")).toBe(false);
-  });
-
-  it("rejects a missing character", () => {
-    expect(matchesFuzzy("sqlz", "postgresql")).toBe(false);
-  });
 });
 
 describe("passesTri", () => {
