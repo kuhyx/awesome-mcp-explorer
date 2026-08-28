@@ -21,7 +21,9 @@ import { inferCost, inferRateLimited } from "./classify.ts";
  */
 export interface Override {
   readonly cost?: Cost;
-  /** Free-text note for the file's own readers; not shown in the UI. */
+  /**
+   * Free-text note for the file's own readers; not shown in the UI.
+   */
   readonly note?: string;
   readonly rateLimited?: Tri;
 }

@@ -51,7 +51,9 @@ function githubToken(): string {
   return token;
 }
 
-/** Distinct `###` sections across a set of entries. */
+/**
+ * Distinct `###` sections across a set of entries.
+ */
 function categoryCount(items: readonly { categories: readonly string[] }[]): number {
   const seen = new Set(items.flatMap((item) => item.categories));
   return seen.size;
@@ -92,10 +94,12 @@ async function main(): Promise<void> {
   // from the triple-A filter. A linked badge wins over a derived URL because
   // the Glama namespace does not always match the GitHub owner.
   stdout.write("Fetching Glama badges (all servers, derived where unlinked)...\n");
-  const badgeTargets = entries.map((entry) => ({
-    badgeUrl: entry.badgeUrl ?? derivedBadgeUrl(entry.owner, entry.repo),
-    id: entry.id,
-  }));
+  const badgeTargets = entries.map((entry) => {
+  	return {
+	    badgeUrl: entry.badgeUrl ?? derivedBadgeUrl(entry.owner, entry.repo),
+	    id: entry.id,
+	  };
+  });
   const badges = await fetchBadges(badgeTargets, {
     cache,
     fetchImpl: fetch,
@@ -123,18 +127,20 @@ function report(
   const pct = (x: number): string => `${((x / servers.length) * 100).toFixed(1)}%`;
 
   const tripleA = servers.filter(
-    (s) =>
-      s.glama?.license === "A" &&
+    (s) => {
+    	return s.glama?.license === "A" &&
       s.glama.quality === "A" &&
-      s.glama.maintenance === "A",
+      s.glama.maintenance === "A";
+    },
   );
   const unknownGlyphs = badges.filter((b) => b.unknownGlyph === true);
   const ghFailures = github.filter((g) => g.facts === null);
   const oddLicenses = new Set(
-    servers.flatMap((s) =>
-      s.gh !== null && isUnrecognisedLicense(s.gh.spdx) && s.gh.spdx !== null
+    servers.flatMap((s) => {
+    	return s.gh !== null && isUnrecognisedLicense(s.gh.spdx) && s.gh.spdx !== null
         ? [s.gh.spdx]
-        : [],
+        : [];
+    },
     ),
   );
 

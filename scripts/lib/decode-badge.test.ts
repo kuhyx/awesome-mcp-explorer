@@ -6,7 +6,9 @@ import { decodeBadge, group, UnknownGlyphError } from "./decode-badge.ts";
 const A_OUTLINE =
   "M.27 0l2.73-8h2.14l2.81 8h-1.82l-.61-1.86h-2.85l-.59 1.86Zm2.81-3.14h2.01l-.25-.72q-.18-.61-.39-1.33-.18-.72-.39-1.53-.2.83-.39 1.55-.19.7-.36 1.31Z";
 
-/** Builds a minimal badge with the given grade slots, in axis order. */
+/**
+ * Builds a minimal badge with the given grade slots, in axis order.
+ */
 function badgeSvg(...slots: { d: string; fill: string }[]): string {
   const defs = slots.map((s, index) => `<path id="g${index}" d="${s.d}"/>`).join("");
   const uses = slots

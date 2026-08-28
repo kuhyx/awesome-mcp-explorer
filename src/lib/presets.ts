@@ -13,13 +13,17 @@ import { decodeFilter, encodeFilter } from "./url-state.ts";
 
 export interface Preset {
   readonly name: string;
-  /** The encoded query string, e.g. `aaa=1&lang=rust`. */
+  /**
+   * The encoded query string, e.g. `aaa=1&lang=rust`.
+   */
   readonly search: string;
 }
 
 const STORAGE_KEY = "awesome-mcp-explorer:presets";
 
-/** Curated starting points, so the feature is useful before you save anything. */
+/**
+ * Curated starting points, so the feature is useful before you save anything.
+ */
 export const BUILTIN_PRESETS: readonly Preset[] = [
   { name: "Triple-A only", search: "aaa=1" },
   { name: "Triple-A + FOSS", search: "aaa=1&foss=yes" },
@@ -49,7 +53,9 @@ export function loadPresets(storage: Storage): Preset[] {
   }
 }
 
-/** Saves presets, ignoring a storage failure (private mode, quota). */
+/**
+ * Saves presets, ignoring a storage failure (private mode, quota).
+ */
 export function savePresets(storage: Storage, presets: readonly Preset[]): void {
   try {
     storage.setItem(STORAGE_KEY, JSON.stringify(presets));
@@ -67,7 +73,9 @@ function isPreset(value: unknown): value is Preset {
   );
 }
 
-/** Adds a preset, replacing any existing one with the same name. */
+/**
+ * Adds a preset, replacing any existing one with the same name.
+ */
 export function addPreset(
   presets: readonly Preset[],
   name: string,
@@ -82,7 +90,9 @@ export function removePreset(presets: readonly Preset[], name: string): Preset[]
   return presets.filter((p) => p.name !== name);
 }
 
-/** Expands a preset back into state. */
+/**
+ * Expands a preset back into state.
+ */
 export function applyPreset(preset: Preset): ReturnType<typeof decodeFilter> {
   return decodeFilter(preset.search);
 }

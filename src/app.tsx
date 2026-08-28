@@ -41,19 +41,21 @@ export function App(): React.JSX.Element {
 
   useKeyboard(
     useMemo(
-      () => ({
-        onClear: (): void => {
-          setShowHelp(false);
-          searchReference.current?.blur();
-        },
-        onFocusSearch: (): void => searchReference.current?.focus(),
-        onToggleHelp: (): void => {
-          setShowHelp((open) => !open);
-        },
-        onToggleTripleA: (): void => {
-          setFilter({ ...filter, tripleA: !filter.tripleA });
-        },
-      }),
+      () => {
+      	return {
+	        onClear: (): void => {
+	          setShowHelp(false);
+	          searchReference.current?.blur();
+	        },
+	        onFocusSearch: (): void => searchReference.current?.focus(),
+	        onToggleHelp: (): void => {
+	          setShowHelp((open) => !open);
+	        },
+	        onToggleTripleA: (): void => {
+	          setFilter({ ...filter, tripleA: !filter.tripleA });
+	        },
+	      };
+      },
       [filter, setFilter],
     ),
   );
@@ -75,10 +77,11 @@ export function App(): React.JSX.Element {
   const pushed = useMemo(() => pushedValues(servers), [servers]);
   const ungraded = useMemo(() => ungradedCount(results), [results]);
   const categories = useMemo(
-    () =>
-      [...new Set(servers.flatMap((s) => s.categories))].toSorted((a, b) =>
+    () => {
+    	return [...new Set(servers.flatMap((s) => s.categories))].toSorted((a, b) =>
         a.localeCompare(b),
-      ),
+      );
+    },
     [servers],
   );
   // Read once, via a lazy initialiser rather than useMemo or an effect.

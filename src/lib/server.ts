@@ -9,10 +9,14 @@ import type { Grades } from "./grade.ts";
 
 export type { Language, Os, Scope } from "../../scripts/lib/parse-readme.ts";
 
-/** Three-valued answer. `unknown` is a real answer, not a missing one. */
+/**
+ * Three-valued answer. `unknown` is a real answer, not a missing one.
+ */
 export type Tri = "no" | "unknown" | "yes";
 
-/** Where a fact came from, so the UI can be honest about how much to trust it. */
+/**
+ * Where a fact came from, so the UI can be honest about how much to trust it.
+ */
 export type Provenance = "inferred" | "override";
 
 export interface InferredFact<T> {
@@ -22,10 +26,14 @@ export interface InferredFact<T> {
 
 export type Cost = "likely-free" | "likely-paid" | "unknown";
 
-/** GitHub facts. Null on the whole object when the repo 404s (deleted/renamed). */
+/**
+ * GitHub facts. Null on the whole object when the repo 404s (deleted/renamed).
+ */
 export interface GithubFacts {
   readonly archived: boolean;
-  /** ISO-8601. */
+  /**
+   * ISO-8601.
+   */
   readonly createdAt: string;
   readonly forks: number;
   /**
@@ -38,24 +46,36 @@ export interface GithubFacts {
    * told apart by `spdx`: null for no licence at all.
    */
   readonly isFoss: Tri;
-  /** ISO-8601 of the last push, the liveness signal. */
+  /**
+   * ISO-8601 of the last push, the liveness signal.
+   */
   readonly pushedAt: string;
-  /** SPDX id, or null when the repo has no licence file at all. */
+  /**
+   * SPDX id, or null when the repo has no licence file at all.
+   */
   readonly spdx: null | string;
   readonly stars: number;
 }
 
 export interface Server {
-  /** Glama badge URL, or null when the README lists no badge. */
+  /**
+   * Glama badge URL, or null when the README lists no badge.
+   */
   readonly badgeUrl: null | string;
-  /** Every `###` section this repo is listed under; monorepos have several. */
+  /**
+   * Every `###` section this repo is listed under; monorepos have several.
+   */
   readonly categories: readonly string[];
   readonly cost: InferredFact<Cost>;
   readonly description: string;
   readonly gh: GithubFacts | null;
-  /** Glama grades, or null when Glama has not indexed the repo. */
+  /**
+   * Glama grades, or null when Glama has not indexed the repo.
+   */
   readonly glama: Grades | null;
-  /** `owner/repo`, lowercased. The join key across all three sources. */
+  /**
+   * `owner/repo`, lowercased. The join key across all three sources.
+   */
   readonly id: string;
   readonly languages: readonly Language[];
   readonly official: boolean;

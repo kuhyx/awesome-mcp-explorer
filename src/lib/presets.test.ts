@@ -12,7 +12,9 @@ import {
   savePresets,
 } from "./presets.ts";
 
-/** A minimal in-memory Storage, so tests do not depend on jsdom's. */
+/**
+ * A minimal in-memory Storage, so tests do not depend on jsdom's.
+ */
 function fakeStorage(initial: null | string = null): Storage {
   let value = initial;
   return {

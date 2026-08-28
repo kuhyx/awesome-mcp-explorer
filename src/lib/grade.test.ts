@@ -10,12 +10,14 @@ import {
   isTripleA,
 } from "./grade.ts";
 
-const grades = (over: Grades = {}): Grades => ({
-  license: "A",
-  maintenance: "A",
-  quality: "A",
-  ...over,
-});
+const grades = (over: Grades = {}): Grades => {
+	return {
+	  license: "A",
+	  maintenance: "A",
+	  quality: "A",
+	  ...over,
+	};
+};
 
 describe("gradeRank", () => {
   it("ranks A best and F worst", () => {

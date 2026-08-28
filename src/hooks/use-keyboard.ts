@@ -13,7 +13,9 @@ export interface KeyboardActions {
   readonly onToggleTripleA: () => void;
 }
 
-/** True when the event target is a field that should swallow the keystroke. */
+/**
+ * True when the event target is a field that should swallow the keystroke.
+ */
 export function isTypingTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
   return (

@@ -60,7 +60,9 @@ const NON_FOSS_LICENSES = new Set([
   "SSPL-1.0",
 ]);
 
-/** GitHub's marker for "there is a licence file but we cannot identify it". */
+/**
+ * GitHub's marker for "there is a licence file but we cannot identify it".
+ */
 const UNIDENTIFIED_LICENSE = "NOASSERTION";
 
 /**
@@ -80,7 +82,9 @@ export function classifyFoss(spdx: null | string): Tri {
   return "unknown";
 }
 
-/** True when the repo is known to GitHub but carries no recognised licence id. */
+/**
+ * True when the repo is known to GitHub but carries no recognised licence id.
+ */
 export function isUnrecognisedLicense(spdx: null | string): boolean {
   return (
     spdx !== null &&
@@ -137,7 +141,9 @@ const PAID_PHRASES = [
   "commercial license",
 ];
 
-/** Phrases that state an API key or account is needed. */
+/**
+ * Phrases that state an API key or account is needed.
+ */
 const CREDENTIAL_PHRASES = [
   "api key",
   "api-key",
@@ -151,7 +157,9 @@ function hasAny(haystack: string, needles: readonly string[]): boolean {
   return needles.some((needle) => haystack.includes(needle));
 }
 
-/** A repo that is local-only (🏠 without ☁️) runs against software you already have. */
+/**
+ * A repo that is local-only (🏠 without ☁️) runs against software you already have.
+ */
 function isLocalOnly(scope: readonly Scope[]): boolean {
   return scope.includes("local") && !scope.includes("cloud");
 }

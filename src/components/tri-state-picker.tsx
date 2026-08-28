@@ -20,9 +20,13 @@ const GLYPHS: Readonly<Record<TriValue, string>> = {
 };
 
 export interface TriStatePickerProps<T extends string> {
-  /** Count of matching servers per option, from the currently filtered set. */
+  /**
+   * Count of matching servers per option, from the currently filtered set.
+   */
   readonly counts: ReadonlyMap<T, number>;
-  /** Renders an option's display name; defaults to the raw value. */
+  /**
+   * Renders an option's display name; defaults to the raw value.
+   */
   readonly format?: (option: T) => string;
   readonly label: string;
   readonly onChange: (next: TriSelect<T>) => void;
@@ -36,8 +40,12 @@ export function stateOf<T extends string>(select: TriSelect<T>, option: T): TriV
   return "off";
 }
 
-/** off -> include -> exclude -> off, rebuilding both lists from the new state. */
-/** The cycle order, as a table rather than nested ternaries. */
+/**
+ * off -> include -> exclude -> off, rebuilding both lists from the new state.
+ */
+/**
+ * The cycle order, as a table rather than nested ternaries.
+ */
 const NEXT_STATE: Readonly<Record<TriValue, TriValue>> = {
   exclude: "off",
   include: "exclude",
@@ -54,7 +62,9 @@ export function cycle<T extends string>(select: TriSelect<T>, option: T): TriSel
   return { excludes, includes };
 }
 
-/** "rust, go · not python", or "Any" when neutral. */
+/**
+ * "rust, go · not python", or "Any" when neutral.
+ */
 export function summarize<T extends string>(
   select: TriSelect<T>,
   format: (option: T) => string,

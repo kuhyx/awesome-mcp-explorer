@@ -5,16 +5,22 @@ import type { FilterState, SortState } from "./filter-sort.ts";
 import { DEFAULT_FILTER, DEFAULT_SORT } from "./filter-sort.ts";
 import { decodeFilter, encodeFilter } from "./url-state.ts";
 
-const filter = (over: Partial<FilterState> = {}): FilterState => ({
-  ...DEFAULT_FILTER,
-  ...over,
-});
-const sort = (over: Partial<SortState> = {}): SortState => ({
-  ...DEFAULT_SORT,
-  ...over,
-});
+const filter = (over: Partial<FilterState> = {}): FilterState => {
+	return {
+	  ...DEFAULT_FILTER,
+	  ...over,
+	};
+};
+const sort = (over: Partial<SortState> = {}): SortState => {
+	return {
+	  ...DEFAULT_SORT,
+	  ...over,
+	};
+};
 
-/** Encodes then decodes, which is the only property that actually matters. */
+/**
+ * Encodes then decodes, which is the only property that actually matters.
+ */
 function roundTrip(f: FilterState, s: SortState = DEFAULT_SORT): {
   filter: FilterState;
   sort: SortState;

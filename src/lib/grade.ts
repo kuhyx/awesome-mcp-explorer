@@ -18,17 +18,23 @@
  * defaulting it into this scale.
  */
 
-/** Best to worst. Index doubles as the rank, so order here is load-bearing. */
+/**
+ * Best to worst. Index doubles as the rank, so order here is load-bearing.
+ */
 export const GRADES = ["A", "B", "C", "D", "F"] as const;
 
 export type Grade = (typeof GRADES)[number];
 
-/** The three independently-graded axes, in the order the badge encodes them. */
+/**
+ * The three independently-graded axes, in the order the badge encodes them.
+ */
 export const GRADE_AXES = ["license", "quality", "maintenance"] as const;
 
 export type GradeAxis = (typeof GRADE_AXES)[number];
 
-/** A server's grades. An axis is absent when Glama did not grade it. */
+/**
+ * A server's grades. An axis is absent when Glama did not grade it.
+ */
 export type Grades = Partial<Record<GradeAxis, Grade>>;
 
 /**
@@ -40,7 +46,9 @@ export function gradeRank(grade: Grade): number {
   return GRADES.indexOf(grade);
 }
 
-/** True when `grade` is at least as good as `min`. */
+/**
+ * True when `grade` is at least as good as `min`.
+ */
 export function isAtLeast(grade: Grade, min: Grade): boolean {
   return gradeRank(grade) <= gradeRank(min);
 }
@@ -57,7 +65,9 @@ export function isTripleA(grades: Grades): boolean {
   return GRADE_AXES.every((axis) => grades[axis] === "A");
 }
 
-/** How completely Glama graded a server. */
+/**
+ * How completely Glama graded a server.
+ */
 export type GradeCoverage = "graded-all" | "graded-partial" | "not-indexed";
 
 export function gradeCoverage(grades: Grades | null): GradeCoverage {

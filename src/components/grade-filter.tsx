@@ -27,7 +27,9 @@ export interface GradeFilterProps {
   readonly filter: FilterState;
   readonly onChange: (next: FilterState) => void;
   readonly tripleACount: number;
-  /** Servers in the current result set that Glama has never graded. */
+  /**
+   * Servers in the current result set that Glama has never graded.
+   */
   readonly ungraded: number;
 }
 
@@ -88,34 +90,38 @@ export function GradeFilter({
               value={filter.minGrades[axis] ?? ""}
             >
               <option value="">any</option>
-              {GRADES.map((grade) => (
-                <option key={grade} value={grade}>
-                  {grade}
-                </option>
-              ))}
+              {GRADES.map((grade) => {
+                return (
+                  <option key={grade} value={grade}>
+                    {grade}
+                  </option>
+                );
+              })}
             </select>
           </label>
         ))}
       </div>
 
       <div className="coverage-row">
-        {(Object.keys(COVERAGE_LABELS) as GradeCoverage[]).map((coverage) => (
-          <button
-            aria-pressed={filter.gradeCoverage === coverage}
-            className={`chip${filter.gradeCoverage === coverage ? " on" : ""}`}
-            key={coverage}
-            onClick={(): void => {
-              onChange({
-                ...filter,
-                gradeCoverage: filter.gradeCoverage === coverage ? null : coverage,
-              });
-            }}
-            type="button"
-          >
-            {COVERAGE_LABELS[coverage]}{" "}
-            <span className="tri-count">{coverageCounts.get(coverage) ?? 0}</span>
-          </button>
-        ))}
+        {(Object.keys(COVERAGE_LABELS) as GradeCoverage[]).map((coverage) => {
+          return (
+            <button
+              aria-pressed={filter.gradeCoverage === coverage}
+              className={`chip${filter.gradeCoverage === coverage ? " on" : ""}`}
+              key={coverage}
+              onClick={(): void => {
+                onChange({
+                  ...filter,
+                  gradeCoverage: filter.gradeCoverage === coverage ? null : coverage,
+                });
+              }}
+              type="button"
+            >
+              {COVERAGE_LABELS[coverage]}{" "}
+              <span className="tri-count">{coverageCounts.get(coverage) ?? 0}</span>
+            </button>
+          );
+        })}
       </div>
 
       {isGradeFilterActive && ungraded > 0 && (

@@ -6,7 +6,9 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-/** The subset of `fetch` this pipeline uses, so tests can supply a fake. */
+/**
+ * The subset of `fetch` this pipeline uses, so tests can supply a fake.
+ */
 export type FetchLike = (url: string, init?: RequestInit) => Promise<Response>;
 
 export interface Cache {
@@ -42,7 +44,9 @@ export function diskCache(directory: string): Cache {
   };
 }
 
-/** A cache that never hits, for tests and for `--no-cache` runs. */
+/**
+ * A cache that never hits, for tests and for `--no-cache` runs.
+ */
 export function nullCache(): Cache {
   return {
     get: () => Promise.resolve(null),

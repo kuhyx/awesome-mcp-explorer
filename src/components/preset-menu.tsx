@@ -24,23 +24,11 @@ export function PresetMenu({
 
   return (
     <div className="presets">
-      {BUILTIN_PRESETS.map((preset) => (
-        <button
-          className="chip"
-          key={preset.name}
-          onClick={(): void => {
-            onApply(preset);
-          }}
-          type="button"
-        >
-          {preset.name}
-        </button>
-      ))}
-
-      {presets.map((preset) => (
-        <span className="preset-saved" key={preset.name}>
+      {BUILTIN_PRESETS.map((preset) => {
+        return (
           <button
-            className="chip on"
+            className="chip"
+            key={preset.name}
             onClick={(): void => {
               onApply(preset);
             }}
@@ -48,18 +36,34 @@ export function PresetMenu({
           >
             {preset.name}
           </button>
-          <button
-            aria-label={`Delete preset ${preset.name}`}
-            className="chip preset-del"
-            onClick={(): void => {
-              onDelete(preset.name);
-            }}
-            type="button"
-          >
-            ✕
-          </button>
-        </span>
-      ))}
+        );
+      })}
+
+      {presets.map((preset) => {
+        return (
+          <span className="preset-saved" key={preset.name}>
+            <button
+              className="chip on"
+              onClick={(): void => {
+                onApply(preset);
+              }}
+              type="button"
+            >
+              {preset.name}
+            </button>
+            <button
+              aria-label={`Delete preset ${preset.name}`}
+              className="chip preset-del"
+              onClick={(): void => {
+                onDelete(preset.name);
+              }}
+              type="button"
+            >
+              ✕
+            </button>
+          </span>
+        );
+      })}
 
       <form
         className="preset-save"

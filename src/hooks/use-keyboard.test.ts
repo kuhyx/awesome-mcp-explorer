@@ -5,13 +5,15 @@ import { actionFor, isTypingTarget, useKeyboard } from "./use-keyboard.ts";
 
 const event = (
   over: Partial<Pick<KeyboardEvent, "ctrlKey" | "key" | "metaKey" | "target">> = {},
-): Pick<KeyboardEvent, "ctrlKey" | "key" | "metaKey" | "target"> => ({
-  ctrlKey: false,
-  key: "a",
-  metaKey: false,
-  target: null,
-  ...over,
-});
+): Pick<KeyboardEvent, "ctrlKey" | "key" | "metaKey" | "target"> => {
+	return {
+	  ctrlKey: false,
+	  key: "a",
+	  metaKey: false,
+	  target: null,
+	  ...over,
+	};
+};
 
 describe("isTypingTarget", () => {
   it("is false for null and non-elements", () => {
@@ -66,12 +68,14 @@ describe("actionFor", () => {
 });
 
 describe("useKeyboard", () => {
-  const actions = (): Record<string, ReturnType<typeof vi.fn>> => ({
-    onClear: vi.fn(),
-    onFocusSearch: vi.fn(),
-    onToggleHelp: vi.fn(),
-    onToggleTripleA: vi.fn(),
-  });
+  const actions = (): Record<string, ReturnType<typeof vi.fn>> => {
+  	return {
+	    onClear: vi.fn(),
+	    onFocusSearch: vi.fn(),
+	    onToggleHelp: vi.fn(),
+	    onToggleTripleA: vi.fn(),
+	  };
+  };
 
   it("runs the mapped action on keydown", () => {
     const handlers = actions();

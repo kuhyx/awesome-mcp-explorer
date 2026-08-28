@@ -13,7 +13,9 @@ import { GradeFilter } from "./grade-filter.tsx";
 import { formatStars } from "./server-row.tsx";
 import { TriStatePicker } from "./tri-state-picker.tsx";
 
-/** Keyed by Language, so a new language is a compile error, not a fallback. */
+/**
+ * Keyed by Language, so a new language is a compile error, not a fallback.
+ */
 const LANGUAGE_NAMES: Readonly<Record<Language, string>> = {
   cpp: "C/C++",
   csharp: "C#",

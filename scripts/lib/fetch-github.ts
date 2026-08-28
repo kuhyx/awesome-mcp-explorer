@@ -13,7 +13,9 @@ import type { Cache, FetchLike } from "./net.ts";
 import { classifyFoss } from "./classify.ts";
 import { mapLimit } from "./net.ts";
 
-/** The fields this pipeline reads from `GET /repos/{owner}/{repo}`. */
+/**
+ * The fields this pipeline reads from `GET /repos/{owner}/{repo}`.
+ */
 interface RepoResponse {
   archived?: boolean;
   created_at?: string;
@@ -26,7 +28,9 @@ interface RepoResponse {
 export interface GithubResult {
   readonly facts: GithubFacts | null;
   readonly id: string;
-  /** Set when the repo could not be read, for the build report. */
+  /**
+   * Set when the repo could not be read, for the build report.
+   */
   readonly reason?: string;
 }
 
@@ -35,11 +39,15 @@ export interface FetchGithubOptions {
   readonly concurrency?: number;
   readonly fetchImpl: FetchLike;
   readonly onProgress?: (done: number, total: number) => void;
-  /** A GitHub token. Without one the limit is 60/hour, which cannot do 3,000 repos. */
+  /**
+   * A GitHub token. Without one the limit is 60/hour, which cannot do 3,000 repos.
+   */
   readonly token: string;
 }
 
-/** Anonymous GitHub allows 60 requests/hour; a token allows 5,000. */
+/**
+ * Anonymous GitHub allows 60 requests/hour; a token allows 5,000.
+ */
 const DEFAULT_CONCURRENCY = 8;
 
 function toFacts(body: RepoResponse): GithubFacts {
@@ -88,7 +96,9 @@ async function fetchOne(
   return { facts: toFacts(JSON.parse(text) as RepoResponse), id };
 }
 
-/** Fetches facts for every id, in input order. Never rejects for one bad repo. */
+/**
+ * Fetches facts for every id, in input order. Never rejects for one bad repo.
+ */
 export function fetchGithub(
   ids: readonly string[],
   options: FetchGithubOptions,

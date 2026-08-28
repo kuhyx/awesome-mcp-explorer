@@ -85,15 +85,23 @@ const GLYPHS = new Map<string, "DASH" | Grade>([
   ],
 ]);
 
-/** Grey fill used for the "ungraded" dash. */
+/**
+ * Grey fill used for the "ungraded" dash.
+ */
 const UNGRADED_FILL = "#555";
 
-/** `<use href="#gN" ... fill="#xxx"/>` — only graded slots carry a fill. */
+/**
+ * `<use href="#gN" ... fill="#xxx"/>` — only graded slots carry a fill.
+ */
 const GRADE_USE = /<use\s+href="#(g\d+)"[^>]*\sfill="([^"]*)"/g;
-/** `<path id="gN" d="..."/>` */
+/**
+ * `<path id="gN" d="..."/>`
+ */
 const GLYPH_DEF = /<path\s+id="(g\d+)"\s+d="([^"]*)"/g;
 
-/** Thrown when a badge contains an outline that is not in {@link GLYPHS}. */
+/**
+ * Thrown when a badge contains an outline that is not in {@link GLYPHS}.
+ */
 export class UnknownGlyphError extends Error {
   // Declared explicitly rather than as a parameter property: those emit runtime
   // assignments, which erasableSyntaxOnly forbids.

@@ -13,7 +13,9 @@ import { decodeBadge, UnknownGlyphError } from "./decode-badge.ts";
 import { mapLimit } from "./net.ts";
 
 export interface BadgeTarget {
-  /** The full badge SVG URL: the README's image src, or a derived one. */
+  /**
+   * The full badge SVG URL: the README's image src, or a derived one.
+   */
   readonly badgeUrl: string;
   readonly id: string;
 }
@@ -21,9 +23,13 @@ export interface BadgeTarget {
 export interface BadgeResult {
   readonly grades: Grades | null;
   readonly id: string;
-  /** Set when the badge could not be read or decoded, for the build report. */
+  /**
+   * Set when the badge could not be read or decoded, for the build report.
+   */
   readonly reason?: string;
-  /** True when decoding failed on an unknown glyph — a format change, not a miss. */
+  /**
+   * True when decoding failed on an unknown glyph — a format change, not a miss.
+   */
   readonly unknownGlyph?: boolean;
 }
 
@@ -34,7 +40,9 @@ export interface FetchBadgesOptions {
   readonly onProgress?: (done: number, total: number) => void;
 }
 
-/** Deliberately gentle: this is someone else's site and the data is not urgent. */
+/**
+ * Deliberately gentle: this is someone else's site and the data is not urgent.
+ */
 const DEFAULT_CONCURRENCY = 4;
 
 async function fetchOne(
@@ -63,7 +71,9 @@ async function readBadge(
   return response.ok ? await response.text() : null;
 }
 
-/** Fetches and decodes every badge, in input order. Never rejects for one bad badge. */
+/**
+ * Fetches and decodes every badge, in input order. Never rejects for one bad badge.
+ */
 export function fetchBadges(
   targets: readonly BadgeTarget[],
   options: FetchBadgesOptions,

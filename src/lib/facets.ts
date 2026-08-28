@@ -11,7 +11,9 @@ import type { Cost, Language, Os, Scope, Server, Tri } from "./server.ts";
 
 import { gradeCoverage, isTripleA as isAllA } from "./grade.ts";
 
-/** Triple-A, tolerating an unindexed server. */
+/**
+ * Triple-A, tolerating an unindexed server.
+ */
 function isTripleA(grades: Server["glama"]): boolean {
   return grades !== null && isAllA(grades);
 }
@@ -88,7 +90,9 @@ export function starValues(servers: readonly Server[]): number[] {
     .toSorted((a, b) => a - b);
 }
 
-/** Ascending last-push timestamps (epoch ms), for the recency slider. */
+/**
+ * Ascending last-push timestamps (epoch ms), for the recency slider.
+ */
 export function pushedValues(servers: readonly Server[]): number[] {
   return servers
     .flatMap((s) => {

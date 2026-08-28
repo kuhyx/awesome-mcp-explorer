@@ -54,7 +54,9 @@ function row(server: Server): readonly string[] {
   ];
 }
 
-/** RFC 4180 quoting: wrap in quotes and double any embedded quote. */
+/**
+ * RFC 4180 quoting: wrap in quotes and double any embedded quote.
+ */
 function csvCell(value: string): string {
   return /[",\n]/.test(value) ? `"${value.replaceAll('"', '""')}"` : value;
 }
@@ -67,7 +69,9 @@ function toCsv(servers: readonly Server[]): string {
   return lines.join("\n");
 }
 
-/** Escapes the pipe that would otherwise break out of a Markdown table cell. */
+/**
+ * Escapes the pipe that would otherwise break out of a Markdown table cell.
+ */
 function mdCell(value: string): string {
   return value.replaceAll("|", String.raw`\|`);
 }

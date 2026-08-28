@@ -20,13 +20,17 @@ const COST_LABELS = {
 
 const RATE_LABELS = { no: "no rate limit", unknown: "limits unknown", yes: "rate limited" } as const;
 
-/** "59.3k" — keeps the star column narrow and non-jittery. */
+/**
+ * "59.3k" — keeps the star column narrow and non-jittery.
+ */
 export function formatStars(stars: number): string {
   if (stars < 1000) return String(stars);
   return `${(stars / 1000).toFixed(stars < 10_000 ? 1 : 0)}k`;
 }
 
-/** "3 days ago", "2 years ago". */
+/**
+ * "3 days ago", "2 years ago".
+ */
 export function formatAge(iso: string, now: number): string {
   const then = Date.parse(iso);
   if (Number.isNaN(then)) return "unknown";
@@ -61,7 +65,9 @@ function InferredChip({
 }
 
 export interface ServerRowProps {
-  /** Injected so the row stays pure and its age text is testable. */
+  /**
+   * Injected so the row stays pure and its age text is testable.
+   */
   readonly now: number;
   readonly server: Server;
 }
@@ -89,26 +95,32 @@ export function ServerRow({ now, server }: ServerRowProps): React.JSX.Element {
         </div>
         <p className="row-desc">{server.description}</p>
         <div className="row-chips">
-          {server.languages.map((language) => (
-            <span className="chip" key={language}>
-              {language}
-            </span>
-          ))}
-          {server.scope.map((scope) => (
-            <span className="chip chip-scope" key={scope}>
-              {scope}
-            </span>
-          ))}
+          {server.languages.map((language) => {
+            return (
+              <span className="chip" key={language}>
+                {language}
+              </span>
+            );
+          })}
+          {server.scope.map((scope) => {
+            return (
+              <span className="chip chip-scope" key={scope}>
+                {scope}
+              </span>
+            );
+          })}
           <InferredChip fact={server.cost} label={COST_LABELS[server.cost.value]} />
           <InferredChip
             fact={server.rateLimited}
             label={RATE_LABELS[server.rateLimited.value]}
           />
-          {server.categories.map((category) => (
-            <span className="chip chip-cat" key={category}>
-              {category}
-            </span>
-          ))}
+          {server.categories.map((category) => {
+            return (
+              <span className="chip chip-cat" key={category}>
+                {category}
+              </span>
+            );
+          })}
         </div>
       </div>
 

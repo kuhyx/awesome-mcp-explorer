@@ -48,11 +48,13 @@ export function StatBar({
           }}
           value={sort.key}
         >
-          {(Object.keys(SORT_LABELS) as SortKey[]).map((key) => (
-            <option key={key} value={key}>
-              {SORT_LABELS[key]}
-            </option>
-          ))}
+          {(Object.keys(SORT_LABELS) as SortKey[]).map((key) => {
+            return (
+              <option key={key} value={key}>
+                {SORT_LABELS[key]}
+              </option>
+            );
+          })}
         </select>
         <button
           aria-label={`Sort ${sort.dir === "asc" ? "ascending" : "descending"}`}

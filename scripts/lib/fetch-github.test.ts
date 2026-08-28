@@ -5,7 +5,9 @@ import type { FetchLike } from "./net.ts";
 import { fetchGithub } from "./fetch-github.ts";
 import { nullCache } from "./net.ts";
 
-/** A real-shaped `GET /repos/{owner}/{repo}` body. */
+/**
+ * A real-shaped `GET /repos/{owner}/{repo}` body.
+ */
 function repoBody(over: Record<string, unknown> = {}): string {
   return JSON.stringify({
     archived: false,

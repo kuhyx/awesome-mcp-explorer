@@ -14,7 +14,9 @@ import type { Server } from "../lib/server.ts";
 import { elementAt } from "../lib/array.ts";
 import { ServerRow } from "./server-row.tsx";
 
-/** Rows vary a little with chip wrapping; the virtualizer measures the real height. */
+/**
+ * Rows vary a little with chip wrapping; the virtualizer measures the real height.
+ */
 const ESTIMATED_ROW_HEIGHT = 132;
 
 export interface ServerListProps {

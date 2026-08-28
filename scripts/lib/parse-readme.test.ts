@@ -9,7 +9,9 @@ import {
   parseRepoUrl,
 } from "./parse-readme.ts";
 
-/** Wraps entry lines in the section heading the parser requires. */
+/**
+ * Wraps entry lines in the section heading the parser requires.
+ */
 function md(...lines: string[]): string {
   return ["## Server Implementations", "", ...lines].join("\n");
 }

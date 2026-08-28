@@ -90,7 +90,9 @@ function splitTri(raw: string): { excludes: string[]; includes: string[] } {
   return { excludes, includes };
 }
 
-/** Decodes a token, tolerating malformed input from a hand-edited URL. */
+/**
+ * Decodes a token, tolerating malformed input from a hand-edited URL.
+ */
 function decodeToken(token: string): string {
   try {
     return decodeURIComponent(token);
@@ -114,7 +116,9 @@ function decodeTri<T extends string>(
   return { excludes: known(excludes), includes: known(includes) };
 }
 
-/** Categories are open-vocabulary, so they cannot be validated against a list. */
+/**
+ * Categories are open-vocabulary, so they cannot be validated against a list.
+ */
 function decodeCategoryTri(raw: null | string): TriSelect<string> {
   if (raw === null || raw === "") return { excludes: [], includes: [] };
   return splitTri(raw);
@@ -143,7 +147,9 @@ function decodeMinGrades(raw: null | string): FilterState["minGrades"] {
   return out;
 }
 
-/** Reads a param only if it is in the allowed vocabulary. */
+/**
+ * Reads a param only if it is in the allowed vocabulary.
+ */
 function oneOf<T extends string>(raw: null | string, allowed: readonly T[]): null | T {
   return raw !== null && allowed.includes(raw as T) ? (raw as T) : null;
 }
@@ -185,12 +191,16 @@ function rawParameters(search: string): Map<string, string> {
   return parameters;
 }
 
-/** A flag contributes its key only when set. */
+/**
+ * A flag contributes its key only when set.
+ */
 function flag(isSet: boolean): null | string {
   return isSet ? "1" : null;
 }
 
-/** A tri-state contributes nothing when neutral. */
+/**
+ * A tri-state contributes nothing when neutral.
+ */
 function tri<T extends string>(select: TriSelect<T>): null | string {
   return isEmptyTri(select) ? null : encodeTri(select);
 }
@@ -233,10 +243,11 @@ export function encodeFilter(
   const PRE_ENCODED = new Set(["cat", "cost", "foss", "lang", "min", "os", "rl", "scope"]);
   return fields
     .filter((field) => field[1] !== null)
-    .map(([key, value]) =>
-      PRE_ENCODED.has(key)
+    .map(([key, value]) => {
+    	return PRE_ENCODED.has(key)
         ? `${key}=${String(value)}`
-        : `${key}=${encodeValue(String(value))}`,
+        : `${key}=${encodeValue(String(value))}`;
+    },
     )
     .join("&");
 }
@@ -246,9 +257,13 @@ export function decodeFilter(search: string): {
   sort: { dir: SortDirection; key: SortKey };
 } {
   const parameters = rawParameters(search);
-  /** Raw (still encoded) — for values this format splits before decoding. */
+  /**
+   * Raw (still encoded) — for values this format splits before decoding.
+   */
   const raw = (key: string): null | string => parameters.get(key) ?? null;
-  /** Decoded — for scalars. */
+  /**
+   * Decoded — for scalars.
+   */
   const get = (key: string): null | string => {
     const value = parameters.get(key);
     return value === undefined ? null : decodeToken(value);

@@ -46,14 +46,18 @@ function server(over: Partial<Server> = {}): Server {
   };
 }
 
-const filter = (over: Partial<FilterState> = {}): FilterState => ({
-  ...DEFAULT_FILTER,
-  ...over,
-});
-const sort = (over: Partial<SortState> = {}): SortState => ({
-  ...DEFAULT_SORT,
-  ...over,
-});
+const filter = (over: Partial<FilterState> = {}): FilterState => {
+	return {
+	  ...DEFAULT_FILTER,
+	  ...over,
+	};
+};
+const sort = (over: Partial<SortState> = {}): SortState => {
+	return {
+	  ...DEFAULT_SORT,
+	  ...over,
+	};
+};
 
 describe("passesTri", () => {
   it("passes everything when neutral", () => {

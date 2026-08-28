@@ -6,7 +6,9 @@
  * obvious approach — see the marker scanner for the full catalogue.
  */
 
-/** Languages the legend defines. */
+/**
+ * Languages the legend defines.
+ */
 export const LANGUAGES = [
   "typescript",
   "python",
@@ -32,14 +34,22 @@ export const OPERATING_SYSTEMS = ["macos", "windows", "linux"] as const;
 
 export type Os = (typeof OPERATING_SYSTEMS)[number];
 
-/** One markdown bullet. A repo listed in several categories yields several. */
+/**
+ * One markdown bullet. A repo listed in several categories yields several.
+ */
 export interface RawEntry {
-  /** Glama badge URL if the entry carries one, else null. */
+  /**
+   * Glama badge URL if the entry carries one, else null.
+   */
   readonly badgeUrl: null | string;
-  /** The `###` section the entry appeared under, e.g. "Browser Automation". */
+  /**
+   * The `###` section the entry appeared under, e.g. "Browser Automation".
+   */
   readonly category: string;
   readonly description: string;
-  /** `owner/repo`, lowercased for stable joining against other sources. */
+  /**
+   * `owner/repo`, lowercased for stable joining against other sources.
+   */
   readonly id: string;
   readonly languages: readonly Language[];
   readonly official: boolean;
@@ -50,7 +60,9 @@ export interface RawEntry {
   readonly url: string;
 }
 
-/** One repository, after merging every row that points at it. */
+/**
+ * One repository, after merging every row that points at it.
+ */
 export interface MergedEntry extends Omit<RawEntry, "category"> {
   readonly categories: readonly string[];
 }
@@ -115,26 +127,38 @@ const BADGE_IMAGE = new RegExp(
   String.raw`\[!\[[^\]]{0,${MAX_LINK_TEXT}}\]\(([^)]{0,${MAX_URL}})\)\]\([^)]{0,${MAX_URL}}\)`,
   "g",
 );
-/** `[text](href)` — an ordinary inline link. */
+/**
+ * `[text](href)` — an ordinary inline link.
+ */
 const INLINE_LINK = new RegExp(
   String.raw`\[([^\]]{0,${MAX_LINK_TEXT}})\]\(([^)]{0,${MAX_URL}})\)`,
   "g",
 );
-/** `### 🔗 <a name="anchor"></a>Category Name` */
+/**
+ * `### 🔗 <a name="anchor"></a>Category Name`
+ */
 const CATEGORY_PREFIX = "### ";
-/** Leading `- [title](url)` of a list entry. */
+/**
+ * Leading `- [title](url)` of a list entry.
+ */
 const ENTRY_START = new RegExp(
   String.raw`^-\s+\[[^\]]{0,${MAX_LINK_TEXT}}\]\((https://github\.com/[^)]{1,${MAX_URL}})\)`,
 );
-/** Variation selectors and the keycap combining mark. */
+/**
+ * Variation selectors and the keycap combining mark.
+ */
 const EMOJI_SUFFIXES = /[\u{FE0F}\u{20E3}]/gu;
 
-/** Strips VS16/keycap so every spelling of a marker collapses to one form. */
+/**
+ * Strips VS16/keycap so every spelling of a marker collapses to one form.
+ */
 function normalizeEmoji(text: string): string {
   return text.replaceAll(EMOJI_SUFFIXES, "");
 }
 
-/** Category headings carry a decorative emoji and an anchor tag; drop both. */
+/**
+ * Category headings carry a decorative emoji and an anchor tag; drop both.
+ */
 function cleanCategory(heading: string): string {
   return heading
     .replaceAll(/<a\s+name="[^"]*"><\/a>/g, "")
@@ -170,7 +194,9 @@ function scanMarkers(text: string): Marker[] {
   return found;
 }
 
-/** Strips markers and links, leaving the human description. */
+/**
+ * Strips markers and links, leaving the human description.
+ */
 function extractDescription(text: string): string {
   let rest = text.replaceAll(BADGE_IMAGE, "");
   // Keep link *text* — descriptions like "mcp server for [cert-manager](url)"
@@ -320,7 +346,9 @@ export function mergeEntries(rows: readonly RawEntry[]): MergedEntry[] {
   return byId.values().toArray();
 }
 
-/** Splits a GitHub URL into owner/repo, ignoring deep links and `.git`. */
+/**
+ * Splits a GitHub URL into owner/repo, ignoring deep links and `.git`.
+ */
 export function parseRepoUrl(url: string): null | { owner: string; repo: string } {
   const match = /^https:\/\/github\.com\/([^/\s]+)\/([^/\s#?]+)/.exec(url);
   const owner = match?.[1];

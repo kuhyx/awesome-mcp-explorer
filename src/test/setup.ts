@@ -64,18 +64,26 @@ class ResizeObserverStub implements ResizeObserver {
 
 Reflect.set(globalThis, "ResizeObserver", ResizeObserverStub);
 
-/** Viewport height every element reports; tests may change it via {@link setTestHeight}. */
+/**
+ * Viewport height every element reports; tests may change it via {@link setTestHeight}.
+ */
 let testHeight = 800;
 
-/** Resize the fake viewport to exercise a different virtual window. */
+/**
+ * Resize the fake viewport to exercise a different virtual window.
+ */
 export function setTestHeight(height: number): void {
   testHeight = height;
 }
 
-/** Height a virtualized row reports. Mirrors ESTIMATED_ROW_HEIGHT. */
+/**
+ * Height a virtualized row reports. Mirrors ESTIMATED_ROW_HEIGHT.
+ */
 const ROW_HEIGHT = 132;
 
-/** True for the scrolling viewport, false for a row inside it. */
+/**
+ * True for the scrolling viewport, false for a row inside it.
+ */
 function isScroller(element: Element): boolean {
   return element.classList.contains("list");
 }

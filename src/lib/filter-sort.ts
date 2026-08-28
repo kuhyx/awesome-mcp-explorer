@@ -45,26 +45,38 @@ export interface SortState {
 
 export interface FilterState {
   readonly categories: TriSelect<string>;
-  /** Multi-select: "likely-free OR unknown" is a normal thing to want. */
+  /**
+   * Multi-select: "likely-free OR unknown" is a normal thing to want.
+   */
   readonly cost: TriSelect<Cost>;
   readonly foss: TriSelect<Tri>;
   readonly gradeCoverage: GradeCoverage | null;
-  /** Hide repos GitHub reports as archived. */
+  /**
+   * Hide repos GitHub reports as archived.
+   */
   readonly hideArchived: boolean;
   readonly languages: TriSelect<Language>;
   readonly maxStars: null | number;
-  /** Per-axis "at least this good"; an ungraded axis never satisfies one. */
+  /**
+   * Per-axis "at least this good"; an ungraded axis never satisfies one.
+   */
   readonly minGrades: Readonly<Partial<Record<GradeAxis, Grade>>>;
   readonly minStars: null | number;
   readonly official: boolean;
   readonly os: TriSelect<Os>;
-  /** Epoch ms; a repo must have been pushed at or after this. */
+  /**
+   * Epoch ms; a repo must have been pushed at or after this.
+   */
   readonly pushedAfter: null | number;
-  /** Fuzzy subsequence query over name, owner and description. */
+  /**
+   * Fuzzy subsequence query over name, owner and description.
+   */
   readonly query: string;
   readonly rateLimited: TriSelect<Tri>;
   readonly scope: TriSelect<Scope>;
-  /** Require all three axes to be exactly A — the headline filter. */
+  /**
+   * Require all three axes to be exactly A — the headline filter.
+   */
   readonly tripleA: boolean;
 }
 
@@ -89,7 +101,9 @@ export const DEFAULT_FILTER: FilterState = {
 
 export const DEFAULT_SORT: SortState = { dir: "desc", key: "stars" };
 
-/** True when any constraint is set — used to badge the UI and offer a reset. */
+/**
+ * True when any constraint is set — used to badge the UI and offer a reset.
+ */
 export function isFilterActive(filter: FilterState): boolean {
   return JSON.stringify(filter) !== JSON.stringify(DEFAULT_FILTER);
 }
@@ -185,7 +199,9 @@ function isTextKey(key: SortKey): key is TextKey {
   return (TEXT_KEYS as readonly SortKey[]).includes(key);
 }
 
-/** Text projection. Always defined: every server has an id and a category. */
+/**
+ * Text projection. Always defined: every server has an id and a category.
+ */
 function textValue(server: Server, key: TextKey): string {
   return key === "category" ? (server.categories[0] ?? "") : server.id;
 }
@@ -241,7 +257,9 @@ function compare(a: Server, b: Server, sort: SortState): number {
   return sort.dir === "asc" ? c : -c;
 }
 
-/** Filters then sorts. Pure: returns a new array, mutates nothing. */
+/**
+ * Filters then sorts. Pure: returns a new array, mutates nothing.
+ */
 export function applyFilterSort(
   servers: readonly Server[],
   filter: FilterState,
