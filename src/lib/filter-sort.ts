@@ -4,7 +4,7 @@ import { fuzzyMatch } from "@kuhyx/web-ui";
  * The filter/sort engine: pure, React-free, and the whole reason the app can
  * hold a 100% coverage bar cheaply.
  *
- * The shape follows `~/dufs-cloud/web/src/lib/filter-sort.ts`: one flat readonly
+ * The shape follows `~/src/dufs-cloud/web/src/lib/filter-sort.ts`: one flat readonly
  * state object where `null`/`[]` mean "no constraint", a `DEFAULT_FILTER` to
  * compare against, and a single pure `applyFilterSort(data, filter, sort)` built
  * from an early-return predicate chain.

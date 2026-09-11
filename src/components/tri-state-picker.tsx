@@ -1,7 +1,7 @@
 /**
  * A tri-state facet picker: each option cycles off -> include -> exclude.
  *
- * Ported from `~/dufs-cloud/web/src/components/extension-picker.tsx`. The
+ * Ported from `~/src/dufs-cloud/web/src/components/extension-picker.tsx`. The
  * rationale carries over exactly: showing every option at once (rather than a
  * datalist, which hides the rest once you pick one) and folding "not X" into
  * the same control removes the need for a separate negation toggle.
