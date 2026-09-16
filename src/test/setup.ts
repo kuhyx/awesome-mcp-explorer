@@ -48,7 +48,13 @@ class MemoryStorage implements Storage {
   }
 }
 
-Reflect.set(globalThis, "localStorage", new MemoryStorage());
+// jsdom (via vitest 5) exposes localStorage as a getter-only accessor, so a
+// plain assignment throws; redefine the property instead.
+Object.defineProperty(globalThis, "localStorage", {
+  configurable: true,
+  value: new MemoryStorage(),
+  writable: true,
+});
 
 class ResizeObserverStub implements ResizeObserver {
   disconnect(): void {
