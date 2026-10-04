@@ -120,8 +120,7 @@ function decodeTri<T extends string>(
  * Categories are open-vocabulary, so they cannot be validated against a list.
  */
 function decodeCategoryTri(raw: null | string): TriSelect<string> {
-  if (raw === null || raw === "") return { excludes: [], includes: [] };
-  return splitTri(raw);
+  return raw === null || raw === "" ? { excludes: [], includes: [] } : splitTri(raw);
 }
 
 function isEmptyTri(select: TriSelect<string>): boolean {
@@ -131,7 +130,7 @@ function isEmptyTri(select: TriSelect<string>): boolean {
 function encodeMinGrades(grades: FilterState["minGrades"]): string {
   return GRADE_AXES.flatMap((axis) => {
     const grade = grades[axis];
-    return grade === undefined ? [] : [`${axis}:${grade}`];
+    return grade === undefined ? [] : `${axis}:${grade}`;
   }).join(",");
 }
 
@@ -140,8 +139,7 @@ function decodeMinGrades(raw: null | string): FilterState["minGrades"] {
   const out: Partial<Record<GradeAxis, Grade>> = {};
   for (const token of raw.split(",")) {
     const [axis, grade] = decodeToken(token).split(":", 2);
-    if (!GRADE_AXES.includes(axis as GradeAxis)) continue;
-    if (!GRADES.includes(grade as Grade)) continue;
+    if (!GRADE_AXES.includes(axis as GradeAxis) || !GRADES.includes(grade as Grade)) continue;
     out[axis as GradeAxis] = grade as Grade;
   }
   return out;

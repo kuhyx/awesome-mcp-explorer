@@ -16,7 +16,7 @@ import { mapLimit } from "./net.ts";
 /**
  * The fields this pipeline reads from `GET /repos/{owner}/{repo}`.
  */
-interface RepoResponse {
+interface RepositoryResponse {
   archived?: boolean;
   created_at?: string;
   forks_count?: number;
@@ -50,7 +50,7 @@ export interface FetchGithubOptions {
  */
 const DEFAULT_CONCURRENCY = 8;
 
-function toFacts(body: RepoResponse): GithubFacts {
+function toFacts(body: RepositoryResponse): GithubFacts {
   // GitHub omits `license` entirely for a repo with no licence file, and sets
   // spdx_id to "NONE" in some responses. classifyFoss treats both as "no".
   const spdx = body.license?.spdx_id ?? null;
@@ -73,7 +73,7 @@ async function fetchOne(
 
   const cached = await options.cache.get(url);
   if (cached !== null) {
-    return { facts: toFacts(JSON.parse(cached) as RepoResponse), id };
+    return { facts: toFacts(JSON.parse(cached) as RepositoryResponse), id };
   }
 
   const response = await options.fetchImpl(url, {
@@ -93,7 +93,7 @@ async function fetchOne(
 
   const text = await response.text();
   await options.cache.set(url, text);
-  return { facts: toFacts(JSON.parse(text) as RepoResponse), id };
+  return { facts: toFacts(JSON.parse(text) as RepositoryResponse), id };
 }
 
 /**

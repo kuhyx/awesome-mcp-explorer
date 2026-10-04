@@ -240,8 +240,8 @@ function extractBadgeUrl(line: string): null | string {
  * has plainly graded — `upstash/context7` (A/A/B) among them — and the headline
  * triple-A filter would silently miss roughly a thousand servers.
  */
-export function derivedBadgeUrl(owner: string, repo: string): string {
-  return `https://glama.ai/mcp/servers/${owner}/${repo}/badges/score.svg`;
+export function derivedBadgeUrl(owner: string, repository: string): string {
+  return `https://glama.ai/mcp/servers/${owner}/${repository}/badges/score.svg`;
 }
 
 /**
@@ -276,7 +276,7 @@ export function parseReadme(markdown: string): RawEntry[] {
 
     // ENTRY_START only guarantees a github.com URL, not that it names a repo:
     // a bare `https://github.com/owner` link reaches here and has no repo.
-    const slug = parseRepoUrl(url);
+    const slug = parseRepositoryUrl(url);
     if (slug === null) continue;
 
     const rest = line.slice(matched.length);
@@ -288,14 +288,14 @@ export function parseReadme(markdown: string): RawEntry[] {
       description: extractDescription(rest),
       id: `${slug.owner}/${slug.repo}`.toLowerCase(),
       languages: dedupe(
-        markers.flatMap((m) => (m.kind === "language" ? [m.value] : [])),
+        markers.flatMap((m) => (m.kind === "language" ? m.value : [])),
       ),
       official: markers.some((m) => m.kind === "official"),
-      os: dedupe(markers.flatMap((m) => (m.kind === "os" ? [m.value] : []))),
+      os: dedupe(markers.flatMap((m) => (m.kind === "os" ? m.value : []))),
       owner: slug.owner,
       repo: slug.repo,
       scope: dedupe(
-        markers.flatMap((m) => (m.kind === "scope" ? [m.value] : [])),
+        markers.flatMap((m) => (m.kind === "scope" ? m.value : [])),
       ),
       url,
     });
@@ -349,12 +349,11 @@ export function mergeEntries(rows: readonly RawEntry[]): MergedEntry[] {
 /**
  * Splits a GitHub URL into owner/repo, ignoring deep links and `.git`.
  */
-export function parseRepoUrl(url: string): null | { owner: string; repo: string } {
+export function parseRepositoryUrl(url: string): null | { owner: string; repo: string } {
   const match = /^https:\/\/github\.com\/([^/\s]+)\/([^/\s#?]+)/.exec(url);
   const owner = match?.[1];
-  const repo = match?.[2];
-  if (owner === undefined || repo === undefined) return null;
-  return { owner, repo: repo.replace(/\.git$/, "") };
+  const repository = match?.[2];
+  return owner === undefined || repository === undefined ? null : { owner, repo: repository.replace(/\.git$/, "") };
 }
 
 function dedupe<T>(values: readonly T[]): T[] {

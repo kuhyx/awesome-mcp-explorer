@@ -36,8 +36,7 @@ export interface TriStatePickerProps<T extends string> {
 
 export function stateOf<T extends string>(select: TriSelect<T>, option: T): TriValue {
   if (select.includes.includes(option)) return "include";
-  if (select.excludes.includes(option)) return "exclude";
-  return "off";
+  return select.excludes.includes(option) ? "exclude" : "off";
 }
 
 /**
@@ -58,8 +57,7 @@ export function cycle<T extends string>(select: TriSelect<T>, option: T): TriSel
   const includes = select.includes.filter((v) => v !== option);
   const excludes = select.excludes.filter((v) => v !== option);
   if (next === "include") return { excludes, includes: [...includes, option] };
-  if (next === "exclude") return { excludes: [...excludes, option], includes };
-  return { excludes, includes };
+  return ({ excludes: next === "exclude" ? [...excludes, option] : excludes, includes });
 }
 
 /**

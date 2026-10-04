@@ -46,8 +46,7 @@ export function loadPresets(storage: Storage): Preset[] {
     const raw = storage.getItem(STORAGE_KEY);
     if (raw === null) return [];
     const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter(isPreset);
+    return Array.isArray(parsed) ? parsed.filter(isPreset) : [];
   } catch {
     return [];
   }

@@ -88,8 +88,7 @@ export function compositeRank(grades: Grades | null): null | number {
   if (grades === null) return null;
   const ranks = GRADE_AXES.flatMap((axis) => {
     const grade = grades[axis];
-    return grade === undefined ? [] : [gradeRank(grade)];
+    return grade === undefined ? [] : gradeRank(grade);
   });
-  if (ranks.length === 0) return null;
-  return ranks.reduce((sum, rank) => sum + rank, 0) / ranks.length;
+  return ranks.length === 0 ? null : ranks.reduce((sum, rank) => sum + rank, 0) / ranks.length;
 }

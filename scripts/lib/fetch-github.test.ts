@@ -8,7 +8,7 @@ import { nullCache } from "./net.ts";
 /**
  * A real-shaped `GET /repos/{owner}/{repo}` body.
  */
-function repoBody(over: Record<string, unknown> = {}): string {
+function repositoryBody(over: Record<string, unknown> = {}): string {
   return JSON.stringify({
     archived: false,
     created_at: "2024-01-01T00:00:00Z",
@@ -30,7 +30,7 @@ describe("fetchGithub", () => {
   it("maps a repo response onto facts", async () => {
     const [result] = await fetchGithub(["upstash/context7"], {
       ...base,
-      fetchImpl: okFetch(repoBody()),
+      fetchImpl: okFetch(repositoryBody()),
     });
     expect(result).toEqual({
       facts: {
@@ -47,7 +47,7 @@ describe("fetchGithub", () => {
   });
 
   it("sends the token and asks for the v3 media type", async () => {
-    const fetchImpl = vi.fn(okFetch(repoBody()));
+    const fetchImpl = vi.fn(okFetch(repositoryBody()));
     await fetchGithub(["a/b"], { ...base, fetchImpl });
     const init = fetchImpl.mock.calls[0]?.[1];
     expect(fetchImpl.mock.calls[0]?.[0]).toBe("https://api.github.com/repos/a/b");
@@ -86,7 +86,7 @@ describe("fetchGithub", () => {
   it("treats a repo with no licence as not free", async () => {
     const [result] = await fetchGithub(["a/b"], {
       ...base,
-      fetchImpl: okFetch(repoBody({ license: null })),
+      fetchImpl: okFetch(repositoryBody({ license: null })),
     });
     expect(result?.facts?.spdx).toBeNull();
     expect(result?.facts?.isFoss).toBe("no");
@@ -95,7 +95,7 @@ describe("fetchGithub", () => {
   it("normalises a NONE spdx id to no licence", async () => {
     const [result] = await fetchGithub(["a/b"], {
       ...base,
-      fetchImpl: okFetch(repoBody({ license: { spdx_id: "NONE" } })),
+      fetchImpl: okFetch(repositoryBody({ license: { spdx_id: "NONE" } })),
     });
     expect(result?.facts?.spdx).toBeNull();
     expect(result?.facts?.isFoss).toBe("no");
@@ -104,7 +104,7 @@ describe("fetchGithub", () => {
   it("keeps an unidentifiable licence as unknown", async () => {
     const [result] = await fetchGithub(["a/b"], {
       ...base,
-      fetchImpl: okFetch(repoBody({ license: { spdx_id: "NOASSERTION" } })),
+      fetchImpl: okFetch(repositoryBody({ license: { spdx_id: "NOASSERTION" } })),
     });
     expect(result?.facts?.spdx).toBe("NOASSERTION");
     expect(result?.facts?.isFoss).toBe("unknown");
@@ -124,7 +124,7 @@ describe("fetchGithub", () => {
   });
 
   it("serves a cached body without fetching", async () => {
-    const store = new Map([["https://api.github.com/repos/a/b", repoBody()]]);
+    const store = new Map([["https://api.github.com/repos/a/b", repositoryBody()]]);
     const fetchImpl = vi.fn<FetchLike>();
     const [result] = await fetchGithub(["a/b"], {
       ...base,
@@ -143,11 +143,11 @@ describe("fetchGithub", () => {
     await fetchGithub(["a/b"], {
       ...base,
       cache: { get: () => Promise.resolve(null), set },
-      fetchImpl: okFetch(repoBody()),
+      fetchImpl: okFetch(repositoryBody()),
     });
     expect(set).toHaveBeenCalledWith(
       "https://api.github.com/repos/a/b",
-      repoBody(),
+      repositoryBody(),
     );
   });
 
@@ -166,7 +166,7 @@ describe("fetchGithub", () => {
     await fetchGithub(["a/b", "c/d"], {
       ...base,
       concurrency: 1,
-      fetchImpl: okFetch(repoBody()),
+      fetchImpl: okFetch(repositoryBody()),
       onProgress,
     });
     expect(onProgress).toHaveBeenLastCalledWith(2, 2);

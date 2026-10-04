@@ -4,7 +4,7 @@ import { defineConfig } from "vite";
 
 // base: "./" keeps the built bundle path-agnostic so it works from a GitHub
 // Pages project subpath (/awesome-mcp-explorer/) and from file:// alike.
-export default defineConfig({
+const config = defineConfig({
   base: "./",
   plugins: [react()],
   test: {
@@ -51,3 +51,5 @@ export default defineConfig({
     ],
   },
 });
+
+export default config;

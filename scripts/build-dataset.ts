@@ -137,8 +137,8 @@ function report(
   const ghFailures = github.filter((g) => g.facts === null);
   const oddLicenses = new Set(
     servers.flatMap((s) => {
-    	return s.gh !== null && isUnrecognisedLicense(s.gh.spdx) && s.gh.spdx !== null
-        ? [s.gh.spdx]
+      return s.gh !== null && isUnrecognisedLicense(s.gh.spdx) && s.gh.spdx !== null
+        ? s.gh.spdx
         : [];
     },
     ),
@@ -179,14 +179,16 @@ function report(
   }
 
   // A changed badge format must fail the build, not quietly empty the filter.
-  if (unknownGlyphs.length > 0) {
-    stderr.write(
-      `\nFAIL: ${unknownGlyphs.length} badges used an unknown glyph. ` +
-        "Glama's badge format has probably changed; see decode-badge.ts.\n",
-    );
-    for (const b of unknownGlyphs.slice(0, 3)) stderr.write(`  ${b.id}: ${b.reason}\n`);
-    exit(1);
+  if (unknownGlyphs.length === 0) {
+    return;
   }
+
+  stderr.write(
+    `\nFAIL: ${unknownGlyphs.length} badges used an unknown glyph. ` +
+      "Glama's badge format has probably changed; see decode-badge.ts.\n",
+  );
+  for (const b of unknownGlyphs.slice(0, 3)) stderr.write(`  ${b.id}: ${b.reason}\n`);
+  exit(1);
 }
 
 await main();

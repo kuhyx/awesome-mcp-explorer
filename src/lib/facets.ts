@@ -86,7 +86,7 @@ export function computeFacets(servers: readonly Server[]): Facets {
  */
 export function starValues(servers: readonly Server[]): number[] {
   return servers
-    .flatMap((s) => (s.gh === null ? [] : [s.gh.stars]))
+    .flatMap((s) => (s.gh === null ? [] : s.gh.stars))
     .toSorted((a, b) => a - b);
 }
 
@@ -95,11 +95,8 @@ export function starValues(servers: readonly Server[]): number[] {
  */
 export function pushedValues(servers: readonly Server[]): number[] {
   return servers
-    .flatMap((s) => {
-      if (s.gh === null) return [];
-      const t = Date.parse(s.gh.pushedAt);
-      return Number.isNaN(t) ? [] : [t];
-    })
+    .map((s) => (s.gh === null ? NaN : Date.parse(s.gh.pushedAt)))
+    .filter((t) => !Number.isNaN(t))
     .toSorted((a, b) => a - b);
 }
 

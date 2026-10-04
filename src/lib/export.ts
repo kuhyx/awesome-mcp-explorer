@@ -86,7 +86,7 @@ function toMarkdown(servers: readonly Server[]): string {
         s.glama === null
           ? "not indexed"
           : [s.glama.license, s.glama.quality, s.glama.maintenance]
-              .map((g) => g ?? "–")
+              .map((g: string | undefined = "–") => g)
               .join("/");
       return `| [${mdCell(s.id)}](${s.url}) | ${grades} | ${s.gh?.stars ?? "?"} | ${
         s.gh?.spdx ?? "none"

@@ -17,10 +17,10 @@ export interface KeyboardActions {
  * True when the event target is a field that should swallow the keystroke.
  */
 export function isTypingTarget(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false;
   return (
-    target.isContentEditable ||
-    ["INPUT", "SELECT", "TEXTAREA"].includes(target.tagName)
+    target instanceof HTMLElement &&
+    (target.isContentEditable ||
+      ["INPUT", "SELECT", "TEXTAREA"].includes(target.tagName))
   );
 }
 

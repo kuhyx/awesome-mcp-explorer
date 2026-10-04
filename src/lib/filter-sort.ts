@@ -120,13 +120,10 @@ export function passesTri<T extends string>(
   values: readonly T[],
   select: TriSelect<T>,
 ): boolean {
-  if (
+  const hasNoMatchingInclude =
     select.includes.length > 0 &&
-    select.includes.every((v) => !values.includes(v))
-  ) {
-    return false;
-  }
-  return select.excludes.every((v) => !values.includes(v));
+    select.includes.every((v) => !values.includes(v));
+  return !hasNoMatchingInclude && select.excludes.every((v) => !values.includes(v));
 }
 
 function passesGrades(server: Server, filter: FilterState): boolean {
@@ -170,16 +167,18 @@ function passesGithub(server: Server, filter: FilterState): boolean {
 
 export function passesFilters(server: Server, filter: FilterState): boolean {
   const haystack = `${server.id} ${server.description}`;
-  if (!fuzzyMatch(filter.query, haystack)) return false;
-  if (filter.official && !server.official) return false;
-  if (!passesTri(server.languages, filter.languages)) return false;
-  if (!passesTri(server.scope, filter.scope)) return false;
-  if (!passesTri(server.os, filter.os)) return false;
-  if (!passesTri(server.categories, filter.categories)) return false;
-  if (!passesTri([server.cost.value], filter.cost)) return false;
-  if (!passesTri([server.rateLimited.value], filter.rateLimited)) return false;
-  if (!passesGrades(server, filter)) return false;
-  return passesGithub(server, filter);
+  return (
+    fuzzyMatch(filter.query, haystack) &&
+    (!filter.official || server.official) &&
+    passesTri(server.languages, filter.languages) &&
+    passesTri(server.scope, filter.scope) &&
+    passesTri(server.os, filter.os) &&
+    passesTri(server.categories, filter.categories) &&
+    passesTri([server.cost.value], filter.cost) &&
+    passesTri([server.rateLimited.value], filter.rateLimited) &&
+    passesGrades(server, filter) &&
+    passesGithub(server, filter)
+  );
 }
 
 /**

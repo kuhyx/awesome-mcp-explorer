@@ -37,8 +37,7 @@ export function formatAge(iso: string, now: number): string {
   const days = Math.floor((now - then) / 86_400_000);
   if (days < 1) return "today";
   if (days < 30) return `${days}d ago`;
-  if (days < 365) return `${Math.floor(days / 30)}mo ago`;
-  return `${Math.floor(days / 365)}y ago`;
+  return days < 365 ? `${Math.floor(days / 30)}mo ago` : `${Math.floor(days / 365)}y ago`;
 }
 
 function InferredChip({

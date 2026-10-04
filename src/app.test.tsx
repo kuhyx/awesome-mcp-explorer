@@ -52,10 +52,10 @@ const DATA: Server[] = [
   }),
 ];
 
-function stubFetch(data: Server[] = DATA): void {
+function stubFetch(): void {
   vi.stubGlobal(
     "fetch",
-    vi.fn(() => Promise.resolve(Response.json(data, { status: 200 }))),
+    vi.fn(() => Promise.resolve(Response.json(DATA, { status: 200 }))),
   );
 }
 

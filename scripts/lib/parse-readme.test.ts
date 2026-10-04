@@ -6,7 +6,7 @@ import {
   derivedBadgeUrl,
   mergeEntries,
   parseReadme,
-  parseRepoUrl,
+  parseRepositoryUrl,
 } from "./parse-readme.ts";
 
 /**
@@ -22,28 +22,28 @@ function only(...lines: string[]): RawEntry {
   return entries[0]!;
 }
 
-describe("parseRepoUrl", () => {
+describe("parseRepositoryUrl", () => {
   it("splits owner and repo", () => {
-    expect(parseRepoUrl("https://github.com/foo/bar")).toEqual({
+    expect(parseRepositoryUrl("https://github.com/foo/bar")).toEqual({
       owner: "foo",
       repo: "bar",
     });
   });
 
   it("ignores deep links and fragments", () => {
-    expect(parseRepoUrl("https://github.com/foo/bar/tree/main#readme")).toEqual({
+    expect(parseRepositoryUrl("https://github.com/foo/bar/tree/main#readme")).toEqual({
       owner: "foo",
       repo: "bar",
     });
   });
 
   it("strips a .git suffix", () => {
-    expect(parseRepoUrl("https://github.com/foo/bar.git")?.repo).toBe("bar");
+    expect(parseRepositoryUrl("https://github.com/foo/bar.git")?.repo).toBe("bar");
   });
 
   it("rejects a non-repo URL", () => {
-    expect(parseRepoUrl("https://github.com/foo")).toBeNull();
-    expect(parseRepoUrl("https://example.com/foo/bar")).toBeNull();
+    expect(parseRepositoryUrl("https://github.com/foo")).toBeNull();
+    expect(parseRepositoryUrl("https://example.com/foo/bar")).toBeNull();
   });
 });
 
@@ -75,7 +75,7 @@ describe("parseReadme sections", () => {
 
   it("ignores a GitHub link that names no repository", () => {
     // The entry pattern only guarantees a github.com URL, so a bare profile
-    // link reaches parseRepoUrl and must be rejected there.
+    // link reaches parseRepositoryUrl and must be rejected there.
     expect(parseReadme(md("- [x](https://github.com/owner) 🐍 - Profile."))).toEqual(
       [],
     );

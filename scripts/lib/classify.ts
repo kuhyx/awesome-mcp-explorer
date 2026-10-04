@@ -78,8 +78,7 @@ export function classifyFoss(spdx: null | string): Tri {
   if (spdx === null || spdx === "NONE") return "no";
   if (spdx === UNIDENTIFIED_LICENSE) return "unknown";
   if (FOSS_LICENSES.has(spdx)) return "yes";
-  if (NON_FOSS_LICENSES.has(spdx)) return "no";
-  return "unknown";
+  return NON_FOSS_LICENSES.has(spdx) ? "no" : "unknown";
 }
 
 /**
@@ -184,8 +183,7 @@ export function inferCost(description: string, scope: readonly Scope[]): Cost {
   if (!isLocalOnly(scope) && hasAny(text, CREDENTIAL_PHRASES)) {
     return "likely-paid";
   }
-  if (isLocalOnly(scope)) return "likely-free";
-  return "unknown";
+  return isLocalOnly(scope) ? "likely-free" : "unknown";
 }
 
 /**
@@ -203,6 +201,5 @@ export function inferRateLimited(
   if (text.includes("rate limit") || text.includes("rate-limit")) return "yes";
   if (hasAny(text, FREE_PHRASES) && isLocalOnly(scope)) return "no";
   if (isLocalOnly(scope)) return "no";
-  if (hasAny(text, CREDENTIAL_PHRASES)) return "yes";
-  return "unknown";
+  return hasAny(text, CREDENTIAL_PHRASES) ? "yes" : "unknown";
 }
