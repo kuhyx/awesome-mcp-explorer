@@ -68,38 +68,40 @@ export function GradeFilter({
       </p>
 
       <div className="grade-axes">
-        {GRADE_AXES.map((axis) => (
-          <label className="grade-axis" key={axis}>
-            <span>{axis} ≥</span>
-            <select
-              onChange={(event): void => {
-                // Rebuilt from entries rather than a dynamic delete: "any"
-                // means the axis is absent, not present-and-empty, and an
-                // empty-string grade would fail every comparison silently.
-                const chosen = event.target.value;
-                const next = Object.fromEntries(
-                  GRADE_AXES.flatMap((a) => {
-                    const grade = a === axis ? chosen : filter.minGrades[a];
-                    return grade === undefined || grade === ""
-                      ? []
-                      : [[a, grade] as const];
-                  }),
-                );
-                onChange({ ...filter, minGrades: next });
-              }}
-              value={filter.minGrades[axis] ?? ""}
-            >
-              <option value="">any</option>
-              {GRADES.map((grade) => {
-                return (
-                  <option key={grade} value={grade}>
-                    {grade}
-                  </option>
-                );
-              })}
-            </select>
-          </label>
-        ))}
+        {GRADE_AXES.map((axis) => {
+          return (
+            <label className="grade-axis" key={axis}>
+              <span>{axis} ≥</span>
+              <select
+                onChange={(event): void => {
+                  // Rebuilt from entries rather than a dynamic delete: "any"
+                  // means the axis is absent, not present-and-empty, and an
+                  // empty-string grade would fail every comparison silently.
+                  const chosen = event.target.value;
+                  const next = Object.fromEntries(
+                    GRADE_AXES.flatMap((a) => {
+                      const grade = a === axis ? chosen : filter.minGrades[a];
+                      return grade === undefined || grade === ""
+                        ? []
+                        : [[a, grade] as const];
+                    }),
+                  );
+                  onChange({ ...filter, minGrades: next });
+                }}
+                value={filter.minGrades[axis] ?? ""}
+              >
+                <option value="">any</option>
+                {GRADES.map((grade) => {
+                  return (
+                    <option key={grade} value={grade}>
+                      {grade}
+                    </option>
+                  );
+                })}
+              </select>
+            </label>
+          );
+        })}
       </div>
 
       <div className="coverage-row">

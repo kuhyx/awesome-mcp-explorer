@@ -159,12 +159,14 @@ export function decodeBadge(svg: string): Grades | null {
 
   const slots = svg
     .matchAll(GRADE_USE)
-    .map((match) => ({
-      fill: group(match, 2),
-      // A use may reference a glyph with no definition; "" then fails the
-      // GLYPHS lookup below and raises UnknownGlyphError, which is right.
-      outline: outlines.get(group(match, 1)) ?? "",
-    }))
+    .map((match) => {
+      return {
+        fill: group(match, 2),
+        // A use may reference a glyph with no definition; "" then fails the
+        // GLYPHS lookup below and raises UnknownGlyphError, which is right.
+        outline: outlines.get(group(match, 1)) ?? "",
+      };
+    })
     .toArray();
 
   if (slots.length === 0) return null;
