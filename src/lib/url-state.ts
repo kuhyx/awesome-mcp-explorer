@@ -19,7 +19,7 @@ import { LANGUAGES, OPERATING_SYSTEMS, SCOPES } from "../../scripts/lib/parse-re
 import { DEFAULT_FILTER, DEFAULT_SORT } from "./filter-sort.ts";
 import { GRADE_AXES, GRADES } from "./grade.ts";
 
-const SORT_KEYS: readonly SortKey[] = [
+export const SORT_KEYS: readonly SortKey[] = [
   "category",
   "created",
   "grade",
@@ -27,8 +27,8 @@ const SORT_KEYS: readonly SortKey[] = [
   "pushed",
   "stars",
 ];
-const COSTS: readonly Cost[] = ["likely-free", "likely-paid", "unknown"];
-const TRIS: readonly Tri[] = ["no", "unknown", "yes"];
+export const COSTS: readonly Cost[] = ["likely-free", "likely-paid", "unknown"];
+export const TRIS: readonly Tri[] = ["no", "unknown", "yes"];
 const COVERAGES: readonly GradeCoverage[] = [
   "graded-all",
   "graded-partial",

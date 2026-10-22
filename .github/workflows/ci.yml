@@ -28,14 +28,15 @@ jobs:
       # a newer 10.x than a developer has locally.
       - uses: pnpm/action-setup@v4
 
-      # 24, not the newer default: it is the lowest version this code runs on.
+      # Node comes from .nvmrc (the dependency-freshness pin), so CI and local
+      # cannot drift. It stays on the 24 line, the lowest this code runs on:
       # Error.isError needs V8 13.6+, and Node 22 (V8 12.4) reports it as
       # undefined -- pinning CI to the floor is what stops a Node-26-only API
       # from passing here and failing for someone on the LTS.
       - uses: actions/setup-node@v4
         with:
           cache: pnpm
-          node-version: "24.21.0"
+          node-version-file: .nvmrc
 
       # --frozen-lockfile: CI must fail on a lockfile that does not match
       # package.json rather than silently resolving something else.

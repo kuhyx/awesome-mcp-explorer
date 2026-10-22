@@ -2,11 +2,14 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
-// base: "./" keeps the built bundle path-agnostic so it works from a GitHub
-// Pages project subpath (/awesome-mcp-explorer/) and from file:// alike.
+import { agentReadySite } from "./scripts/lib/site/vite-plugin.ts";
+
+// base: "./" keeps the built bundle path-agnostic (any host root or file://).
+// The canonical address lives in one place: BASE_URL in
+// scripts/lib/site/site-config.ts, served at the root of its own host.
 const config = defineConfig({
   base: "./",
-  plugins: [react()],
+  plugins: [react(), agentReadySite()],
   test: {
     coverage: {
       exclude: [
