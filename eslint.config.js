@@ -3,28 +3,21 @@
 // Baseline is typescript-eslint's *type-checked* strict + stylistic presets, so
 // anything they flag is an error, not a warning. On top of that: unicorn (all),
 // sonarjs (cognitive complexity / duplicate logic), perfectionist (sorting), and
-// react-hooks. Unused disable directives are themselves errors, so every
+// astro. Unused disable directives are themselves errors, so every
 // `eslint-disable` in this repo must be load-bearing.
-//
-// Deliberately absent:
-//   - eslint-plugin-react   : 7.37.x still calls context.getFilename(), removed in
-//                             ESLint 10, so it crashes the run.
-//   - eslint-plugin-jsx-a11y: 6.10.2 declares peer ESLint "^3 || ... || ^9" — no
-//                             ESLint 10 support yet. a11y is enforced by review +
-//                             testing-library queries (getByLabelText) instead.
 //
 // TypeScript is pinned to 6.0.x, not 7.x: typescript-eslint requires
 // "typescript >=4.8.4 <6.1.0", and losing every type-aware rule would be a far
 // bigger regression than gaining the Go-native compiler.
 import js from "@eslint/js";
+import astro from "eslint-plugin-astro";
 import perfectionist from "eslint-plugin-perfectionist";
-import reactHooks from "eslint-plugin-react-hooks";
 import sonarjs from "eslint-plugin-sonarjs";
 import unicorn from "eslint-plugin-unicorn";
 import tseslint from "typescript-eslint";
 
 const config = tseslint.config(
-  { ignores: ["dist", "coverage", "data/cache", "public/servers.json"] },
+  { ignores: ["dist", "coverage", ".astro", "data/cache", "public/servers.json"] },
   { linterOptions: { reportUnusedDisableDirectives: "error" } },
 
   js.configs.recommended,
@@ -33,19 +26,17 @@ const config = tseslint.config(
   unicorn.configs.all,
   sonarjs.configs.recommended,
   perfectionist.configs["recommended-natural"],
+  ...astro.configs["flat/recommended"],
 
   {
-    files: ["**/*.{ts,tsx}"],
+    files: ["**/*.ts"],
     languageOptions: {
       parserOptions: {
         projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
     },
-    plugins: { "react-hooks": reactHooks },
     rules: {
-      ...reactHooks.configs.recommended.rules,
-
       // Numbers in template literals are unambiguous and pervasive here
       // (counts, star totals, grades).
       "@typescript-eslint/restrict-template-expressions": [
@@ -62,14 +53,9 @@ const config = tseslint.config(
         { prefixes: { matches: true, passes: true } },
       ],
 
-      // Kebab-case files exporting PascalCase components: house convention.
+      // Kebab-case file names: house convention, .astro included.
       "unicorn/filename-case": ["error", { case: "kebabCase" }],
 
-      // Keep the rule, drop one replacement: `props` is React's own word.
-      // `interface FilterBarProps` is the convention every React codebase and
-      // every reader expects; `FilterBarProperties` would be unidiomatic in
-      // service of a generic dictionary. Every other replacement stays on.
-      "unicorn/name-replacements": ["error", { replacements: { props: false } }],
     },
   },
 
@@ -100,6 +86,9 @@ const config = tseslint.config(
       // narrative order. Every *other* perfectionist rule stays on — sorting
       // imports, union members and object keys destroys no narrative.
       "perfectionist/sort-modules": "off",
+
+      // `Props` is the name Astro requires for a component's props interface.
+      "unicorn/name-replacements": ["error", { replacements: { props: false } }],
 
       // Wants JSDoc blocks written without leading `*`, which is neither the
       // TypeScript convention nor what editors/typedoc render.
@@ -144,9 +133,17 @@ const config = tseslint.config(
     },
   },
 
+  {
+    files: ["astro.config.ts"],
+    rules: {
+      // Vite plugin hooks get their context (`this.resolve`) as `this`.
+      "unicorn/no-this-outside-of-class": "off",
+    },
+  },
+
   // Tests: relax the rules that fight with mocking and fixtures.
   {
-    files: ["**/*.test.{ts,tsx}", "src/test/**", "scripts/**/__fixtures__/**"],
+    files: ["**/*.test.ts", "src/test/**", "scripts/**/__fixtures__/**"],
     rules: {
       "@typescript-eslint/no-empty-function": "off",
       "@typescript-eslint/no-non-null-assertion": "off",
@@ -177,10 +174,11 @@ const config = tseslint.config(
     },
   },
 
-  // Plain JS config files get no type-aware linting.
+  // Plain JS config files and .astro templates get no type-aware linting; the
+  // logic .astro files call lives in type-checked .ts modules.
   {
     extends: [tseslint.configs.disableTypeChecked],
-    files: ["**/*.{js,mjs,cjs}"],
+    files: ["**/*.{js,mjs,cjs}", "**/*.astro", "**/*.astro/*.ts"],
   },
 );
 

@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 
 import type { Page } from "./pages.ts";
 
-import { headTags, pageDocument, renderBlocks } from "./render-html.ts";
+import { headModel, linkResolver, pageBody, renderBlocks } from "./render-html.ts";
 import { pageMarkdown } from "./render-markdown.ts";
 import { BASE_URL } from "./site-config.ts";
 
@@ -41,21 +41,34 @@ describe("renderBlocks", () => {
   });
 });
 
-describe("headTags", () => {
-  const head = headTags(PAGE);
+describe("pageBody", () => {
+  it("starts with an escaped H1, then the blocks", () => {
+    const html = pageBody(PAGE, (href) => href);
+    expect(html).toMatch(/^<h1>About &lt;it&gt;<\/h1>\n<p>/u);
+    expect(html).toContain("<h2>Links</h2>");
+  });
+});
+
+describe("headModel", () => {
+  const model = headModel(PAGE);
 
   it("links the catalog, llms.txt and the markdown mirror relative to the page", () => {
-    expect(head).toContain('<link rel="ai-catalog" href="../.well-known/ai-catalog.json" type="application/ai-catalog+json">');
-    expect(head).toContain('<link rel="alternate" type="text/plain" href="../llms.txt" title="llms.txt">');
-    expect(head).toContain('<link rel="alternate" type="text/markdown" href="index.md">');
+    expect(model.links).toContainEqual({ href: "../.well-known/ai-catalog.json", rel: "ai-catalog", type: "application/ai-catalog+json" });
+    expect(model.links).toContainEqual({ href: "../llms.txt", rel: "alternate", title: "llms.txt", type: "text/plain" });
+    expect(model.links).toContainEqual({ href: "index.md", rel: "alternate", type: "text/markdown" });
   });
 
   it("sets an absolute canonical URL on the canonical host", () => {
-    expect(head).toContain(`<link rel="canonical" href="${BASE_URL}about/">`);
+    expect(model.canonical).toBe(`${BASE_URL}about/`);
+  });
+
+  it("titles non-home pages with the site name", () => {
+    expect(model.title).toBe("About <it> · MCP Explorer");
+    expect(model.description).toBe("A test page.");
   });
 
   it("carries JSON-LD with @context, with < escaped", () => {
-    const json = /<script type="application\/ld\+json">(.+?)<\/script>/u.exec(head)?.[1] ?? "";
+    const json = model.jsonLd ?? "";
     expect(json).not.toContain("<");
     const data = JSON.parse(json) as Record<string, unknown>;
     expect(data["@context"]).toBe("https://schema.org");
@@ -63,28 +76,33 @@ describe("headTags", () => {
     expect(data.name).toBe("About <it>");
   });
 
-  it("describes the homepage as the web application itself", () => {
-    const home = headTags({ ...PAGE, path: "" });
-    expect(home).toContain('"@type":"WebApplication"');
-    expect(home).toContain('href="index.md"');
+  it("describes the homepage as the web application, with the hand-written title", () => {
+    const home = headModel({ ...PAGE, path: "" });
+    expect(home.jsonLd).toContain('"@type":"WebApplication"');
+    expect(home.links).toContainEqual({ href: "index.md", rel: "alternate", type: "text/markdown" });
+    expect(home.title).toBe("MCP Explorer — filter awesome-mcp-servers");
+    expect(home.description).toMatch(/^Filter and sort every server in awesome-mcp-servers/u);
+  });
+
+  it("drops the discovery tags for the absolute (404) mode", () => {
+    const missing = headModel(PAGE, { absolute: true });
+    expect(missing.canonical).toBeUndefined();
+    expect(missing.jsonLd).toBeUndefined();
+    expect(missing.links).toEqual([]);
+    expect(missing.title).toBe("About <it> · MCP Explorer");
   });
 });
 
-describe("pageDocument", () => {
-  it("is a complete document with a home link and an escaped title", () => {
-    const html = pageDocument(PAGE);
-    expect(html).toMatch(/^<!doctype html>\n<html lang="en">/u);
-    expect(html).toContain("<title>About &lt;it&gt; · MCP Explorer</title>");
-    expect(html).toContain('<a href="../">MCP Explorer</a>');
-    expect(html).toContain('<a href="../filters/">filters</a>');
+describe("linkResolver", () => {
+  it("emits relative links by default", () => {
+    expect(linkResolver(PAGE)("filters/")).toBe("../filters/");
+    expect(linkResolver(PAGE)("")).toBe("../");
   });
 
-  it("uses absolute links and no page-only tags for the 404 page", () => {
-    const html = pageDocument(PAGE, { absolute: true });
-    expect(html).toContain(`<a href="${BASE_URL}filters/">filters</a>`);
-    expect(html).toContain(`<a href="${BASE_URL}">MCP Explorer</a>`);
-    expect(html).not.toContain("text/markdown");
-    expect(html).not.toContain("canonical");
+  it("emits absolute links for site paths and keeps external ones in absolute mode", () => {
+    const absolute = linkResolver(PAGE, { absolute: true });
+    expect(absolute("filters/")).toBe(`${BASE_URL}filters/`);
+    expect(absolute("https://glama.ai/mcp")).toBe("https://glama.ai/mcp");
   });
 });
 

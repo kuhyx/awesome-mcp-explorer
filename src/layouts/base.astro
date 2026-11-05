@@ -1,0 +1,34 @@
+---
+import type { Page } from "../../scripts/lib/site/pages.ts";
+
+import { headModel } from "../../scripts/lib/site/render-html.ts";
+
+interface Props {
+  /**
+   * 404 mode: no canonical, JSON-LD or discovery links (served at any depth).
+   */
+  absolute?: boolean;
+  page: Page;
+}
+
+const { absolute = false, page } = Astro.props;
+const { canonical, description, jsonLd, links, title } = headModel(page, { absolute });
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link href="data:," rel="icon" />
+    <title>{title}</title>
+    <meta content={description} name="description" />
+    {canonical !== undefined && <link href={canonical} rel="canonical" />}
+    {links.map((link) => <link {...link} />)}
+    {jsonLd !== undefined && <script set:html={jsonLd} type="application/ld+json" />}
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

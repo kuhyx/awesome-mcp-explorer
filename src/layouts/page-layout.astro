@@ -1,0 +1,23 @@
+---
+import type { Page } from "../../scripts/lib/site/pages.ts";
+
+import { linkResolver, pageBody } from "../../scripts/lib/site/render-html.ts";
+import { SITE_NAME } from "../../scripts/lib/site/site-config.ts";
+import Base from "./base.astro";
+
+interface Props {
+  absolute?: boolean;
+  page: Page;
+}
+
+const { absolute = false, page } = Astro.props;
+const linkFor = linkResolver(page, { absolute });
+---
+
+<Base absolute={absolute} page={page}>
+  <style is:inline slot="head">
+    body{font-family:system-ui,sans-serif;line-height:1.5;max-width:44rem;margin:0 auto;padding:1.5rem;color:#211d1b;background:#faf8f5}a{color:#8a6422}pre{overflow-x:auto;padding:.75rem;background:#efebe5}
+  </style>
+  <nav><a href={linkFor("")}>{SITE_NAME}</a></nav>
+  <main set:html={pageBody(page, linkFor)} />
+</Base>

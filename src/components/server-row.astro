@@ -1,0 +1,86 @@
+---
+/**
+ * One server in the list.
+ *
+ * Cost and rate-limiting are *inferred* from the README's scope markers and
+ * description text, so those chips render dashed with a `~` prefix; a value
+ * from `data/overrides.json` is a checked fact and renders solid. An inferred
+ * value must never be mistaken for a fact.
+ *
+ * The age is printed as an absolute date: the browser swaps it for a relative
+ * one on load, because a build-time "3d ago" would be wrong by the time it is read.
+ */
+import type { Server } from "../lib/server.ts";
+
+import { COST_LABELS, formatDate, formatStars, RATE_LABELS } from "../lib/format.ts";
+import { GRADE_AXES } from "../lib/grade.ts";
+
+interface Props {
+  server: Server;
+}
+
+const { server } = Astro.props;
+const { gh, glama } = server;
+const facts = [
+  { fact: server.cost, label: COST_LABELS[server.cost.value] },
+  { fact: server.rateLimited, label: RATE_LABELS[server.rateLimited.value] },
+];
+---
+
+<article class="row" data-id={server.id}>
+  <div class="row-main">
+    <div class="row-head">
+      <a class="row-name" href={server.url} rel="noreferrer" target="_blank">{server.id}</a>
+      {server.official && <span class="chip chip-official" title="Official implementation">🎖️ official</span>}
+      {gh?.archived === true && <span class="chip chip-dead" title="Archived on GitHub">archived</span>}
+    </div>
+    <p class="row-desc">{server.description}</p>
+    <div class="row-chips">
+      {server.languages.map((language) => <span class="chip">{language}</span>)}
+      {server.scope.map((scope) => <span class="chip chip-scope">{scope}</span>)}
+      {
+        facts.map(({ fact, label }) => {
+          return (
+            <span
+              class:list={["chip", fact.source === "inferred" ? "chip-inferred" : "chip-fact"]}
+              title={
+                fact.source === "inferred"
+                  ? "Inferred from the server's scope and description — not published data. Correct it in data/overrides.json."
+                  : "Checked by hand and recorded in data/overrides.json."
+              }
+            >{fact.source === "inferred" ? "~" : ""}{label}</span>
+          );
+        })
+      }
+      {server.categories.map((category) => <span class="chip chip-cat">{category}</span>)}
+    </div>
+  </div>
+
+  <div class="row-meta">
+    <div class="grades" title="Glama: licence / quality / maintenance">
+      {
+        glama === null ? (
+          <span class="grade grade-none">not on Glama</span>
+        ) : (
+          GRADE_AXES.map((axis) => {
+            return (
+              <span
+                class={`grade grade-${glama[axis] ?? "ungraded"}`}
+                title={glama[axis] === undefined ? `${axis}: not graded` : `${axis}: ${glama[axis]}`}
+              >{glama[axis] ?? "–"}</span>
+            );
+          })
+        )
+      }
+    </div>
+    <div class="row-stats">
+      <span title="GitHub stars">★ {gh === null ? "?" : formatStars(gh.stars)}</span>
+      <span title="Last push">
+        {gh === null ? "gone" : <time class="row-age" datetime={gh.pushedAt}>{formatDate(gh.pushedAt)}</time>}
+      </span>
+      <span class={gh?.isFoss === "yes" ? "foss-yes" : "foss-no"} title={gh?.spdx ?? "No licence file: all rights reserved"}>
+        {gh?.spdx ?? "no licence"}
+      </span>
+    </div>
+  </div>
+</article>

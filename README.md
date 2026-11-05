@@ -93,16 +93,16 @@ sites:
 
 ```bash
 pnpm install
-pnpm run lint       # tsc --noEmit && eslint .
+pnpm run lint       # astro check && eslint .
 pnpm test           # vitest
 pnpm run coverage   # 100% or it fails
-pnpm run build      # tsc -b && vite build
+pnpm run build      # astro check && astro build
 pnpm run build:data # rebuild servers.json (needs `gh auth login`)
 ```
 
-Node 24+ · React 19.2 · Vite 8 · TypeScript 6 · Vitest 4 at 100% coverage · ESLint 10 with
+Node 24+ · Astro 7 · TypeScript 6 · Vitest 5 at 100% coverage · ESLint 10 with
 typescript-eslint `strictTypeChecked`, `unicorn/all`, sonarjs and perfectionist.
-Runtime dependencies: React and `@tanstack/react-virtual`. Nothing else.
+Runtime dependencies: Astro (build only) and `@kuhyx/web-ui`. No UI framework.
 
 TypeScript is pinned to 6.0 rather than 7.x because typescript-eslint requires
 `typescript <6.1.0`, and losing every type-aware rule would cost more than the

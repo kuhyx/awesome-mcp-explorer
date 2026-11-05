@@ -1,7 +1,7 @@
 /**
- * Renders the page table as HTML: the prerendered homepage body, the other
- * pages and the 404 page all share these functions, so every page gets the
- * same head tags (catalog, llms.txt, markdown mirror, JSON-LD).
+ * Page-table helpers for the Astro layout: block HTML, link resolution and
+ * the head model, shared by every page so each gets the same discovery tags
+ * (catalog, llms.txt, markdown mirror, JSON-LD).
  */
 import type { Block, Page } from "./pages.ts";
 
@@ -62,6 +62,13 @@ export function renderBlocks(blocks: readonly Block[], linkFor: LinkFor): string
   return blocks.map((item) => block(item, linkFor)).join("\n");
 }
 
+/**
+ * The visible article for a page: H1, then its blocks.
+ */
+export function pageBody(page: Page, linkFor: LinkFor): string {
+  return `<h1>${escapeHtml(page.title)}</h1>\n${renderBlocks(page.blocks, linkFor)}`;
+}
+
 function jsonLd(page: Page): string {
   const data =
     page.path === ""
@@ -85,57 +92,65 @@ function jsonLd(page: Page): string {
   return JSON.stringify(data).replaceAll("<", String.raw`\u003c`);
 }
 
-/**
- * Discovery tags for one page's head. Hrefs are relative to the page, so they
- * resolve under whatever path the site is served from.
- */
-export function headTags(page: Page): string {
-  const href = (to: string): string => escapeHtml(relativeHref(page.path, to));
-  const mirror = `${page.path}index.md`;
-  return [
-    `<link rel="canonical" href="${escapeHtml(absoluteUrl(page.path))}">`,
-    `<link rel="ai-catalog" href="${href(".well-known/ai-catalog.json")}" type="application/ai-catalog+json">`,
-    `<link rel="alternate" type="text/plain" href="${href("llms.txt")}" title="llms.txt">`,
-    `<link rel="alternate" type="text/markdown" href="${href(mirror)}">`,
-    `<script type="application/ld+json">${jsonLd(page)}</script>`,
-  ].join("\n");
+export interface HeadLink {
+  readonly href: string;
+  readonly rel: string;
+  readonly title?: string;
+  readonly type?: string;
+}
+
+export interface HeadModel {
+  readonly canonical?: string;
+  readonly description: string;
+  readonly jsonLd?: string;
+  readonly links: readonly HeadLink[];
+  readonly title: string;
+}
+
+export interface HeadOptions {
+  /**
+   * For 404.html, served at any depth: absolute links, no page-only tags.
+   */
+  readonly absolute?: boolean;
 }
 
 /**
- * The visible article for a page: H1, then its blocks.
+ * The homepage's search-result title and description are hand-written; the
+ * page table's own strings stay the short ones used by llms.txt and JSON-LD.
  */
-export function pageBody(page: Page, linkFor: LinkFor): string {
-  return `<h1>${escapeHtml(page.title)}</h1>\n${renderBlocks(page.blocks, linkFor)}`;
-}
-
-const STYLE =
-  "body{font-family:system-ui,sans-serif;line-height:1.5;max-width:44rem;margin:0 auto;padding:1.5rem;color:#211d1b;background:#faf8f5}a{color:#8a6422}pre{overflow-x:auto;padding:.75rem;background:#efebe5}";
+const HOME_TITLE = `${SITE_NAME} — filter awesome-mcp-servers`;
+const HOME_DESCRIPTION =
+  "Filter and sort every server in awesome-mcp-servers by Glama grade, licence, scope, language, OS and activity.";
 
 /**
- * A standalone page. `absolute` (for 404.html, served at any depth) makes
- * every link absolute and drops the tags that only describe a real page.
+ * Resolves content hrefs for a page: relative to the page by default, so the
+ * output works under whatever path the site is served from.
  */
-export function pageDocument(page: Page, options: { absolute?: boolean } = {}): string {
-  const linkFor: LinkFor =
-    options.absolute === true
-      ? (href) => (isExternal(href) ? href : absoluteUrl(href))
-      : (href) => relativeHref(page.path, href);
-  const head = options.absolute === true ? "" : `\n${headTags(page)}`;
-  return `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${escapeHtml(page.title)} · ${SITE_NAME}</title>
-<meta name="description" content="${escapeHtml(page.description)}">${head}
-<style>${STYLE}</style>
-</head>
-<body>
-<nav><a href="${escapeHtml(linkFor(""))}">${SITE_NAME}</a></nav>
-<main>
-${pageBody(page, linkFor)}
-</main>
-</body>
-</html>
-`;
+export function linkResolver(page: Page, options: HeadOptions = {}): LinkFor {
+  return options.absolute === true
+    ? (href) => (isExternal(href) ? href : absoluteUrl(href))
+    : (href) => relativeHref(page.path, href);
+}
+
+/**
+ * Everything a layout needs for one page's `<head>`, as plain data. Astro
+ * escapes the values when it renders them.
+ */
+export function headModel(page: Page, options: HeadOptions = {}): HeadModel {
+  const isHome = page.path === "";
+  const title = isHome ? HOME_TITLE : `${page.title} · ${SITE_NAME}`;
+  const description = isHome ? HOME_DESCRIPTION : page.description;
+  if (options.absolute === true) return { description, links: [], title };
+  const href = linkResolver(page);
+  return {
+    canonical: absoluteUrl(page.path),
+    description,
+    jsonLd: jsonLd(page),
+    links: [
+      { href: href(".well-known/ai-catalog.json"), rel: "ai-catalog", type: "application/ai-catalog+json" },
+      { href: href("llms.txt"), rel: "alternate", title: "llms.txt", type: "text/plain" },
+      { href: href(`${page.path}index.md`), rel: "alternate", type: "text/markdown" },
+    ],
+    title,
+  };
 }

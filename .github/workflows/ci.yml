@@ -1,7 +1,7 @@
 # Mirrors the local gate exactly, so green-local means green-CI:
-#   pnpm run lint      -> tsc --noEmit && eslint .
+#   pnpm run lint      -> astro check && eslint .
 #   pnpm run coverage  -> vitest, which fails below 100%
-#   pnpm run build     -> tsc -b && vite build
+#   pnpm run build     -> astro check && astro build
 #
 # The dataset is NOT built here. Tests run against committed fixtures, and
 # building it would need ~2,981 GitHub calls against a 1,000/hour limit for the
@@ -28,11 +28,8 @@ jobs:
       # a newer 10.x than a developer has locally.
       - uses: pnpm/action-setup@v4
 
-      # Node comes from .nvmrc (the dependency-freshness pin), so CI and local
-      # cannot drift. It stays on the 24 line, the lowest this code runs on:
-      # Error.isError needs V8 13.6+, and Node 22 (V8 12.4) reports it as
-      # undefined -- pinning CI to the floor is what stops a Node-26-only API
-      # from passing here and failing for someone on the LTS.
+      # Node comes from .nvmrc (the dependency-freshness pin, newest stable),
+      # so CI and local cannot drift. package.json engines still allows >=24.
       - uses: actions/setup-node@v4
         with:
           cache: pnpm
@@ -42,7 +39,7 @@ jobs:
       # package.json rather than silently resolving something else.
       - run: pnpm install --frozen-lockfile
 
-      - name: Lint (typecheck + eslint)
+      - name: Lint (astro check + eslint)
         run: pnpm run lint
 
       - name: Shellcheck run.sh

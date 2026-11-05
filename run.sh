@@ -235,15 +235,24 @@ open_browser() {
     fi
 }
 
-serve() {
-    local url="http://localhost:${PORT}/"
+ensure_port_free() {
+    # Astro silently moves to the next port when this one is taken, which would
+    # leave wait_for_server polling whatever else owns it.
+    if [[ -n "$(ss -ltnH "sport = :${PORT}" 2>/dev/null)" ]]; then
+        die "port ${PORT} is already in use (try --port)"
+    fi
+}
 
+serve() {
+    local url="http://127.0.0.1:${PORT}/"
+
+    ensure_port_free
     if [[ "$PRODUCTION_BUILD" == true ]]; then
         echo "==> Building for production"
-        pnpm run build
-        pnpm exec vite preview --port "$PORT" --strictPort &
+        pnpm exec astro build
+        pnpm exec astro preview --host 127.0.0.1 --port "$PORT" &
     else
-        pnpm exec vite --port "$PORT" --strictPort &
+        pnpm exec astro dev --host 127.0.0.1 --port "$PORT" &
     fi
     SERVER_PID=$!
 

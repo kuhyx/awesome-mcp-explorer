@@ -1,0 +1,50 @@
+---
+/**
+ * A tri-state facet picker: each option cycles off -> include -> exclude.
+ * Showing every option at once, with "not X" folded into the same control,
+ * removes the need for a separate negation toggle. The state shown here is the
+ * neutral one; `<server-explorer>` patches buttons, counts and summary in place.
+ */
+import type { FacetOption } from "../lib/facet-defs.ts";
+
+import { GLYPHS } from "../lib/tri-state.ts";
+
+interface Props {
+  counts: ReadonlyMap<string, number>;
+  facet: string;
+  label: string;
+  options: readonly FacetOption[];
+}
+
+const { counts, facet, label, options } = Astro.props;
+---
+
+<fieldset class="facet" data-facet={facet}>
+  <legend>
+    <span class="facet-legend-label">{label}</span>
+    <span class="facet-summary" title="Any">Any</span>
+  </legend>
+  <div class="facet-options">
+    {
+      options.map((option) => {
+        const count = counts.get(option.value) ?? 0;
+        return (
+          <button
+            aria-label={`${option.name}: off`}
+            aria-pressed="false"
+            class="tri tri-off"
+            data-key={facet}
+            data-name={option.name}
+            data-option={option.value}
+            disabled={count === 0}
+            type="button"
+          >
+            <span aria-hidden="true" class="tri-glyph">{GLYPHS.off}</span>
+            <span class="tri-name">{option.name}</span>
+            <span class="tri-count">{count}</span>
+          </button>
+        );
+      })
+    }
+  </div>
+</fieldset>

@@ -1,0 +1,6 @@
+---
+import Home from "../components/home.astro";
+import { readServersFile } from "../lib/servers-data.ts";
+---
+
+<Home servers={readServersFile()} />

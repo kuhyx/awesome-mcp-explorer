@@ -1,0 +1,52 @@
+---
+/**
+ * The whole filter sidebar, printed in its neutral state. `<server-explorer>`
+ * owns the state and patches this markup in place.
+ */
+import RangeSlider from "@kuhyx/web-ui/RangeSlider.astro";
+
+import type { HomeModel } from "../lib/servers-data.ts";
+
+import { FACETS } from "../lib/facet-defs.ts";
+import { formatMonth, formatStars } from "../lib/format.ts";
+import GradeFilter from "./grade-filter.astro";
+import TriStatePicker from "./tri-state-picker.astro";
+
+interface Props {
+  model: HomeModel;
+}
+
+const { model } = Astro.props;
+const { categories, facets, pushed, stars } = model;
+const countsOf = (key: keyof typeof facets): ReadonlyMap<string, number> => facets[key] as ReadonlyMap<string, number>;
+---
+
+<aside class="filters">
+  <GradeFilter facets={facets} />
+
+  <fieldset class="facet">
+    <legend>Provenance</legend>
+    <button aria-pressed="false" class="chip" data-action="toggle-official" type="button">
+      🎖️ Official only <span class="tri-count" data-count="official">{facets.official}</span>
+    </button>
+    <button aria-pressed="false" class="chip" data-action="toggle-archived" type="button">Hide archived</button>
+  </fieldset>
+
+  {FACETS.map((spec) => <TriStatePicker counts={countsOf(spec.key)} facet={spec.key} label={spec.label} options={spec.options} />)}
+
+  <p class="facet-hint">
+    Cost and rate limits are <strong>inferred</strong> from each server’s scope and description — neither the awesome
+    list nor Glama publishes them. Values are marked <code>~</code> and can be corrected in
+    <code>data/overrides.json</code>.
+  </p>
+
+  <div data-slider="stars"><RangeSlider format={formatStars} label="Stars" values={stars} /></div>
+  <div data-slider="pushed"><RangeSlider format={formatMonth} label="Last push" values={pushed} /></div>
+
+  <TriStatePicker
+    counts={countsOf("categories")}
+    facet="categories"
+    label="Category"
+    options={categories.map((name) => ({ name, value: name }))}
+  />
+</aside>

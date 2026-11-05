@@ -1,0 +1,67 @@
+---
+/**
+ * The grade controls, including the headline Triple-A toggle.
+ *
+ * Triple-A is strict: all three axes graded and all three `A` (Glama has no
+ * `A-`, so no looser variant exists). Roughly 12% of servers have no grade at
+ * all and an ungraded axis is unknown rather than bad, so while a grade filter
+ * is active the explorer states how many servers it cannot speak for.
+ */
+import type { Facets } from "../lib/facets.ts";
+import type { GradeCoverage } from "../lib/grade.ts";
+
+import { COVERAGE_LABELS } from "../lib/facet-defs.ts";
+import { GRADE_AXES, GRADES } from "../lib/grade.ts";
+
+interface Props {
+  facets: Facets;
+}
+
+const { facets } = Astro.props;
+const coverages = Object.entries(COVERAGE_LABELS) as [GradeCoverage, string][];
+---
+
+<fieldset class="facet" data-grade>
+  <legend>Glama grade</legend>
+
+  <button aria-pressed="false" class="aaa-toggle" data-action="toggle-aaa" type="button">
+    <span class="aaa-mark">AAA</span>
+    <span class="aaa-text">Triple-A only <span class="tri-count" data-count="aaa">{facets.tripleA}</span></span>
+  </button>
+  <p class="facet-hint">
+    Licence, quality and maintenance all graded <strong>A</strong>. Glama has no A−, so there is no looser variant.
+  </p>
+
+  <div class="grade-axes">
+    {
+      GRADE_AXES.map((axis) => {
+        return (
+          <label class="grade-axis">
+            <span>{axis} ≥</span>
+            <select data-axis={axis}>
+              <option value="">any</option>
+              {GRADES.map((grade) => <option value={grade}>{grade}</option>)}
+            </select>
+          </label>
+        );
+      })
+    }
+  </div>
+
+  <div class="coverage-row">
+    {
+      coverages.map(([coverage, label]) => {
+        return (
+          <button aria-pressed="false" class="chip" data-coverage={coverage} type="button">
+            {label} <span class="tri-count">{facets.gradeCoverage.get(coverage) ?? 0}</span>
+          </button>
+        );
+      })
+    }
+  </div>
+
+  <p class="warn" data-ungraded hidden role="status">
+    <span data-ungraded-text></span> no Glama grade at all and cannot satisfy a grade filter. An empty result here
+    means “none that Glama has graded”, not “none exist”.
+  </p>
+</fieldset>

@@ -1,0 +1,38 @@
+---
+/**
+ * The result count, sort control, share link and export menu.
+ */
+import { EXPORT_FORMATS, SORT_LABELS } from "../lib/facet-defs.ts";
+import { DEFAULT_SORT } from "../lib/filter-sort.ts";
+
+interface Props {
+  total: number;
+}
+
+const { total } = Astro.props;
+const count = total.toLocaleString("en-US");
+---
+
+<div class="statbar">
+  <span class="count" role="status">Showing <strong data-shown>{count}</strong> of <span data-total>{count}</span></span>
+
+  <label class="sort">
+    Sort
+    <select data-sort-key>
+      {Object.entries(SORT_LABELS).map(([key, label]) => <option selected={key === DEFAULT_SORT.key} value={key}>{label}</option>)}
+    </select>
+    <button aria-label="Sort descending" class="chip" data-action="sort-dir" type="button">↓</button>
+  </label>
+
+  <div class="statbar-actions">
+    <button class="chip" data-action="reset" hidden type="button">Reset</button>
+    <button class="chip" data-action="copy" type="button">Copy link</button>
+    <label class="sort">
+      Export
+      <select data-export>
+        <option value="">…</option>
+        {EXPORT_FORMATS.map(({ format, name }) => <option value={format}>{name}</option>)}
+      </select>
+    </label>
+  </div>
+</div>

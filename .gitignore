@@ -7,3 +7,4 @@ data/cache/
 # missing). Kept out of history because it is a 2.3 MB blob that churns wholly
 # on every refresh.
 public/servers.json
+.astro/

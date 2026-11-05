@@ -1,0 +1,24 @@
+---
+/**
+ * Built-in and saved filter presets. Saved ones (localStorage) are cloned from
+ * the template by `<server-explorer>`.
+ */
+import { BUILTIN_PRESETS } from "../lib/presets.ts";
+---
+
+<div class="presets">
+  {BUILTIN_PRESETS.map((preset) => <button class="chip" data-preset={preset.search} type="button">{preset.name}</button>)}
+
+  <span class="preset-saved-list" data-saved></span>
+  <template data-saved-template>
+    <span class="preset-saved">
+      <button class="chip on" data-preset="" type="button"></button>
+      <button class="chip preset-del" data-preset-delete="" type="button">✕</button>
+    </span>
+  </template>
+
+  <form class="preset-save" data-preset-form>
+    <input aria-label="Preset name" data-preset-name placeholder="Save current as…" />
+    <button class="chip" disabled type="submit">Save</button>
+  </form>
+</div>

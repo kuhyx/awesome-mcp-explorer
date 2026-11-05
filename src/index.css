@@ -4,7 +4,7 @@
  * class vocabulary here is small enough that a framework would be the largest
  * dependency in the project.
  */
-/* Tokens come from @kuhyx/web-ui (imported in main.tsx): the palette, spacing,
+/* Tokens come from @kuhyx/web-ui (imported in components/home.astro): the palette, spacing,
  * radius, type scale, shadows and focus ring. Nothing bespoke is redefined
  * here -- a local redefinition would shadow the shared value and silently
  * un-migrate this repo.
@@ -32,6 +32,16 @@
 
 * {
   box-sizing: border-box;
+}
+
+/* Author display rules (.row, .chip, ...) would otherwise beat the UA's
+ * [hidden] and leave "hidden" rows on screen. */
+[hidden] {
+  display: none !important;
+}
+
+server-explorer {
+  display: contents;
 }
 
 body {
@@ -93,6 +103,10 @@ body {
   align-items: center;
   flex-wrap: wrap;
   margin-left: auto;
+}
+
+.preset-saved-list {
+  display: contents;
 }
 
 .preset-saved {
@@ -470,23 +484,19 @@ body {
   contain: strict;
 }
 
+/* ~3,000 rows are in the DOM; the browser skips layout and paint for the
+ * off-screen ones. The intrinsic size is the typical row height, so the
+ * scrollbar stays stable until a row is first rendered. */
+.row {
+  content-visibility: auto;
+  contain-intrinsic-size: auto var(--row-h);
+}
+
 .list-empty {
   flex: 1;
   padding: 3rem;
   color: var(--text-muted);
   text-align: center;
-}
-
-.list-inner {
-  position: relative;
-  width: 100%;
-}
-
-.list-item {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
 }
 
 .row {
@@ -526,6 +536,7 @@ body {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  overflow-wrap: anywhere;
 }
 
 .row-chips {
@@ -610,4 +621,106 @@ body {
 
 .foss-no {
   color: var(--grade-d);
+}
+
+/* ---------- help + prose ---------- */
+
+.help {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 10;
+  max-width: 22rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-1);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.25);
+}
+
+.help h2 {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+}
+
+.help dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.2rem 0.75rem;
+  margin: 0;
+}
+
+.help dt {
+  font-family: ui-monospace, monospace;
+  color: var(--accent);
+}
+
+.help dd {
+  margin: 0;
+}
+
+.prerender {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+  color: var(--text-muted);
+}
+
+.prerender a {
+  color: var(--accent);
+}
+
+.prerender pre {
+  overflow-x: auto;
+}
+
+/* ---------- narrow screens ---------- */
+
+/* Below this width the sidebar cannot sit beside the list: stack them and let
+ * the page itself scroll instead of nesting two scroll areas. */
+@media (max-width: 800px) {
+  .app {
+    height: auto;
+  }
+
+  .body {
+    flex-direction: column;
+  }
+
+  .filters {
+    flex: none;
+    max-height: 45vh;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .list {
+    flex: none;
+    overflow: visible;
+    contain: none;
+  }
+
+  .search {
+    flex: 1 1 100%;
+  }
+
+  .presets {
+    margin-left: 0;
+  }
+
+  .row {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .row-meta {
+    flex: none;
+    width: 100%;
+    text-align: left;
+  }
+
+  .grades,
+  .row-stats {
+    justify-content: flex-start;
+  }
 }

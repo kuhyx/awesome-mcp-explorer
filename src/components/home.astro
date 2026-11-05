@@ -1,0 +1,27 @@
+---
+/**
+ * The homepage as a component, so tests can render it with a fixture while
+ * `pages/index.astro` feeds it the real dataset.
+ */
+import "@kuhyx/web-ui/tokens.css";
+import "@kuhyx/web-ui/range-slider.css";
+
+import "../index.css";
+
+import type { Server } from "../lib/server.ts";
+
+import { HOME_PAGE } from "../../scripts/lib/site/pages.ts";
+import Base from "../layouts/base.astro";
+import { buildHomeModel } from "../lib/servers-data.ts";
+import ExplorerPage from "./explorer-page.astro";
+
+interface Props {
+  servers: readonly Server[];
+}
+
+const model = buildHomeModel(Astro.props.servers);
+---
+
+<Base page={HOME_PAGE}>
+  <ExplorerPage model={model} />
+</Base>

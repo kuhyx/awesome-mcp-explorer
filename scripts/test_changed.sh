@@ -21,7 +21,7 @@ src=()
 for f in "${CHANGED[@]}"; do
     case "$f" in
         package.json | pnpm-lock.yaml | yarn.lock | package-lock.json) full=1 ;;
-        *.ts | *.tsx | *.js | *.jsx | *.mjs | *.cjs) src+=("$f") ;;
+        *.ts | *.astro | *.js | *.mjs | *.cjs) src+=("$f") ;;
     esac
 done
 
