@@ -1,0 +1,16 @@
+---
+/**
+ * One sprite icon. Decorative by itself: the control around it carries the
+ * spoken name (`aria-label`), so the icon is always `aria-hidden`.
+ */
+import type { IconName } from "../lib/icons.ts";
+
+interface Props {
+  class?: string;
+  name: IconName;
+}
+
+const { class: extra, name } = Astro.props;
+---
+
+<svg aria-hidden="true" class:list={["icon", extra]} data-icon={name}><use href={`#i-${name}`}></use></svg>

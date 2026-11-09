@@ -1,0 +1,312 @@
+/*
+ * The text-free layer (kuhy's textgate rule): icon sizing, the spoken-only
+ * helper, key caps, badges, dashed "inferred / ungraded" shapes and the copy
+ * pulse. Loaded after index.css, so rules here refine the ones there.
+ */
+
+/* In the DOM for screen readers and crawlers, never painted. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.icon {
+  flex: none;
+  width: 1.15em;
+  height: 1.15em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: -0.2em;
+}
+
+.icon-logo {
+  width: 1.6rem;
+  height: 1.6rem;
+  color: var(--accent);
+}
+
+.icon-xl {
+  width: 3rem;
+  height: 3rem;
+}
+
+.icon-empty {
+  width: 7rem;
+  height: 7rem;
+  stroke-width: 2.5;
+}
+
+.glyph {
+  line-height: 1;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+}
+
+/* ---------- search ---------- */
+
+.search-box {
+  position: relative;
+  display: flex;
+  flex: 0 0 22rem;
+  align-items: center;
+  color: var(--text-muted);
+}
+
+.search-box > .icon {
+  position: absolute;
+  left: 0.6rem;
+}
+
+.search-box .search {
+  flex: 1;
+  min-width: 0;
+  padding-inline: 2.1rem 2.2rem;
+}
+
+.search-box > .keycap {
+  position: absolute;
+  right: 0.6rem;
+}
+
+.keycap {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.4em;
+  padding: 0 0.3em;
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--surface-1);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+/* ---------- controls ---------- */
+
+/* An icon-only button still needs a target big enough to hit (and to see focus on). */
+.icon-btn {
+  justify-content: center;
+  min-width: 2rem;
+  min-height: 1.75rem;
+}
+
+.statbar .chip {
+  font-size: 0.85rem;
+}
+
+.badge {
+  min-width: 1.3em;
+  padding: 0 0.3em;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-fill);
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.copy-btn .when-copied,
+.copy-btn[data-copied] .when-idle {
+  display: none;
+}
+
+.copy-btn[data-copied] .when-copied {
+  display: inline;
+}
+
+.copy-btn[data-copied] {
+  border-color: var(--success);
+  color: var(--success);
+  animation: pulse 0.5s ease-out 2;
+}
+
+@keyframes pulse {
+  50% {
+    transform: scale(1.18);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .copy-btn[data-copied] {
+    animation: none;
+  }
+}
+
+.preset-chip {
+  gap: 0.35rem;
+}
+
+.preset-mark {
+  display: inline-flex;
+  align-items: center;
+}
+
+.preset-exclude {
+  color: var(--grade-d);
+  text-decoration: line-through;
+}
+
+.preset-exclude .icon {
+  opacity: 0.6;
+}
+
+.preset-chip .glyph:only-child {
+  font-weight: 600;
+}
+
+.facet legend .icon {
+  align-self: center;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.aaa-toggle .tri-count {
+  margin-left: auto;
+}
+
+.tri-mark {
+  display: inline-flex;
+  flex: 1;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.tri-mark .icon {
+  padding: 1px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  width: 1.3em;
+  height: 1.3em;
+}
+
+.tri-inferred .icon {
+  border-style: dashed;
+}
+
+.warn {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.warn .icon {
+  color: var(--grade-c);
+}
+
+/* The package prints its caption as a word; the icon beside the slider replaces it. */
+.slider-head > span:first-child {
+  display: none;
+}
+
+.slider-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.slider-row > range-slider {
+  flex: 1;
+  min-width: 0;
+}
+
+.slider-icon {
+  margin-top: 0.15rem;
+  color: var(--text-muted);
+}
+
+/* ---------- states ---------- */
+
+.app-error {
+  display: grid;
+  place-items: center;
+  margin: 1rem;
+  border: 1px solid var(--danger);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  color: var(--danger);
+}
+
+.list-empty {
+  display: grid;
+  place-items: center;
+}
+
+/* ---------- rows ---------- */
+
+.row-archived {
+  opacity: 0.55;
+}
+
+.chip-inferred {
+  font-style: normal;
+}
+
+.grade {
+  gap: 0.15rem;
+  grid-auto-flow: column;
+  width: auto;
+  min-width: 22px;
+  padding: 0 0.25rem;
+}
+
+.grade .icon {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.grade-ungraded,
+.grade-none {
+  border-style: dashed;
+}
+
+.grade-none {
+  font-size: 0.8rem;
+}
+
+.row-pushed {
+  display: inline-flex;
+  gap: 0.2rem;
+  align-items: center;
+}
+
+/* ---------- help legend ---------- */
+
+.help dl {
+  align-items: center;
+}
+
+.help dd {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 800px) {
+  .search-box {
+    flex: 1 1 100%;
+  }
+}

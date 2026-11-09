@@ -1,0 +1,16 @@
+---
+/**
+ * A {@link Mark}: a sprite icon or a letter-free glyph.
+ */
+import type { Mark } from "../lib/icons.ts";
+
+import Icon from "./icon.astro";
+
+interface Props {
+  mark: Mark;
+}
+
+const { mark } = Astro.props;
+---
+
+{"icon" in mark ? <Icon name={mark.icon} /> : <span aria-hidden="true" class="glyph">{mark.glyph}</span>}
