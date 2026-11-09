@@ -15,11 +15,11 @@ export interface PresetMark {
   /**
    * Struck through: the preset excludes this.
    */
-  readonly exclude: boolean;
+  readonly isExcluded: boolean;
   readonly mark: Mark;
 }
 
-const on = (mark: Mark): PresetMark => ({ exclude: false, mark });
+const on = (mark: Mark): PresetMark => ({ isExcluded: false, mark });
 
 function triMarks(filter: FilterState): PresetMark[] {
   return FACETS.flatMap((spec) => {
@@ -27,10 +27,11 @@ function triMarks(filter: FilterState): PresetMark[] {
     if (select.includes.length + select.excludes.length === 0) return [];
     // Walks the page's own options, so a value the page has no button for
     // (nothing to draw) is skipped rather than shown as raw text.
-    const picked = (values: readonly string[], exclude: boolean): PresetMark[] =>
-      spec.options
+    const picked = (values: readonly string[], isExcluded: boolean): PresetMark[] => {
+      return spec.options
         .filter((option) => values.includes(option.value))
-        .map((option) => ({ exclude, mark: { glyph: option.mark ?? option.name } }));
+        .map((option) => ({ isExcluded, mark: { glyph: option.mark ?? option.name } }));
+    };
     return [on({ icon: spec.icon }), ...picked(select.includes, false), ...picked(select.excludes, true)];
   });
 }
@@ -45,7 +46,7 @@ export function presetMarks(search: string): PresetMark[] {
   return [
     ...(filter.tripleA ? [on({ glyph: "AAA" })] : []),
     ...(filter.official ? [on({ glyph: "🎖️" })] : []),
-    ...(filter.hideArchived ? [{ exclude: true, mark: { icon: "archive" } } as const] : []),
+    ...(filter.hideArchived ? [{ isExcluded: true, mark: { icon: "archive" } } as const] : []),
     ...triMarks(filter),
     ...sortMarks(sort),
   ];

@@ -15,9 +15,9 @@ import Mark from "./mark.astro";
     BUILTIN_PRESETS.map((preset) => {
       return (
       <button aria-label={preset.name} class="chip preset-chip" data-preset={preset.search} type="button">
-        {presetMarks(preset.search).map(({ exclude, mark }) => {
+        {presetMarks(preset.search).map(({ isExcluded, mark }) => {
           return (
-          <span class:list={["preset-mark", { "preset-exclude": exclude }]}>
+          <span class:list={["preset-mark", { "preset-exclude": isExcluded }]}>
             <Mark mark={mark} />
           </span>
           );
