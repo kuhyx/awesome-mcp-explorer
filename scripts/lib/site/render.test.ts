@@ -80,7 +80,7 @@ describe("headModel", () => {
     const home = headModel({ ...PAGE, path: "" });
     expect(home.jsonLd).toContain('"@type":"WebApplication"');
     expect(home.links).toContainEqual({ href: "index.md", rel: "alternate", type: "text/markdown" });
-    expect(home.title).toBe("MCP Explorer — filter awesome-mcp-servers");
+    expect(home.title).toBe("MCP Explorer");
     expect(home.description).toMatch(/^Filter and sort every server in awesome-mcp-servers/u);
   });
 

@@ -71,13 +71,13 @@ describe("ListView.refreshAges", () => {
   it("swaps the printed date for an age relative to now", () => {
     const { root, view } = build();
     view.refreshAges(Date.parse("2026-07-04T00:00:00Z"));
-    expect(root.querySelector("time")?.textContent).toBe("3d ago");
+    expect(root.querySelector("time")?.textContent).toBe("3d");
   });
 
-  it("falls back to unknown for a row without a datetime", () => {
+  it("falls back to ? for a row without a datetime", () => {
     const { root, view } = build();
     root.querySelector("time")?.removeAttribute("datetime");
     view.refreshAges(Date.now());
-    expect(root.querySelector("time")?.textContent).toBe("unknown");
+    expect(root.querySelector("time")?.textContent).toBe("?");
   });
 });

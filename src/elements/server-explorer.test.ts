@@ -59,7 +59,7 @@ describe("hydration", () => {
   it("keeps the prerendered rows in default order and shows the full count", async () => {
     await mountHome();
     expect(visibleIds()).toEqual(DEFAULT_ORDER);
-    expect(status()).toBe("Showing 5 of 5");
+    expect(status()).toBe("5 / 5");
   });
 
   it("replaces printed dates with ages relative to page load", async () => {
@@ -68,8 +68,8 @@ describe("hydration", () => {
     await mountHome();
     vi.useRealTimers();
     const ages = [...document.querySelectorAll("time.row-age")].map((t) => t.textContent);
-    expect(ages).toContain("3d ago");
-    expect(ages.every((age) => /ago|today/.test(age))).toBe(true);
+    expect(ages).toContain("3d");
+    expect(ages.every((age) => /^\d+(d|mo|y)$/.test(age))).toBe(true);
   });
 
   it("restores every filter and the sort from the URL, and shows them in the controls", async () => {
@@ -80,17 +80,17 @@ describe("hydration", () => {
     );
     await mountHome();
     expect(visibleIds()).toEqual(["acme/aaa-server"]);
-    expect(status()).toBe("Showing 1 of 5");
+    expect(status()).toBe("1 / 5");
     expect(document.querySelector<HTMLInputElement>("[data-search]")?.value).toBe("aaa");
     expect(aaa()).toHaveAttribute("aria-pressed", "true");
     expect(tri("TS/JS: include")).toHaveAttribute("aria-pressed", "true");
     expect(tri("Rust: exclude")).toBeInTheDocument();
-    expect(document.querySelector<HTMLSelectElement>("[data-sort-key]")?.value).toBe("name");
+    expect(document.querySelector('[data-sort-key="name"]')).toHaveAttribute("aria-pressed", "true");
     expect(tri("Sort ascending")).toHaveTextContent("↑");
     expect(document.querySelector<HTMLSelectElement>('[data-axis="quality"]')?.value).toBe("A");
-    expect(document.querySelector(".facet-summary[title^='TS/JS']")).toHaveTextContent(
-      "TS/JS · not Rust",
-    );
+    const summary = document.querySelector('[data-facet="languages"] .facet-summary');
+    expect(summary).toHaveAttribute("aria-label", "TS/JS · not Rust");
+    expect(summary).toHaveTextContent("✓1 ✕1");
   });
 
   it("restores a stars bound onto the slider", async () => {
@@ -115,7 +115,10 @@ describe("a URL naming a value the page has no button for", () => {
     globalThis.history.replaceState(null, "", "/?cat=Nonexistent");
     await mountHome();
     expect(visibleIds()).toEqual([]);
-    expect(document.querySelector(".facet-summary[title='Nonexistent']")).toBeInTheDocument();
+    expect(document.querySelector('[data-facet="categories"] .facet-summary')).toHaveAttribute(
+      "aria-label",
+      "Nonexistent",
+    );
   });
 });
 
@@ -137,9 +140,11 @@ describe("search", () => {
     await mountHome();
     await user.type(screen.getByRole("searchbox"), "zzzzqqq");
     expect(visibleIds()).toEqual([]);
-    expect(screen.getByText("No servers match these filters.")).toBeVisible();
+    const empty = screen.getByLabelText("No servers match these filters");
+    expect(empty).toBeVisible();
+    expect(empty).toHaveTextContent("");
     await user.clear(screen.getByRole("searchbox"));
-    expect(screen.getByText("No servers match these filters.")).not.toBeVisible();
+    expect(empty).not.toBeVisible();
   });
 });
 
@@ -150,7 +155,7 @@ describe("tri-state facets", () => {
     await user.click(tri("Rust: off"));
     expect(visibleIds()).toEqual(["acme/bbb-server"]);
     expect(search()).toBe("?lang=rust");
-    expect(document.querySelector(".facet-summary[title='Rust']")).toBeInTheDocument();
+    expect(document.querySelector('[data-facet="languages"] .facet-summary')).toHaveAttribute("aria-label", "Rust");
 
     await user.click(tri("Rust: include"));
     expect(visibleIds()).toEqual(DEFAULT_ORDER.filter((id) => id !== "acme/bbb-server"));
@@ -216,9 +221,10 @@ describe("provenance and grade controls", () => {
     await user.click(screen.getByRole("button", { name: /Not on Glama/ }));
     expect(visibleIds()).toEqual(["acme/ccc-server", "acme/eee-server"]);
     expect(warning).toBeVisible();
-    expect(warning).toHaveTextContent("2 matching servers have no Glama grade at all");
+    expect(warning).toHaveTextContent("2");
+    expect(warning).toHaveAttribute("aria-label", "2 matching without a Glama grade");
     await user.type(screen.getByRole("searchbox"), "eee-");
-    expect(warning).toHaveTextContent("1 matching server has no Glama grade at all");
+    expect(warning).toHaveTextContent("1");
     await user.click(screen.getByRole("button", { name: /Not on Glama/ }));
     expect(warning).not.toBeVisible();
   });
@@ -228,7 +234,7 @@ describe("sorting", () => {
   it("changes the sort key and reorders the rows", async () => {
     const user = userEvent.setup();
     await mountHome();
-    await user.selectOptions(document.querySelector<HTMLSelectElement>("[data-sort-key]") as HTMLElement, "name");
+    await user.click(document.querySelector('[data-sort-key="name"]')!);
     expect(visibleIds()).toEqual([
       "acme/eee-server",
       "acme/ddd-server",
@@ -237,6 +243,8 @@ describe("sorting", () => {
       "acme/aaa-server",
     ]);
     expect(search()).toBe("?sort=name");
+    expect(document.querySelector('[data-sort-key="name"]')).toHaveAttribute("aria-pressed", "true");
+    expect(document.querySelector('[data-sort-key="stars"]')).toHaveAttribute("aria-pressed", "false");
   });
 
   it("flips the direction", async () => {
@@ -264,7 +272,11 @@ describe("reset, copy link and export", () => {
     expect(reset).not.toBeVisible();
     await user.click(tri("Rust: off"));
     expect(reset).toBeVisible();
-    await user.click(screen.getByRole("button", { name: "Reset" }));
+    expect(reset).toHaveTextContent("1");
+    await user.click(tri("Rust: include"));
+    await user.click(screen.getByRole("button", { name: "Official only" }));
+    expect(reset).toHaveTextContent("2");
+    await user.click(screen.getByRole("button", { name: "Reset filters" }));
     expect(visibleIds()).toEqual(DEFAULT_ORDER);
     expect(search()).toBe("");
     expect(reset).not.toBeVisible();
@@ -275,8 +287,10 @@ describe("reset, copy link and export", () => {
     const write = vi.spyOn(navigator.clipboard, "writeText");
     await mountHome();
     await user.click(tri("Rust: off"));
-    await user.click(screen.getByRole("button", { name: "Copy link" }));
+    const copy = screen.getByRole("button", { name: "Copy link" });
+    await user.click(copy);
     expect(write).toHaveBeenCalledWith(expect.stringContaining("?lang=rust"));
+    expect(copy).toHaveAttribute("data-copied");
   });
 
   it("exports the current results as a download", async () => {
@@ -374,13 +388,13 @@ describe("presets", () => {
     await user.click(screen.getByRole("button", { name: "Actively maintained" }));
     expect(search()).toBe("?live=1&sort=pushed");
     expect(visibleIds()).not.toContain("acme/ddd-server");
-    expect(document.querySelector<HTMLSelectElement>("[data-sort-key]")?.value).toBe("pushed");
+    expect(document.querySelector('[data-sort-key="pushed"]')).toHaveAttribute("aria-pressed", "true");
   });
 
   it("saves the current view, persists it, applies it and deletes it", async () => {
     const user = userEvent.setup();
     await mountHome();
-    const save = screen.getByRole("button", { name: "Save" });
+    const save = screen.getByRole("button", { name: "Save current as preset" });
     expect(save).toBeDisabled();
 
     await user.click(tri("Rust: off"));
@@ -393,7 +407,7 @@ describe("presets", () => {
     expect(saved).toHaveClass("on");
     expect(globalThis.localStorage.getItem("awesome-mcp-explorer:presets")).toContain("My rust");
 
-    await user.click(screen.getByRole("button", { name: "Reset" }));
+    await user.click(screen.getByRole("button", { name: "Reset filters" }));
     expect(visibleIds()).toEqual(DEFAULT_ORDER);
     await user.click(saved);
     expect(visibleIds()).toEqual(["acme/bbb-server"]);
@@ -446,7 +460,7 @@ describe("keyboard", () => {
 
     await user.keyboard("?");
     expect(help).toBeVisible();
-    expect(within(help!).getByText("focus search")).toBeVisible();
+    expect(within(help!).getByLabelText("focus search")).toBeVisible();
     await user.keyboard("?");
     expect(help).not.toBeVisible();
     await user.keyboard("?");
@@ -540,15 +554,18 @@ describe("before the data arrives", () => {
 });
 
 describe("when servers.json cannot be loaded", () => {
-  it("says so and points at build:data, leaving the printed rows alone", async () => {
+  it("shows the error icon, logs the detail, and leaves the printed rows alone", async () => {
     vi.stubGlobal("fetch", () => Promise.resolve(new Response("", { status: 500 })));
     insertHome();
+    const logged = vi.spyOn(console, "error").mockReturnValue();
     const message = document.querySelector<HTMLElement>("[data-error]");
     await waitFor(() => {
       expect(message).toBeVisible();
     });
-    expect(message).toHaveTextContent("Could not load servers.json: HTTP 500");
-    expect(message).toHaveTextContent("pnpm run build:data");
+    expect(message).toHaveTextContent("servers.json: HTTP 500");
+    expect(message?.querySelector("[data-error-detail]")).toHaveClass("sr-only");
+    expect(message?.querySelector("svg[data-icon='error']")).toBeInTheDocument();
+    expect(logged).toHaveBeenCalledWith("servers.json: HTTP 500");
     expect(visibleIds()).toEqual(DEFAULT_ORDER);
   });
 

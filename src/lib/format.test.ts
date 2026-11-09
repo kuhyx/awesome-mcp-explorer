@@ -21,18 +21,18 @@ describe("formatStars", () => {
 });
 
 describe("formatAge", () => {
-  it("says today for the last day", () => {
-    expect(formatAge("2026-07-09T12:00:00Z", NOW)).toBe("today");
+  it("says 0d for the last day", () => {
+    expect(formatAge("2026-07-09T12:00:00Z", NOW)).toBe("0d");
   });
 
   it("counts days, months and years", () => {
-    expect(formatAge("2026-07-07T00:00:00Z", NOW)).toBe("3d ago");
-    expect(formatAge("2026-04-10T00:00:00Z", NOW)).toBe("3mo ago");
-    expect(formatAge("2023-07-09T00:00:00Z", NOW)).toBe("3y ago");
+    expect(formatAge("2026-07-07T00:00:00Z", NOW)).toBe("3d");
+    expect(formatAge("2026-04-10T00:00:00Z", NOW)).toBe("3mo");
+    expect(formatAge("2023-07-09T00:00:00Z", NOW)).toBe("3y");
   });
 
-  it("says unknown for an unparseable date", () => {
-    expect(formatAge("not a date", NOW)).toBe("unknown");
+  it("says ? for an unparseable date", () => {
+    expect(formatAge("not a date", NOW)).toBe("?");
   });
 });
 

@@ -10,13 +10,13 @@ const body = bodyOf(html);
 
 function rowIds(markup: string): string[] {
   return markup
-    .matchAll(/<article class="row" data-id="([^"]+)"/g)
+    .matchAll(/<article class="row[^"]*" data-id="([^"]+)"/g)
     .map((match) => match[1] ?? "")
     .toArray();
 }
 
 function proseOf(markup: string): string {
-  const start = markup.indexOf('<section class="prerender">');
+  const start = markup.indexOf('<section class="prerender sr-only">');
   const section = markup.slice(start, markup.indexOf("</section>", start));
   return section.replaceAll(/<[^<>]*>/g, " ");
 }
@@ -48,7 +48,7 @@ describe("homepage prerender", () => {
   });
 
   it("sets the title, description, canonical link and JSON-LD", () => {
-    expect(html).toContain("<title>MCP Explorer — filter awesome-mcp-servers</title>");
+    expect(html).toContain("<title>MCP Explorer</title>");
     expect(html).toMatch(/<meta content="Filter and sort every server[^"]*" name="description">/);
     expect(html).toContain('rel="canonical"');
     expect(html).toContain('<script type="application/ld+json">');
@@ -56,10 +56,10 @@ describe("homepage prerender", () => {
   });
 
   it("prerenders the header, stat bar and filter shells", () => {
-    expect(html).toContain('<h1>MCP Explorer <span class="subtitle">5 servers</span></h1>');
-    expect(html).toContain("Showing <strong data-shown>5</strong> of <span data-total>5</span>");
+    expect(html).toContain('<span class="sr-only">MCP Explorer</span></h1>');
+    expect(html).toContain("<strong data-shown>5</strong> / <span data-total>5</span>");
     for (const facet of ["languages", "scope", "os", "foss", "cost", "rateLimited", "categories"]) {
-      expect(html).toContain(`<fieldset class="facet" data-facet="${facet}">`);
+      expect(html).toMatch(new RegExp(`<fieldset[^>]*class="facet"[^>]*data-facet="${facet}"`));
     }
     expect(html).toContain('data-slider="stars"');
     expect(html).toContain('data-slider="pushed"');
@@ -76,7 +76,7 @@ describe("homepage prerender", () => {
     expect(proseOf(html).length).toBeGreaterThan(400);
     expect(html).toContain('href="about/"');
     expect(html).toContain('href="filters/"');
-    expect(html).toContain('<section class="prerender">');
+    expect(html).toContain('<section class="prerender sr-only">');
   });
 
   it("has exactly one h1", () => {
@@ -88,8 +88,8 @@ describe("homepage prerender without a dataset", () => {
   it("still renders the page, with no rows, as CI builds it", async () => {
     const empty = await renderHome([]);
     expect(rowIds(empty)).toEqual([]);
-    expect(empty).toContain("Showing <strong data-shown>0</strong> of <span data-total>0</span>");
+    expect(empty).toContain("<strong data-shown>0</strong> / <span data-total>0</span>");
     expect(empty).toContain('href="about/"');
-    expect(empty).toContain("<title>MCP Explorer — filter awesome-mcp-servers</title>");
+    expect(empty).toContain("<title>MCP Explorer</title>");
   });
 });

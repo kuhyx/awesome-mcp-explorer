@@ -1,51 +1,375 @@
 <main>
+<svg aria-hidden="true" class="sprite" xmlns="http://www.w3.org/2000/svg">
+<symbol id="i-logo" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="3">
+</circle>
+<circle cx="4" cy="5" r="2">
+</circle>
+<circle cx="20" cy="5" r="2">
+</circle>
+<circle cx="12" cy="21" r="2">
+</circle>
+<path d="M5.6 6.2 9.6 10M18.4 6.2 14.4 10M12 15v4">
+</path>
+</symbol>
+<symbol id="i-search" viewBox="0 0 24 24">
+<circle cx="10.5" cy="10.5" r="6.5">
+</circle>
+<path d="m15.5 15.5 5 5">
+</path>
+</symbol>
+<symbol id="i-code" viewBox="0 0 24 24">
+<path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16">
+</path>
+</symbol>
+<symbol id="i-pin" viewBox="0 0 24 24">
+<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z">
+</path>
+<circle cx="12" cy="9.5" r="2.5">
+</circle>
+</symbol>
+<symbol id="i-monitor" viewBox="0 0 24 24">
+<rect height="12" rx="1.5" width="18" x="3" y="4">
+</rect>
+<path d="M9 20h6M12 16v4">
+</path>
+</symbol>
+<symbol id="i-scale" viewBox="0 0 24 24">
+<path d="M12 4v16M7 20h10M5 7h14M5 7l-3 7h6zM19 7l-3 7h6z">
+</path>
+</symbol>
+<symbol id="i-coin" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="8.5">
+</circle>
+<circle cx="12" cy="12" r="5">
+</circle>
+</symbol>
+<symbol id="i-gauge" viewBox="0 0 24 24">
+<path d="M3.5 17a9 9 0 1 1 17 0M12 14l4.5-5">
+</path>
+<circle cx="12" cy="14.5" fill="currentColor" r="1.3">
+</circle>
+</symbol>
+<symbol id="i-folder" viewBox="0 0 24 24">
+<path d="M3 6.5V18a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1h-8l-2-2.5H4a1 1 0 0 0-1 1z">
+</path>
+</symbol>
+<symbol id="i-star" viewBox="0 0 24 24">
+<path d="m12 3 2.8 5.8 6.2.9-4.5 4.4 1 6.2L12 17.4l-5.5 2.9 1-6.2L3 9.7l6.2-.9z">
+</path>
+</symbol>
+<symbol id="i-wrench" viewBox="0 0 24 24">
+<path d="M14.5 4a5 5 0 0 0 5.6 6.6l-9 9a2.1 2.1 0 0 1-3-3l9-9A5 5 0 0 1 14.5 4z">
+</path>
+</symbol>
+<symbol id="i-clock" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="8.5">
+</circle>
+<path d="M12 7v5l3.5 2">
+</path>
+</symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24">
+<rect height="15" rx="1.5" width="17" x="3.5" y="5.5">
+</rect>
+<path d="M3.5 10h17M8 3.5v4M16 3.5v4">
+</path>
+</symbol>
+<symbol id="i-grade" viewBox="0 0 24 24">
+<circle cx="12" cy="9" r="5.5">
+</circle>
+<path d="m8.5 13.5-2 7 5.5-2.5 5.5 2.5-2-7">
+</path>
+</symbol>
+<symbol id="i-shield" viewBox="0 0 24 24">
+<path d="M12 3 4.5 6v5.5c0 4.6 3.2 8 7.5 9.5 4.3-1.5 7.5-4.9 7.5-9.5V6z">
+</path>
+</symbol>
+<symbol id="i-sort" viewBox="0 0 24 24">
+<path d="M7 4v16M3.5 16.5 7 20l3.5-3.5M17 20V4M13.5 7.5 17 4l3.5 3.5">
+</path>
+</symbol>
+<symbol id="i-download" viewBox="0 0 24 24">
+<path d="M12 4v11M7 10.5l5 5 5-5M4.5 20h15">
+</path>
+</symbol>
+<symbol id="i-link" viewBox="0 0 24 24">
+<path d="M10 14a4 4 0 0 0 5.7 0l3.6-3.6a4 4 0 0 0-5.7-5.7L12 6.3">
+</path>
+<path d="M14 10a4 4 0 0 0-5.7 0l-3.6 3.6a4 4 0 0 0 5.7 5.7l1.6-1.6">
+</path>
+</symbol>
+<symbol id="i-link-off" viewBox="0 0 24 24">
+<path d="M15.7 14 19.3 10.4a4 4 0 0 0-5.7-5.7L12 6.3M8.3 10l-3.6 3.6a4 4 0 0 0 5.7 5.7l1.6-1.6M3 3l18 18">
+</path>
+</symbol>
+<symbol id="i-check" viewBox="0 0 24 24">
+<path d="m4.5 12.5 5 5 10-11">
+</path>
+</symbol>
+<symbol id="i-reset" viewBox="0 0 24 24">
+<path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4v4.5H9">
+</path>
+</symbol>
+<symbol id="i-save" viewBox="0 0 24 24">
+<path d="M6 3.5h12v17l-6-4.5-6 4.5zM12 7.5v5M9.5 10h5">
+</path>
+</symbol>
+<symbol id="i-close" viewBox="0 0 24 24">
+<path d="m6 6 12 12M18 6 6 18">
+</path>
+</symbol>
+<symbol id="i-archive" viewBox="0 0 24 24">
+<rect height="4" rx="1" width="18" x="3" y="4">
+</rect>
+<path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M10 12h4">
+</path>
+</symbol>
+<symbol id="i-warning" viewBox="0 0 24 24">
+<path d="M12 3.5 2.5 20h19z">
+</path>
+<path d="M12 10v4.5">
+</path>
+<circle cx="12" cy="17.3" fill="currentColor" r="0.9" stroke="none">
+</circle>
+</symbol>
+<symbol id="i-error" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="9">
+</circle>
+<path d="M12 7v6">
+</path>
+<circle cx="12" cy="16.5" fill="currentColor" r="1" stroke="none">
+</circle>
+</symbol>
+<symbol id="i-help" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="9">
+</circle>
+<path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7">
+</path>
+<circle cx="12" cy="17" fill="currentColor" r="1" stroke="none">
+</circle>
+</symbol>
+<symbol id="i-cov-all" viewBox="0 0 24 24">
+<rect fill="currentColor" height="5" rx="1" width="5" x="2" y="9.5">
+</rect>
+<rect fill="currentColor" height="5" rx="1" width="5" x="9.5" y="9.5">
+</rect>
+<rect fill="currentColor" height="5" rx="1" width="5" x="17" y="9.5">
+</rect>
+</symbol>
+<symbol id="i-cov-part" viewBox="0 0 24 24">
+<rect fill="currentColor" height="5" rx="1" width="5" x="2" y="9.5">
+</rect>
+<rect height="5" rx="1" stroke-dasharray="2 1.5" stroke-width="1.5" width="5" x="9.5" y="9.5">
+</rect>
+<rect height="5" rx="1" stroke-dasharray="2 1.5" stroke-width="1.5" width="5" x="17" y="9.5">
+</rect>
+</symbol>
+<symbol id="i-cov-none" viewBox="0 0 24 24">
+<rect height="16" rx="2" stroke-dasharray="3 2.5" width="16" x="4" y="4">
+</rect>
+<path d="m8 16 8-8">
+</path>
+</symbol>
+<symbol id="i-empty" viewBox="0 0 64 64">
+<rect height="34" rx="4" stroke-dasharray="5 4" width="40" x="6" y="18">
+</rect>
+<circle cx="42" cy="22" r="11">
+</circle>
+<path d="m50 30 9 9">
+</path>
+</symbol>
+</svg>
 <server-explorer>
 <div class="app">
 <header class="topbar">
-<h1>MCP Explorer <span class="subtitle">5 servers</span>
+<h1 class="brand">
+<svg aria-hidden="true" class="icon icon-logo" data-icon="logo">
+<use href="#i-logo">
+</use>
+</svg>
+<span class="sr-only">MCP Explorer</span>
 </h1>
-<input aria-label="Search servers" class="search" data-search placeholder="Fuzzy search name or description…  (/)" type="search">
+<div class="search-box">
+<svg aria-hidden="true" class="icon" data-icon="search">
+<use href="#i-search">
+</use>
+</svg>
+<input aria-label="Search servers" class="search" data-search type="search">
+<kbd aria-hidden="true" class="keycap">/</kbd>
+</div>
 <div class="presets">
-<button class="chip" data-preset="aaa=1" type="button">Triple-A only</button>
-<button class="chip" data-preset="aaa=1&amp;foss=yes" type="button">Triple-A + FOSS</button>
-<button class="chip" data-preset="cost=likely-free,unknown" type="button">Free or unknown cost</button>
-<button class="chip" data-preset="official=1" type="button">Official implementations</button>
-<button class="chip" data-preset="scope=local,!cloud" type="button">Local-only, no cloud</button>
-<button class="chip" data-preset="live=1&amp;sort=pushed" type="button">Actively maintained</button>
-<button class="chip" data-preset="lang=rust" type="button">Rust servers</button>
+<button aria-label="Triple-A only" class="chip preset-chip" data-preset="aaa=1" type="button">
+<span class="preset-mark">
+<span aria-hidden="true" class="glyph">AAA</span>
+</span>
+</button>
+<button aria-label="Triple-A + FOSS" class="chip preset-chip" data-preset="aaa=1&amp;foss=yes" type="button">
+<span class="preset-mark">
+<span aria-hidden="true" class="glyph">AAA</span>
+</span>
+<span class="preset-mark">
+<svg aria-hidden="true" class="icon" data-icon="scale">
+<use href="#i-scale">
+</use>
+</svg>
+</span>
+<span class="preset-mark">
+<span aria-hidden="true" class="glyph">FOSS</span>
+</span>
+</button>
+<button aria-label="Free or unknown cost" class="chip preset-chip" data-preset="cost=likely-free,unknown" type="button">
+<span class="preset-mark">
+<svg aria-hidden="true" class="icon" data-icon="coin">
+<use href="#i-coin">
+</use>
+</svg>
+</span>
+<span class="preset-mark">
+<span aria-hidden="true" class="glyph">0</span>
+</span>
+<span class="preset-mark">
+<span aria-hidden="true" class="glyph">?</span>
+</span>
+</button>
+<button aria-label="Official implementations" class="chip preset-chip" data-preset="official=1" type="button">
+<span class="preset-mark">
+<span aria-hidden="true" class="glyph">🎖️</span>
+</span>
+</button>
+<button aria-label="Local-only, no cloud" class="chip preset-chip" data-preset="scope=local,!cloud" type="button">
+<span class="preset-mark">
+<svg aria-hidden="true" class="icon" data-icon="pin">
+<use href="#i-pin">
+</use>
+</svg>
+</span>
+<span class="preset-mark">
+<span aria-hidden="true" class="glyph">local</span>
+</span>
+<span class="preset-mark preset-exclude">
+<span aria-hidden="true" class="glyph">cloud</span>
+</span>
+</button>
+<button aria-label="Actively maintained" class="chip preset-chip" data-preset="live=1&amp;sort=pushed" type="button">
+<span class="preset-mark preset-exclude">
+<svg aria-hidden="true" class="icon" data-icon="archive">
+<use href="#i-archive">
+</use>
+</svg>
+</span>
+<span class="preset-mark">
+<svg aria-hidden="true" class="icon" data-icon="clock">
+<use href="#i-clock">
+</use>
+</svg>
+</span>
+<span class="preset-mark">
+<span aria-hidden="true" class="glyph">↓</span>
+</span>
+</button>
+<button aria-label="Rust servers" class="chip preset-chip" data-preset="lang=rust" type="button">
+<span class="preset-mark">
+<svg aria-hidden="true" class="icon" data-icon="code">
+<use href="#i-code">
+</use>
+</svg>
+</span>
+<span class="preset-mark">
+<span aria-hidden="true" class="glyph">Rust</span>
+</span>
+</button>
 <span class="preset-saved-list" data-saved>
 </span>
 <template data-saved-template>
 <span class="preset-saved">
 <button class="chip on" data-preset="" type="button">
 </button>
-<button class="chip preset-del" data-preset-delete="" type="button">✕</button>
+<button class="chip preset-del" data-preset-delete="" type="button">
+<svg aria-hidden="true" class="icon" data-icon="close">
+<use href="#i-close">
+</use>
+</svg>
+</button>
 </span>
 </template>
 <form class="preset-save" data-preset-form>
-<input aria-label="Preset name" data-preset-name placeholder="Save current as…">
-<button class="chip" disabled type="submit">Save</button>
+<input aria-label="Preset name" data-preset-name>
+<button aria-label="Save current as preset" class="chip icon-btn" disabled type="submit">
+<svg aria-hidden="true" class="icon" data-icon="save">
+<use href="#i-save">
+</use>
+</svg>
+</button>
 </form>
 </div>
 </header>
 <div class="statbar">
-<span class="count" role="status">Showing <strong data-shown>5</strong> of <span data-total>5</span>
+<span class="count" role="status">
+<strong data-shown>5</strong> / <span data-total>5</span>
 </span>
-<label class="sort">Sort<select data-sort-key>
-<option value="category">category</option>
-<option value="created">age</option>
-<option value="grade">grade</option>
-<option value="name">name</option>
-<option value="pushed">last push</option>
-<option selected value="stars">stars</option>
-</select>
-<button aria-label="Sort descending" class="chip" data-action="sort-dir" type="button">↓</button>
-</label>
+<div aria-label="Sort" class="sort" role="group">
+<svg aria-hidden="true" class="icon" data-icon="sort">
+<use href="#i-sort">
+</use>
+</svg>
+<button aria-label="Sort by category" aria-pressed="false" class="chip icon-btn" data-sort-key="category" type="button">
+<svg aria-hidden="true" class="icon" data-icon="folder">
+<use href="#i-folder">
+</use>
+</svg>
+</button>
+<button aria-label="Sort by age" aria-pressed="false" class="chip icon-btn" data-sort-key="created" type="button">
+<svg aria-hidden="true" class="icon" data-icon="calendar">
+<use href="#i-calendar">
+</use>
+</svg>
+</button>
+<button aria-label="Sort by grade" aria-pressed="false" class="chip icon-btn" data-sort-key="grade" type="button">
+<svg aria-hidden="true" class="icon" data-icon="grade">
+<use href="#i-grade">
+</use>
+</svg>
+</button>
+<button aria-label="Sort by name" aria-pressed="false" class="chip icon-btn" data-sort-key="name" type="button">
+<span aria-hidden="true" class="glyph">A–Z</span>
+</button>
+<button aria-label="Sort by last push" aria-pressed="false" class="chip icon-btn" data-sort-key="pushed" type="button">
+<svg aria-hidden="true" class="icon" data-icon="clock">
+<use href="#i-clock">
+</use>
+</svg>
+</button>
+<button aria-label="Sort by stars" aria-pressed="true" class="chip icon-btn on" data-sort-key="stars" type="button">
+<span aria-hidden="true" class="glyph">★</span>
+</button>
+<button aria-label="Sort descending" class="chip icon-btn" data-action="sort-dir" type="button">↓</button>
+</div>
 <div class="statbar-actions">
-<button class="chip" data-action="reset" hidden type="button">Reset</button>
-<button class="chip" data-action="copy" type="button">Copy link</button>
-<label class="sort">Export<select data-export>
-<option value="">…</option>
+<button aria-label="Reset filters" class="chip icon-btn" data-action="reset" hidden type="button">
+<svg aria-hidden="true" class="icon" data-icon="reset">
+<use href="#i-reset">
+</use>
+</svg>
+<span class="badge" data-reset-count>0</span>
+</button>
+<button aria-label="Copy link" class="chip icon-btn copy-btn" data-action="copy" type="button">
+<svg aria-hidden="true" class="icon when-idle" data-icon="link">
+<use href="#i-link">
+</use>
+</svg>
+<svg aria-hidden="true" class="icon when-copied" data-icon="check">
+<use href="#i-check">
+</use>
+</svg>
+</button>
+<label class="sort">
+<svg aria-hidden="true" class="icon" data-icon="download">
+<use href="#i-download">
+</use>
+</svg>
+<select aria-label="Export" data-export>
+<option hidden selected value="">
+</option>
 <option value="json">JSON</option>
 <option value="csv">CSV</option>
 <option value="markdown">Markdown</option>
@@ -55,19 +379,26 @@
 </div>
 <div class="body">
 <aside class="filters">
-<fieldset class="facet" data-grade>
-<legend>Glama grade</legend>
-<button aria-pressed="false" class="aaa-toggle" data-action="toggle-aaa" type="button">
+<fieldset aria-label="Glama grade" class="facet" data-grade>
+<legend>
+<svg aria-hidden="true" class="icon" data-icon="grade">
+<use href="#i-grade">
+</use>
+</svg>
+</legend>
+<button aria-label="Triple-A only" aria-pressed="false" class="aaa-toggle" data-action="toggle-aaa" type="button">
 <span class="aaa-mark">AAA</span>
-<span class="aaa-text">Triple-A only <span class="tri-count" data-count="aaa">1</span>
-</span>
+<span class="tri-count" data-count="aaa">1</span>
 </button>
-<p class="facet-hint">Licence, quality and maintenance all graded <strong>A</strong>. Glama has no A−, so there is no looser variant.</p>
 <div class="grade-axes">
 <label class="grade-axis">
-<span>license ≥</span>
-<select data-axis="license">
-<option value="">any</option>
+<svg aria-hidden="true" class="icon" data-icon="scale">
+<use href="#i-scale">
+</use>
+</svg>
+<span aria-hidden="true">≥</span>
+<select aria-label="license at least" data-axis="license">
+<option value="">⬚</option>
 <option value="A">A</option>
 <option value="B">B</option>
 <option value="C">C</option>
@@ -76,9 +407,13 @@
 </select>
 </label>
 <label class="grade-axis">
-<span>quality ≥</span>
-<select data-axis="quality">
-<option value="">any</option>
+<svg aria-hidden="true" class="icon" data-icon="star">
+<use href="#i-star">
+</use>
+</svg>
+<span aria-hidden="true">≥</span>
+<select aria-label="quality at least" data-axis="quality">
+<option value="">⬚</option>
 <option value="A">A</option>
 <option value="B">B</option>
 <option value="C">C</option>
@@ -87,9 +422,13 @@
 </select>
 </label>
 <label class="grade-axis">
-<span>maintenance ≥</span>
-<select data-axis="maintenance">
-<option value="">any</option>
+<svg aria-hidden="true" class="icon" data-icon="wrench">
+<use href="#i-wrench">
+</use>
+</svg>
+<span aria-hidden="true">≥</span>
+<select aria-label="maintenance at least" data-axis="maintenance">
+<option value="">⬚</option>
 <option value="A">A</option>
 <option value="B">B</option>
 <option value="C">C</option>
@@ -99,27 +438,57 @@
 </label>
 </div>
 <div class="coverage-row">
-<button aria-pressed="false" class="chip" data-coverage="graded-all" type="button">All three graded <span class="tri-count">2</span>
+<button aria-label="All three graded" aria-pressed="false" class="chip" data-coverage="graded-all" type="button">
+<svg aria-hidden="true" class="icon" data-icon="cov-all">
+<use href="#i-cov-all">
+</use>
+</svg> <span class="tri-count">2</span>
 </button>
-<button aria-pressed="false" class="chip" data-coverage="graded-partial" type="button">Partly graded <span class="tri-count">1</span>
+<button aria-label="Partly graded" aria-pressed="false" class="chip" data-coverage="graded-partial" type="button">
+<svg aria-hidden="true" class="icon" data-icon="cov-part">
+<use href="#i-cov-part">
+</use>
+</svg> <span class="tri-count">1</span>
 </button>
-<button aria-pressed="false" class="chip" data-coverage="not-indexed" type="button">Not on Glama <span class="tri-count">2</span>
+<button aria-label="Not on Glama" aria-pressed="false" class="chip" data-coverage="not-indexed" type="button">
+<svg aria-hidden="true" class="icon" data-icon="cov-none">
+<use href="#i-cov-none">
+</use>
+</svg> <span class="tri-count">2</span>
 </button>
 </div>
-<p class="warn" data-ungraded hidden role="status">
-<span data-ungraded-text>
-</span> no Glama grade at all and cannot satisfy a grade filter. An empty result here means “none that Glama has graded”, not “none exist”.</p>
+<div class="warn" data-ungraded hidden role="status">
+<svg aria-hidden="true" class="icon" data-icon="warning">
+<use href="#i-warning">
+</use>
+</svg> <span data-ungraded-text>
+</span>
+</div>
 </fieldset>
-<fieldset class="facet">
-<legend>Provenance</legend>
-<button aria-pressed="false" class="chip" data-action="toggle-official" type="button">🎖️ Official only <span class="tri-count" data-count="official">1</span>
-</button>
-<button aria-pressed="false" class="chip" data-action="toggle-archived" type="button">Hide archived</button>
-</fieldset>
-<fieldset class="facet" data-facet="languages">
+<fieldset aria-label="Provenance" class="facet">
 <legend>
-<span class="facet-legend-label">Language</span>
-<span class="facet-summary" title="Any">Any</span>
+<svg aria-hidden="true" class="icon" data-icon="shield">
+<use href="#i-shield">
+</use>
+</svg>
+</legend>
+<button aria-label="Official only" aria-pressed="false" class="chip" data-action="toggle-official" type="button">
+<span aria-hidden="true">🎖️</span> <span class="tri-count" data-count="official">1</span>
+</button>
+<button aria-label="Hide archived" aria-pressed="false" class="chip icon-btn" data-action="toggle-archived" type="button">
+<svg aria-hidden="true" class="icon" data-icon="archive">
+<use href="#i-archive">
+</use>
+</svg>
+</button>
+</fieldset>
+<fieldset aria-label="Language" class="facet" data-facet="languages">
+<legend>
+<svg aria-hidden="true" class="icon" data-icon="code">
+<use href="#i-code">
+</use>
+</svg>
+<span aria-label="Any" class="facet-summary" role="img">·</span>
 </legend>
 <div class="facet-options">
 <button aria-label="TS/JS: off" aria-pressed="false" class="tri tri-off" data-key="languages" data-name="TS/JS" data-option="typescript" type="button">
@@ -164,10 +533,13 @@
 </button>
 </div>
 </fieldset>
-<fieldset class="facet" data-facet="scope">
+<fieldset aria-label="Scope (local vs cloud)" class="facet" data-facet="scope">
 <legend>
-<span class="facet-legend-label">Scope (local vs cloud)</span>
-<span class="facet-summary" title="Any">Any</span>
+<svg aria-hidden="true" class="icon" data-icon="pin">
+<use href="#i-pin">
+</use>
+</svg>
+<span aria-label="Any" class="facet-summary" role="img">·</span>
 </legend>
 <div class="facet-options">
 <button aria-label="cloud: off" aria-pressed="false" class="tri tri-off" data-key="scope" data-name="cloud" data-option="cloud" type="button">
@@ -187,10 +559,13 @@
 </button>
 </div>
 </fieldset>
-<fieldset class="facet" data-facet="os">
+<fieldset aria-label="Operating system" class="facet" data-facet="os">
 <legend>
-<span class="facet-legend-label">Operating system</span>
-<span class="facet-summary" title="Any">Any</span>
+<svg aria-hidden="true" class="icon" data-icon="monitor">
+<use href="#i-monitor">
+</use>
+</svg>
+<span aria-label="Any" class="facet-summary" role="img">·</span>
 </legend>
 <div class="facet-options">
 <button aria-label="macos: off" aria-pressed="false" class="tri tri-off" data-key="os" data-name="macos" data-option="macos" disabled type="button">
@@ -210,10 +585,13 @@
 </button>
 </div>
 </fieldset>
-<fieldset class="facet" data-facet="foss">
+<fieldset aria-label="Licence" class="facet" data-facet="foss">
 <legend>
-<span class="facet-legend-label">Licence</span>
-<span class="facet-summary" title="Any">Any</span>
+<svg aria-hidden="true" class="icon" data-icon="scale">
+<use href="#i-scale">
+</use>
+</svg>
+<span aria-label="Any" class="facet-summary" role="img">·</span>
 </legend>
 <div class="facet-options">
 <button aria-label="FOSS: off" aria-pressed="false" class="tri tri-off" data-key="foss" data-name="FOSS" data-option="yes" type="button">
@@ -223,64 +601,102 @@
 </button>
 <button aria-label="Not FOSS: off" aria-pressed="false" class="tri tri-off" data-key="foss" data-name="Not FOSS" data-option="no" type="button">
 <span aria-hidden="true" class="tri-glyph">☐</span>
-<span class="tri-name">Not FOSS</span>
+<span class="tri-mark">
+<svg aria-hidden="true" class="icon" data-icon="scale">
+<use href="#i-scale">
+</use>
+</svg>©</span>
 <span class="tri-count">1</span>
 </button>
 <button aria-label="Unclear: off" aria-pressed="false" class="tri tri-off" data-key="foss" data-name="Unclear" data-option="unknown" disabled type="button">
 <span aria-hidden="true" class="tri-glyph">☐</span>
-<span class="tri-name">Unclear</span>
+<span class="tri-mark">
+<svg aria-hidden="true" class="icon" data-icon="scale">
+<use href="#i-scale">
+</use>
+</svg>?</span>
 <span class="tri-count">0</span>
 </button>
 </div>
 </fieldset>
-<fieldset class="facet" data-facet="cost">
+<fieldset aria-label="Cost (inferred)" class="facet" data-facet="cost">
 <legend>
-<span class="facet-legend-label">Cost (inferred)</span>
-<span class="facet-summary" title="Any">Any</span>
+<svg aria-hidden="true" class="icon" data-icon="coin">
+<use href="#i-coin">
+</use>
+</svg>
+<span aria-label="Any" class="facet-summary" role="img">·</span>
 </legend>
 <div class="facet-options">
-<button aria-label="~free: off" aria-pressed="false" class="tri tri-off" data-key="cost" data-name="~free" data-option="likely-free" type="button">
+<button aria-label="free: off" aria-pressed="false" class="tri tri-off" data-key="cost" data-name="free" data-option="likely-free" type="button">
 <span aria-hidden="true" class="tri-glyph">☐</span>
-<span class="tri-name">~free</span>
+<span class="tri-mark tri-inferred">
+<svg aria-hidden="true" class="icon" data-icon="coin">
+<use href="#i-coin">
+</use>
+</svg>0</span>
 <span class="tri-count">4</span>
 </button>
-<button aria-label="~paid: off" aria-pressed="false" class="tri tri-off" data-key="cost" data-name="~paid" data-option="likely-paid" type="button">
+<button aria-label="paid: off" aria-pressed="false" class="tri tri-off" data-key="cost" data-name="paid" data-option="likely-paid" type="button">
 <span aria-hidden="true" class="tri-glyph">☐</span>
-<span class="tri-name">~paid</span>
+<span class="tri-mark tri-inferred">
+<svg aria-hidden="true" class="icon" data-icon="coin">
+<use href="#i-coin">
+</use>
+</svg>$</span>
 <span class="tri-count">1</span>
 </button>
-<button aria-label="~unknown: off" aria-pressed="false" class="tri tri-off" data-key="cost" data-name="~unknown" data-option="unknown" disabled type="button">
+<button aria-label="cost unknown: off" aria-pressed="false" class="tri tri-off" data-key="cost" data-name="cost unknown" data-option="unknown" disabled type="button">
 <span aria-hidden="true" class="tri-glyph">☐</span>
-<span class="tri-name">~unknown</span>
+<span class="tri-mark tri-inferred">
+<svg aria-hidden="true" class="icon" data-icon="coin">
+<use href="#i-coin">
+</use>
+</svg>?</span>
 <span class="tri-count">0</span>
 </button>
 </div>
 </fieldset>
-<fieldset class="facet" data-facet="rateLimited">
+<fieldset aria-label="Rate limit (inferred)" class="facet" data-facet="rateLimited">
 <legend>
-<span class="facet-legend-label">Rate limit (inferred)</span>
-<span class="facet-summary" title="Any">Any</span>
+<svg aria-hidden="true" class="icon" data-icon="gauge">
+<use href="#i-gauge">
+</use>
+</svg>
+<span aria-label="Any" class="facet-summary" role="img">·</span>
 </legend>
 <div class="facet-options">
-<button aria-label="~limited: off" aria-pressed="false" class="tri tri-off" data-key="rateLimited" data-name="~limited" data-option="yes" type="button">
+<button aria-label="rate limited: off" aria-pressed="false" class="tri tri-off" data-key="rateLimited" data-name="rate limited" data-option="yes" type="button">
 <span aria-hidden="true" class="tri-glyph">☐</span>
-<span class="tri-name">~limited</span>
+<span class="tri-mark tri-inferred">
+<svg aria-hidden="true" class="icon" data-icon="gauge">
+<use href="#i-gauge">
+</use>
+</svg>≤</span>
 <span class="tri-count">1</span>
 </button>
-<button aria-label="~unlimited: off" aria-pressed="false" class="tri tri-off" data-key="rateLimited" data-name="~unlimited" data-option="no" type="button">
+<button aria-label="no rate limit: off" aria-pressed="false" class="tri tri-off" data-key="rateLimited" data-name="no rate limit" data-option="no" type="button">
 <span aria-hidden="true" class="tri-glyph">☐</span>
-<span class="tri-name">~unlimited</span>
+<span class="tri-mark tri-inferred">
+<svg aria-hidden="true" class="icon" data-icon="gauge">
+<use href="#i-gauge">
+</use>
+</svg>∞</span>
 <span class="tri-count">4</span>
 </button>
-<button aria-label="~unknown: off" aria-pressed="false" class="tri tri-off" data-key="rateLimited" data-name="~unknown" data-option="unknown" disabled type="button">
+<button aria-label="limits unknown: off" aria-pressed="false" class="tri tri-off" data-key="rateLimited" data-name="limits unknown" data-option="unknown" disabled type="button">
 <span aria-hidden="true" class="tri-glyph">☐</span>
-<span class="tri-name">~unknown</span>
+<span class="tri-mark tri-inferred">
+<svg aria-hidden="true" class="icon" data-icon="gauge">
+<use href="#i-gauge">
+</use>
+</svg>?</span>
 <span class="tri-count">0</span>
 </button>
 </div>
 </fieldset>
-<p class="facet-hint">Cost and rate limits are <strong>inferred</strong> from each server’s scope and description — neither the awesome list nor Glama publishes them. Values are marked <code>~</code> and can be corrected in<code>data/overrides.json</code>.</p>
-<div data-slider="stars">
+<div class="slider-row" data-slider="stars">
+<span aria-hidden="true" class="slider-icon glyph">★</span>
 <range-slider label="Stars">
 <div class="slider">
 <div class="slider-head">
@@ -298,7 +714,13 @@
 </div>
 </range-slider>
 </div>
-<div data-slider="pushed">
+<div class="slider-row" data-slider="pushed">
+<span class="slider-icon">
+<svg aria-hidden="true" class="icon" data-icon="clock">
+<use href="#i-clock">
+</use>
+</svg>
+</span>
 <range-slider label="Last push">
 <div class="slider">
 <div class="slider-head">
@@ -316,10 +738,13 @@
 </div>
 </range-slider>
 </div>
-<fieldset class="facet" data-facet="categories">
+<fieldset aria-label="Category" class="facet" data-facet="categories">
 <legend>
-<span class="facet-legend-label">Category</span>
-<span class="facet-summary" title="Any">Any</span>
+<svg aria-hidden="true" class="icon" data-icon="folder">
+<use href="#i-folder">
+</use>
+</svg>
+<span aria-label="Any" class="facet-summary" role="img">·</span>
 </legend>
 <div class="facet-options">
 <button aria-label="Databases: off" aria-pressed="false" class="tri tri-off" data-key="categories" data-name="Databases" data-option="Databases" type="button">
@@ -336,38 +761,78 @@
 </fieldset>
 </aside>
 <div class="list" data-list>
-<p class="app-msg" data-error hidden>Could not load servers.json: <span data-error-detail>
-</span>. Run <code>pnpm run build:data</code> to generate it.</p>
-<p class="list-empty" data-empty hidden>No servers match these filters.</p>
-<article class="row" data-id="acme/ddd-server">
+<div class="app-msg app-error" data-error hidden role="alert">
+<svg aria-hidden="true" class="icon icon-xl" data-icon="error">
+<use href="#i-error">
+</use>
+</svg>
+<span class="sr-only" data-error-detail>
+</span>
+</div>
+<div aria-label="No servers match these filters" class="list-empty" data-empty hidden role="img">
+<svg aria-hidden="true" class="icon icon-empty" data-icon="empty">
+<use href="#i-empty">
+</use>
+</svg>
+</div>
+<article class="row row-archived" data-id="acme/ddd-server">
 <div class="row-main">
 <div class="row-head">
 <a class="row-name" href="https://github.com/acme/ddd-server" rel="noreferrer" target="_blank">acme/ddd-server</a>
-<span class="chip chip-official" title="Official implementation">🎖️ official</span>
-<span class="chip chip-dead" title="Archived on GitHub">archived</span>
+<span aria-label="Official implementation" class="chip chip-official" role="img">🎖️</span>
+<span aria-label="Archived on GitHub" class="chip chip-dead" role="img">
+<svg aria-hidden="true" class="icon" data-icon="archive">
+<use href="#i-archive">
+</use>
+</svg>
+</span>
 </div>
 <p class="row-desc">Archived but official.</p>
 <div class="row-chips">
-<span class="chip">typescript</span>
+<span class="chip chip-lang">typescript</span>
 <span class="chip chip-scope">cloud</span>
-<span class="chip chip-fact" title="Checked by hand and recorded in data/overrides.json.">paid</span>
-<span class="chip chip-fact" title="Checked by hand and recorded in data/overrides.json.">rate limited</span>
+<span aria-label="paid" class="chip chip-fact" role="img">
+<svg aria-hidden="true" class="icon" data-icon="coin">
+<use href="#i-coin">
+</use>
+</svg>$</span>
+<span aria-label="rate limited" class="chip chip-fact" role="img">
+<svg aria-hidden="true" class="icon" data-icon="gauge">
+<use href="#i-gauge">
+</use>
+</svg>≤</span>
 <span class="chip chip-cat">Databases</span>
 <span class="chip chip-cat">Search &amp; Data Extraction</span>
 </div>
 </div>
 <div class="row-meta">
-<div class="grades" title="Glama: licence / quality / maintenance">
-<span class="grade grade-A" title="license: A">A</span>
-<span class="grade grade-C" title="quality: C">C</span>
-<span class="grade grade-ungraded" title="maintenance: not graded">–</span>
+<div class="grades">
+<span aria-label="license: A" class="grade grade-A" role="img">
+<svg aria-hidden="true" class="icon" data-icon="scale">
+<use href="#i-scale">
+</use>
+</svg>A</span>
+<span aria-label="quality: C" class="grade grade-C" role="img">
+<svg aria-hidden="true" class="icon" data-icon="star">
+<use href="#i-star">
+</use>
+</svg>C</span>
+<span aria-label="maintenance: not graded" class="grade grade-ungraded" role="img">
+<svg aria-hidden="true" class="icon" data-icon="wrench">
+<use href="#i-wrench">
+</use>
+</svg>
+</span>
 </div>
 <div class="row-stats">
-<span title="GitHub stars">★ 12k</span>
-<span title="Last push">
-<time class="row-age" datetime="2026-07-01T00:00:00Z">2026-07-01</time>
+<span aria-label="GitHub stars" role="img">★ 12k</span>
+<span class="row-pushed">
+<svg aria-hidden="true" class="icon" data-icon="clock">
+<use href="#i-clock">
+</use>
+</svg> <time class="row-age" datetime="2026-07-01T00:00:00Z">2026-07-01</time>
 </span>
-<span class="foss-yes" title="MIT">MIT</span>
+<span class="row-spdx foss-yes">MIT</span>
 </div>
 </div>
 </article>
@@ -378,23 +843,34 @@
 </div>
 <p class="row-desc">A server for things.</p>
 <div class="row-chips">
-<span class="chip">typescript</span>
+<span class="chip chip-lang">typescript</span>
 <span class="chip chip-scope">local</span>
-<span class="chip chip-inferred" title="Inferred from the server's scope and description — not published data. Correct it in data/overrides.json.">~free</span>
-<span class="chip chip-inferred" title="Inferred from the server's scope and description — not published data. Correct it in data/overrides.json.">~no rate limit</span>
+<span aria-label="free, inferred" class="chip chip-inferred" role="img">
+<svg aria-hidden="true" class="icon" data-icon="coin">
+<use href="#i-coin">
+</use>
+</svg>0</span>
+<span aria-label="no rate limit, inferred" class="chip chip-inferred" role="img">
+<svg aria-hidden="true" class="icon" data-icon="gauge">
+<use href="#i-gauge">
+</use>
+</svg>∞</span>
 <span class="chip chip-cat">Search &amp; Data Extraction</span>
 </div>
 </div>
 <div class="row-meta">
-<div class="grades" title="Glama: licence / quality / maintenance">
-<span class="grade grade-none">not on Glama</span>
+<div class="grades">
+<span aria-label="not on Glama" class="grade grade-none" role="img">∅</span>
 </div>
 <div class="row-stats">
-<span title="GitHub stars">★ 1.5k</span>
-<span title="Last push">
-<time class="row-age" datetime="2026-07-01T00:00:00Z">2026-07-01</time>
+<span aria-label="GitHub stars" role="img">★ 1.5k</span>
+<span class="row-pushed">
+<svg aria-hidden="true" class="icon" data-icon="clock">
+<use href="#i-clock">
+</use>
+</svg> <time class="row-age" datetime="2026-07-01T00:00:00Z">2026-07-01</time>
 </span>
-<span class="foss-no" title="No licence file: all rights reserved">no licence</span>
+<span aria-label="No licence file: all rights reserved" class="foss-no" role="img">©</span>
 </div>
 </div>
 </article>
@@ -405,25 +881,48 @@
 </div>
 <p class="row-desc">A server for things.</p>
 <div class="row-chips">
-<span class="chip">typescript</span>
+<span class="chip chip-lang">typescript</span>
 <span class="chip chip-scope">cloud</span>
-<span class="chip chip-inferred" title="Inferred from the server's scope and description — not published data. Correct it in data/overrides.json.">~free</span>
-<span class="chip chip-inferred" title="Inferred from the server's scope and description — not published data. Correct it in data/overrides.json.">~no rate limit</span>
+<span aria-label="free, inferred" class="chip chip-inferred" role="img">
+<svg aria-hidden="true" class="icon" data-icon="coin">
+<use href="#i-coin">
+</use>
+</svg>0</span>
+<span aria-label="no rate limit, inferred" class="chip chip-inferred" role="img">
+<svg aria-hidden="true" class="icon" data-icon="gauge">
+<use href="#i-gauge">
+</use>
+</svg>∞</span>
 <span class="chip chip-cat">Databases</span>
 </div>
 </div>
 <div class="row-meta">
-<div class="grades" title="Glama: licence / quality / maintenance">
-<span class="grade grade-A" title="license: A">A</span>
-<span class="grade grade-A" title="quality: A">A</span>
-<span class="grade grade-A" title="maintenance: A">A</span>
+<div class="grades">
+<span aria-label="license: A" class="grade grade-A" role="img">
+<svg aria-hidden="true" class="icon" data-icon="scale">
+<use href="#i-scale">
+</use>
+</svg>A</span>
+<span aria-label="quality: A" class="grade grade-A" role="img">
+<svg aria-hidden="true" class="icon" data-icon="star">
+<use href="#i-star">
+</use>
+</svg>A</span>
+<span aria-label="maintenance: A" class="grade grade-A" role="img">
+<svg aria-hidden="true" class="icon" data-icon="wrench">
+<use href="#i-wrench">
+</use>
+</svg>A</span>
 </div>
 <div class="row-stats">
-<span title="GitHub stars">★ 500</span>
-<span title="Last push">
-<time class="row-age" datetime="2026-07-01T00:00:00Z">2026-07-01</time>
+<span aria-label="GitHub stars" role="img">★ 500</span>
+<span class="row-pushed">
+<svg aria-hidden="true" class="icon" data-icon="clock">
+<use href="#i-clock">
+</use>
+</svg> <time class="row-age" datetime="2026-07-01T00:00:00Z">2026-07-01</time>
 </span>
-<span class="foss-yes" title="MIT">MIT</span>
+<span class="row-spdx foss-yes">MIT</span>
 </div>
 </div>
 </article>
@@ -434,25 +933,48 @@
 </div>
 <p class="row-desc">A server for things.</p>
 <div class="row-chips">
-<span class="chip">rust</span>
+<span class="chip chip-lang">rust</span>
 <span class="chip chip-scope">cloud</span>
-<span class="chip chip-inferred" title="Inferred from the server's scope and description — not published data. Correct it in data/overrides.json.">~free</span>
-<span class="chip chip-inferred" title="Inferred from the server's scope and description — not published data. Correct it in data/overrides.json.">~no rate limit</span>
+<span aria-label="free, inferred" class="chip chip-inferred" role="img">
+<svg aria-hidden="true" class="icon" data-icon="coin">
+<use href="#i-coin">
+</use>
+</svg>0</span>
+<span aria-label="no rate limit, inferred" class="chip chip-inferred" role="img">
+<svg aria-hidden="true" class="icon" data-icon="gauge">
+<use href="#i-gauge">
+</use>
+</svg>∞</span>
 <span class="chip chip-cat">Databases</span>
 </div>
 </div>
 <div class="row-meta">
-<div class="grades" title="Glama: licence / quality / maintenance">
-<span class="grade grade-A" title="license: A">A</span>
-<span class="grade grade-A" title="quality: A">A</span>
-<span class="grade grade-B" title="maintenance: B">B</span>
+<div class="grades">
+<span aria-label="license: A" class="grade grade-A" role="img">
+<svg aria-hidden="true" class="icon" data-icon="scale">
+<use href="#i-scale">
+</use>
+</svg>A</span>
+<span aria-label="quality: A" class="grade grade-A" role="img">
+<svg aria-hidden="true" class="icon" data-icon="star">
+<use href="#i-star">
+</use>
+</svg>A</span>
+<span aria-label="maintenance: B" class="grade grade-B" role="img">
+<svg aria-hidden="true" class="icon" data-icon="wrench">
+<use href="#i-wrench">
+</use>
+</svg>B</span>
 </div>
 <div class="row-stats">
-<span title="GitHub stars">★ 50</span>
-<span title="Last push">
-<time class="row-age" datetime="2025-01-01T00:00:00Z">2025-01-01</time>
+<span aria-label="GitHub stars" role="img">★ 50</span>
+<span class="row-pushed">
+<svg aria-hidden="true" class="icon" data-icon="clock">
+<use href="#i-clock">
+</use>
+</svg> <time class="row-age" datetime="2025-01-01T00:00:00Z">2025-01-01</time>
 </span>
-<span class="foss-yes" title="MIT">MIT</span>
+<span class="row-spdx foss-yes">MIT</span>
 </div>
 </div>
 </article>
@@ -463,43 +985,85 @@
 </div>
 <p class="row-desc">A server for things.</p>
 <div class="row-chips">
-<span class="chip">typescript</span>
+<span class="chip chip-lang">typescript</span>
 <span class="chip chip-scope">cloud</span>
-<span class="chip chip-inferred" title="Inferred from the server's scope and description — not published data. Correct it in data/overrides.json.">~free</span>
-<span class="chip chip-inferred" title="Inferred from the server's scope and description — not published data. Correct it in data/overrides.json.">~no rate limit</span>
+<span aria-label="free, inferred" class="chip chip-inferred" role="img">
+<svg aria-hidden="true" class="icon" data-icon="coin">
+<use href="#i-coin">
+</use>
+</svg>0</span>
+<span aria-label="no rate limit, inferred" class="chip chip-inferred" role="img">
+<svg aria-hidden="true" class="icon" data-icon="gauge">
+<use href="#i-gauge">
+</use>
+</svg>∞</span>
 <span class="chip chip-cat">Databases</span>
 </div>
 </div>
 <div class="row-meta">
-<div class="grades" title="Glama: licence / quality / maintenance">
-<span class="grade grade-none">not on Glama</span>
+<div class="grades">
+<span aria-label="not on Glama" class="grade grade-none" role="img">∅</span>
 </div>
 <div class="row-stats">
-<span title="GitHub stars">★ ?</span>
-<span title="Last push">gone</span>
-<span class="foss-no" title="No licence file: all rights reserved">no licence</span>
+<span aria-label="GitHub stars" role="img">★ ?</span>
+<span aria-label="repository gone" class="foss-no" role="img">
+<svg aria-hidden="true" class="icon" data-icon="link-off">
+<use href="#i-link-off">
+</use>
+</svg>
+</span>
+<span aria-label="No licence file: all rights reserved" class="foss-no" role="img">©</span>
 </div>
 </div>
 </article>
 </div>
 </div>
 </div>
-<div class="help" data-help hidden role="dialog">
-<h2>Shortcuts</h2>
+<div aria-label="Keyboard shortcuts" class="help" data-help hidden role="dialog">
 <dl>
-<dt>/</dt>
-<dd>focus search</dd>
-<dt>a</dt>
-<dd>toggle Triple-A</dd>
-<dt>Esc</dt>
-<dd>leave search / close this</dd>
-<dt>?</dt>
-<dd>this help</dd>
+<dt>
+<kbd class="keycap">/</kbd>
+</dt>
+<dd>
+<span aria-label="focus search" role="img">
+<svg aria-hidden="true" class="icon" data-icon="search">
+<use href="#i-search">
+</use>
+</svg>
+</span>
+</dd>
+<dt>
+<kbd class="keycap">a</kbd>
+</dt>
+<dd>
+<span aria-label="toggle Triple-A" class="aaa-mark" role="img">AAA</span>
+</dd>
+<dt>
+<kbd class="keycap">Esc</kbd>
+</dt>
+<dd>
+<span aria-label="leave search, close this" role="img">
+<svg aria-hidden="true" class="icon" data-icon="close">
+<use href="#i-close">
+</use>
+</svg>
+</span>
+</dd>
+<dt>
+<kbd class="keycap">?</kbd>
+</dt>
+<dd>
+<span aria-label="this help" role="img">
+<svg aria-hidden="true" class="icon" data-icon="help">
+<use href="#i-help">
+</use>
+</svg>
+</span>
+</dd>
 </dl>
-<p>Every filter lives in the URL, so the address bar is always a shareable link.</p>
 </div>
 </server-explorer>
-<section class="prerender">
+<section class="prerender sr-only">
 <p>Filter and sort every server in punkpeye/awesome-mcp-servers by Glama grade, licence, scope, language, OS, popularity and activity.</p>
 <p>This page is the explorer itself: with JavaScript on, it loads every server from <a href="https://github.com/punkpeye/awesome-mcp-servers">awesome-mcp-servers</a> — about 3,000 of them — into one filterable, sortable list. Every filter lives in the URL, so a view can be bookmarked or shared.</p>
 <h2>Example</h2>

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { TriSelect } from "./filter-sort.ts";
 
-import { cycle, stateOf, summarize } from "./tri-state.ts";
+import { cycle, stateOf, summarize, tally } from "./tri-state.ts";
 
 type Lang = "go" | "python" | "rust";
 const empty: TriSelect<Lang> = { excludes: [], includes: [] };
@@ -42,5 +42,16 @@ describe("summarize", () => {
       "RUST, PYTHON · not GO",
     );
     expect(summarize({ excludes: ["go"], includes: [] }, upper)).toBe("not GO");
+  });
+});
+
+describe("tally", () => {
+  it("is a neutral dot when nothing is selected", () => {
+    expect(tally({ excludes: [], includes: [] })).toBe("·");
+  });
+
+  it("counts included and excluded values with their glyphs", () => {
+    expect(tally({ excludes: ["go"], includes: ["rust", "python"] })).toBe("✓2 ✕1");
+    expect(tally({ excludes: ["go"], includes: [] })).toBe("✕1");
   });
 });
