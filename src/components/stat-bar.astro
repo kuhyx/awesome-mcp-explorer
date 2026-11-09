@@ -1,9 +1,13 @@
 ---
 /**
- * The result count, sort control, share link and export menu.
+ * The result count ("shown / total"), sort keys, share link, reset and export.
+ * Every control is an icon or glyph with its old caption as `aria-label`.
  */
 import { EXPORT_FORMATS, SORT_LABELS } from "../lib/facet-defs.ts";
-import { DEFAULT_SORT } from "../lib/filter-sort.ts";
+import { DEFAULT_SORT, type SortKey } from "../lib/filter-sort.ts";
+import { SORT_MARKS } from "../lib/icons.ts";
+import Icon from "./icon.astro";
+import Mark from "./mark.astro";
 
 interface Props {
   total: number;
@@ -11,26 +15,43 @@ interface Props {
 
 const { total } = Astro.props;
 const count = total.toLocaleString("en-US");
+const sortKeys = Object.keys(SORT_LABELS) as SortKey[];
 ---
 
 <div class="statbar">
-  <span class="count" role="status">Showing <strong data-shown>{count}</strong> of <span data-total>{count}</span></span>
+  <span class="count" role="status"><strong data-shown>{count}</strong> / <span data-total>{count}</span></span>
 
-  <label class="sort">
-    Sort
-    <select data-sort-key>
-      {Object.entries(SORT_LABELS).map(([key, label]) => <option selected={key === DEFAULT_SORT.key} value={key}>{label}</option>)}
-    </select>
-    <button aria-label="Sort descending" class="chip" data-action="sort-dir" type="button">↓</button>
-  </label>
+  <div aria-label="Sort" class="sort" role="group">
+    <Icon name="sort" />
+    {
+      sortKeys.map((key) => {
+        return (
+        <button
+          aria-label={`Sort by ${SORT_LABELS[key]}`}
+          aria-pressed={key === DEFAULT_SORT.key ? "true" : "false"}
+          class:list={["chip", "icon-btn", { on: key === DEFAULT_SORT.key }]}
+          data-sort-key={key}
+          type="button"
+        >
+          <Mark mark={SORT_MARKS[key]} />
+        </button>
+        );
+      })
+    }
+    <button aria-label="Sort descending" class="chip icon-btn" data-action="sort-dir" type="button">↓</button>
+  </div>
 
   <div class="statbar-actions">
-    <button class="chip" data-action="reset" hidden type="button">Reset</button>
-    <button class="chip" data-action="copy" type="button">Copy link</button>
+    <button aria-label="Reset filters" class="chip icon-btn" data-action="reset" hidden type="button">
+      <Icon name="reset" /><span class="badge" data-reset-count>0</span>
+    </button>
+    <button aria-label="Copy link" class="chip icon-btn copy-btn" data-action="copy" type="button">
+      <Icon class="when-idle" name="link" /><Icon class="when-copied" name="check" />
+    </button>
     <label class="sort">
-      Export
-      <select data-export>
-        <option value="">…</option>
+      <Icon name="download" />
+      <select aria-label="Export" data-export>
+        <option hidden selected value=""></option>
         {EXPORT_FORMATS.map(({ format, name }) => <option value={format}>{name}</option>)}
       </select>
     </label>

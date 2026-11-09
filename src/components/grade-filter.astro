@@ -5,13 +5,19 @@
  * Triple-A is strict: all three axes graded and all three `A` (Glama has no
  * `A-`, so no looser variant exists). Roughly 12% of servers have no grade at
  * all and an ungraded axis is unknown rather than bad, so while a grade filter
- * is active the explorer states how many servers it cannot speak for.
+ * is active the explorer shows a warning icon with how many servers it cannot
+ * speak for.
+ *
+ * Each axis has a fixed icon (scale = licence, star = quality, wrench =
+ * maintenance) before its letter select; ⬚ is "any".
  */
 import type { Facets } from "../lib/facets.ts";
 import type { GradeCoverage } from "../lib/grade.ts";
 
 import { COVERAGE_LABELS } from "../lib/facet-defs.ts";
 import { GRADE_AXES, GRADES } from "../lib/grade.ts";
+import { AXIS_ICONS, COVERAGE_ICONS } from "../lib/icons.ts";
+import Icon from "./icon.astro";
 
 interface Props {
   facets: Facets;
@@ -21,28 +27,26 @@ const { facets } = Astro.props;
 const coverages = Object.entries(COVERAGE_LABELS) as [GradeCoverage, string][];
 ---
 
-<fieldset class="facet" data-grade>
-  <legend>Glama grade</legend>
+<fieldset aria-label="Glama grade" class="facet" data-grade>
+  <legend><Icon name="grade" /></legend>
 
-  <button aria-pressed="false" class="aaa-toggle" data-action="toggle-aaa" type="button">
+  <button aria-label="Triple-A only" aria-pressed="false" class="aaa-toggle" data-action="toggle-aaa" type="button">
     <span class="aaa-mark">AAA</span>
-    <span class="aaa-text">Triple-A only <span class="tri-count" data-count="aaa">{facets.tripleA}</span></span>
+    <span class="tri-count" data-count="aaa">{facets.tripleA}</span>
   </button>
-  <p class="facet-hint">
-    Licence, quality and maintenance all graded <strong>A</strong>. Glama has no A−, so there is no looser variant.
-  </p>
 
   <div class="grade-axes">
     {
       GRADE_AXES.map((axis) => {
         return (
-          <label class="grade-axis">
-            <span>{axis} ≥</span>
-            <select data-axis={axis}>
-              <option value="">any</option>
-              {GRADES.map((grade) => <option value={grade}>{grade}</option>)}
-            </select>
-          </label>
+        <label class="grade-axis">
+          <Icon name={AXIS_ICONS[axis]} />
+          <span aria-hidden="true">≥</span>
+          <select aria-label={`${axis} at least`} data-axis={axis}>
+            <option value="">⬚</option>
+            {GRADES.map((grade) => <option value={grade}>{grade}</option>)}
+          </select>
+        </label>
         );
       })
     }
@@ -52,16 +56,15 @@ const coverages = Object.entries(COVERAGE_LABELS) as [GradeCoverage, string][];
     {
       coverages.map(([coverage, label]) => {
         return (
-          <button aria-pressed="false" class="chip" data-coverage={coverage} type="button">
-            {label} <span class="tri-count">{facets.gradeCoverage.get(coverage) ?? 0}</span>
-          </button>
+        <button aria-label={label} aria-pressed="false" class="chip" data-coverage={coverage} type="button">
+          <Icon name={COVERAGE_ICONS[coverage]} /> <span class="tri-count">{facets.gradeCoverage.get(coverage) ?? 0}</span>
+        </button>
         );
       })
     }
   </div>
 
-  <p class="warn" data-ungraded hidden role="status">
-    <span data-ungraded-text></span> no Glama grade at all and cannot satisfy a grade filter. An empty result here
-    means “none that Glama has graded”, not “none exist”.
-  </p>
+  <div class="warn" data-ungraded hidden role="status">
+    <Icon name="warning" /> <span data-ungraded-text></span>
+  </div>
 </fieldset>

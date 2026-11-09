@@ -81,11 +81,6 @@ body {
   white-space: nowrap;
 }
 
-.subtitle {
-  color: var(--text-muted);
-  font-weight: 400;
-}
-
 .search {
   /* Constant width: it must not resize as sibling controls come and go. */
   flex: 0 0 22rem;
@@ -214,8 +209,8 @@ body {
  * Without this the summary grows the legend from one line to two the moment you
  * select a second value ("~unlimited, ~unknown · not ~limited"), which pushed
  * the fieldset from 64.6px to 82.6px and shifted every row below it down by
- * 18px — so the panel jumped out from under the pointer mid-click. The full
- * text stays reachable via the title attribute.
+ * 18px — so the panel jumped out from under the pointer mid-click. The
+ * summary is now a short "✓2 ✕1" tally; the full text is its aria-label.
  */
 .facet legend {
   display: flex;
@@ -228,10 +223,6 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   white-space: nowrap;
-}
-
-.facet-legend-label {
-  flex: none;
 }
 
 /*
@@ -251,12 +242,6 @@ body {
   letter-spacing: 0;
   color: var(--accent);
   white-space: nowrap;
-}
-
-.facet-hint {
-  margin: 0.4rem 0 0;
-  color: var(--text-muted);
-  font-size: 0.72rem;
 }
 
 .facet-options {
@@ -433,13 +418,6 @@ body {
   font-weight: 700;
   font-size: 0.7rem;
   letter-spacing: 0.06em;
-}
-
-.aaa-text {
-  display: flex;
-  gap: 0.4rem;
-  align-items: center;
-  flex: 1;
 }
 
 .grade-axes {

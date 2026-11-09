@@ -8,9 +8,11 @@
 import type { ExportFormat } from "./export.ts";
 import type { SortKey } from "./filter-sort.ts";
 import type { GradeCoverage } from "./grade.ts";
+import type { IconName } from "./icons.ts";
 import type { Cost, Language, Tri } from "./server.ts";
 
 import { LANGUAGES, OPERATING_SYSTEMS, SCOPES } from "../../scripts/lib/parse-readme.ts";
+import { COST_LABELS, COST_MARKS, RATE_LABELS, RATE_MARKS } from "./format.ts";
 
 /**
  * The tri-state facets: keys shared by `FilterState` and `Facets`.
@@ -25,12 +27,27 @@ export type TriKey =
   | "scope";
 
 export interface FacetOption {
+  /**
+   * Shown instead of the name when set; the name is then spoken only.
+   */
+  readonly mark?: string;
+  /**
+   * The spoken name, and the visible one for proper nouns (Rust, macOS, FOSS).
+   */
   readonly name: string;
   readonly value: string;
 }
 
 export interface FacetSpec {
+  readonly icon: IconName;
+  /**
+   * Values guessed from the README text rather than published: drawn dashed.
+   */
+  readonly inferred: boolean;
   readonly key: Exclude<TriKey, "categories">;
+  /**
+   * Spoken name of the whole facet.
+   */
   readonly label: string;
   readonly options: readonly FacetOption[];
 }
@@ -58,23 +75,22 @@ const FOSS_NAMES: Readonly<Record<Tri, string>> = {
   yes: "FOSS",
 };
 
-const COST_NAMES: Readonly<Record<Cost, string>> = {
-  "likely-free": "~free",
-  "likely-paid": "~paid",
-  unknown: "~unknown",
-};
-
-const RATE_NAMES: Readonly<Record<Tri, string>> = {
-  no: "~unlimited",
-  unknown: "~unknown",
-  yes: "~limited",
+// FOSS stays a word (a proper noun); the other two are glyphs: © for "all
+// rights reserved", ? for unclear.
+const FOSS_MARKS: Readonly<Partial<Record<Tri, string>>> = {
+  no: "©",
+  unknown: "?",
 };
 
 function named<T extends string>(
   values: readonly T[],
   nameOf: (value: T) => string,
+  marks?: Readonly<Partial<Record<T, string>>>,
 ): FacetOption[] {
-  return values.map((value) => ({ name: nameOf(value), value }));
+  return values.map((value) => {
+    const mark = marks?.[value];
+    return mark === undefined ? { name: nameOf(value), value } : { mark, name: nameOf(value), value };
+  });
 }
 
 const TRI_ORDER: readonly Tri[] = ["yes", "no", "unknown"];
@@ -84,15 +100,35 @@ const COST_ORDER: readonly Cost[] = ["likely-free", "likely-paid", "unknown"];
  * Rendered in this order, between the provenance chips and the sliders.
  */
 export const FACETS: readonly FacetSpec[] = [
-  { key: "languages", label: "Language", options: named(LANGUAGES, (v) => LANGUAGE_NAMES[v]) },
-  { key: "scope", label: "Scope (local vs cloud)", options: named(SCOPES, String) },
-  { key: "os", label: "Operating system", options: named(OPERATING_SYSTEMS, String) },
-  { key: "foss", label: "Licence", options: named(TRI_ORDER, (v) => FOSS_NAMES[v]) },
-  { key: "cost", label: "Cost (inferred)", options: named(COST_ORDER, (v) => COST_NAMES[v]) },
   {
+    icon: "code",
+    inferred: false,
+    key: "languages",
+    label: "Language",
+    options: named(LANGUAGES, (v) => LANGUAGE_NAMES[v]),
+  },
+  { icon: "pin", inferred: false, key: "scope", label: "Scope (local vs cloud)", options: named(SCOPES, String) },
+  { icon: "monitor", inferred: false, key: "os", label: "Operating system", options: named(OPERATING_SYSTEMS, String) },
+  {
+    icon: "scale",
+    inferred: false,
+    key: "foss",
+    label: "Licence",
+    options: named(TRI_ORDER, (v) => FOSS_NAMES[v], FOSS_MARKS),
+  },
+  {
+    icon: "coin",
+    inferred: true,
+    key: "cost",
+    label: "Cost (inferred)",
+    options: named(COST_ORDER, (v) => COST_LABELS[v], COST_MARKS),
+  },
+  {
+    icon: "gauge",
+    inferred: true,
     key: "rateLimited",
     label: "Rate limit (inferred)",
-    options: named(TRI_ORDER, (v) => RATE_NAMES[v]),
+    options: named(TRI_ORDER, (v) => RATE_LABELS[v], RATE_MARKS),
   },
 ];
 

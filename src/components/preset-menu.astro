@@ -1,24 +1,42 @@
 ---
 /**
- * Built-in and saved filter presets. Saved ones (localStorage) are cloned from
- * the template by `<server-explorer>`.
+ * Built-in and saved filter presets. A built-in shows the marks of the filters
+ * it sets (its name is spoken only); a saved one shows the name the user typed.
+ * Saved ones (localStorage) are cloned from the template by `<server-explorer>`.
  */
+import { presetMarks } from "../lib/preset-marks.ts";
 import { BUILTIN_PRESETS } from "../lib/presets.ts";
+import Icon from "./icon.astro";
+import Mark from "./mark.astro";
 ---
 
 <div class="presets">
-  {BUILTIN_PRESETS.map((preset) => <button class="chip" data-preset={preset.search} type="button">{preset.name}</button>)}
+  {
+    BUILTIN_PRESETS.map((preset) => {
+      return (
+      <button aria-label={preset.name} class="chip preset-chip" data-preset={preset.search} type="button">
+        {presetMarks(preset.search).map(({ exclude, mark }) => {
+          return (
+          <span class:list={["preset-mark", { "preset-exclude": exclude }]}>
+            <Mark mark={mark} />
+          </span>
+          );
+        })}
+      </button>
+      );
+    })
+  }
 
   <span class="preset-saved-list" data-saved></span>
   <template data-saved-template>
     <span class="preset-saved">
       <button class="chip on" data-preset="" type="button"></button>
-      <button class="chip preset-del" data-preset-delete="" type="button">✕</button>
+      <button class="chip preset-del" data-preset-delete="" type="button"><Icon name="close" /></button>
     </span>
   </template>
 
   <form class="preset-save" data-preset-form>
-    <input aria-label="Preset name" data-preset-name placeholder="Save current as…" />
-    <button class="chip" disabled type="submit">Save</button>
+    <input aria-label="Preset name" data-preset-name />
+    <button aria-label="Save current as preset" class="chip icon-btn" disabled type="submit"><Icon name="save" /></button>
   </form>
 </div>

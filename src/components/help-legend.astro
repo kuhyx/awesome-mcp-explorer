@@ -1,0 +1,20 @@
+---
+/**
+ * The `?` overlay: each shortcut's key cap beside the icon of the control it
+ * drives. The action names are spoken only.
+ */
+import Icon from "./icon.astro";
+---
+
+<div aria-label="Keyboard shortcuts" class="help" data-help hidden role="dialog">
+  <dl>
+    <dt><kbd class="keycap">/</kbd></dt>
+    <dd><span aria-label="focus search" role="img"><Icon name="search" /></span></dd>
+    <dt><kbd class="keycap">a</kbd></dt>
+    <dd><span aria-label="toggle Triple-A" class="aaa-mark" role="img">AAA</span></dd>
+    <dt><kbd class="keycap">Esc</kbd></dt>
+    <dd><span aria-label="leave search, close this" role="img"><Icon name="close" /></span></dd>
+    <dt><kbd class="keycap">?</kbd></dt>
+    <dd><span aria-label="this help" role="img"><Icon name="help" /></span></dd>
+  </dl>
+</div>

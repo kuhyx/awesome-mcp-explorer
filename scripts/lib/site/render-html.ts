@@ -115,10 +115,12 @@ export interface HeadOptions {
 }
 
 /**
- * The homepage's search-result title and description are hand-written; the
- * page table's own strings stay the short ones used by llms.txt and JSON-LD.
+ * The homepage's tab title is the site name alone (an OS-level proper noun,
+ * kuhy's textgate rule: no subtitle); the description is hand-written for
+ * crawlers. The page table's own strings stay the short ones used by llms.txt
+ * and JSON-LD.
  */
-const HOME_TITLE = `${SITE_NAME} — filter awesome-mcp-servers`;
+const HOME_TITLE = SITE_NAME;
 const HOME_DESCRIPTION =
   "Filter and sort every server in awesome-mcp-servers by Glama grade, licence, scope, language, OS and activity.";
 

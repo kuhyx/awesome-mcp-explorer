@@ -40,7 +40,18 @@ export function cycle<T extends string>(select: TriSelect<T>, option: T): TriSel
 }
 
 /**
- * "rust, go · not python", or "Any" when neutral.
+ * The visible facet summary: "✓2 ✕1" (included / excluded counts), "·" when neutral.
+ */
+export function tally<T extends string>(select: TriSelect<T>): string {
+  const parts = [
+    select.includes.length > 0 ? `${GLYPHS.include}${select.includes.length}` : "",
+    select.excludes.length > 0 ? `${GLYPHS.exclude}${select.excludes.length}` : "",
+  ].filter((part) => part !== "");
+  return parts.length === 0 ? "·" : parts.join(" ");
+}
+
+/**
+ * The spoken facet summary: "rust, go · not python", or "Any" when neutral.
  */
 export function summarize<T extends string>(
   select: TriSelect<T>,

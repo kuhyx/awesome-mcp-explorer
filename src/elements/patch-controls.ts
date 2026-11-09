@@ -7,9 +7,9 @@ import type { Facets } from "../lib/facets.ts";
 import type { FilterState, SortState, TriSelect } from "../lib/filter-sort.ts";
 import type { GradeCoverage } from "../lib/grade.ts";
 
-import { isFilterActive } from "../lib/filter-sort.ts";
+import { activeFilterCount } from "../lib/active-count.ts";
 import { GRADE_AXES } from "../lib/grade.ts";
-import { GLYPHS, stateOf, summarize } from "../lib/tri-state.ts";
+import { GLYPHS, stateOf, summarize, tally } from "../lib/tri-state.ts";
 import { required, requiredAs, setNumberAttribute } from "./dom.ts";
 
 function setPressed(button: Element, isOn: boolean): void {
@@ -36,9 +36,8 @@ function patchTriGroup(
     required(button, ".tri-count").textContent = String(count);
   }
   const summary = required(group, ".facet-summary");
-  const text = summarize(select, (option) => names.get(option) ?? option);
-  summary.textContent = text;
-  summary.title = text;
+  summary.textContent = tally(select);
+  summary.setAttribute("aria-label", summarize(select, (option) => names.get(option) ?? option));
 }
 
 export function patchFacets(root: ParentNode, filter: FilterState, facets: Facets): void {
@@ -73,8 +72,8 @@ export function patchGrade(
     filter.tripleA || filter.gradeCoverage !== null || Object.keys(filter.minGrades).length > 0;
   const warning = required(root, "[data-ungraded]");
   warning.hidden = !(isGradeFilterActive && ungraded > 0);
-  required(warning, "[data-ungraded-text]").textContent =
-    `${ungraded} matching server${ungraded === 1 ? " has" : "s have"}`;
+  required(warning, "[data-ungraded-text]").textContent = String(ungraded);
+  warning.setAttribute("aria-label", `${ungraded} matching without a Glama grade`);
 }
 
 export interface StatModel {
@@ -90,11 +89,15 @@ export function patchStat(
 ): void {
   required(root, "[data-shown]").textContent = stat.shown.toLocaleString("en-US");
   required(root, "[data-total]").textContent = stat.total.toLocaleString("en-US");
-  requiredAs(root, "[data-sort-key]", HTMLSelectElement).value = sort.key;
+  for (const button of root.querySelectorAll<HTMLElement>("[data-sort-key]")) {
+    setPressed(button, button.dataset.sortKey === sort.key);
+  }
   const direction = required(root, '[data-action="sort-dir"]');
   direction.textContent = sort.dir === "asc" ? "↑" : "↓";
   direction.setAttribute("aria-label", `Sort ${sort.dir === "asc" ? "ascending" : "descending"}`);
-  required(root, '[data-action="reset"]').hidden = !isFilterActive(filter);
+  const active = activeFilterCount(filter);
+  required(root, '[data-action="reset"]').hidden = active === 0;
+  required(root, "[data-reset-count]").textContent = String(active);
 }
 
 // A null bound removes the attribute, parking the thumb at the distribution's end.

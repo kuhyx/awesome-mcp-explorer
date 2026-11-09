@@ -4,25 +4,33 @@
  * Showing every option at once, with "not X" folded into the same control,
  * removes the need for a separate negation toggle. The state shown here is the
  * neutral one; `<server-explorer>` patches buttons, counts and summary in place.
+ *
+ * The heading is the facet's icon; an option shows its proper-noun name
+ * (Rust, macOS) or, for generated values, the facet icon plus a glyph, drawn
+ * dashed when the value is inferred rather than published.
  */
 import type { FacetOption } from "../lib/facet-defs.ts";
+import type { IconName } from "../lib/icons.ts";
 
 import { GLYPHS } from "../lib/tri-state.ts";
+import Icon from "./icon.astro";
 
 interface Props {
   counts: ReadonlyMap<string, number>;
   facet: string;
+  icon: IconName;
+  inferred?: boolean;
   label: string;
   options: readonly FacetOption[];
 }
 
-const { counts, facet, label, options } = Astro.props;
+const { counts, facet, icon, inferred = false, label, options } = Astro.props;
 ---
 
-<fieldset class="facet" data-facet={facet}>
+<fieldset aria-label={label} class="facet" data-facet={facet}>
   <legend>
-    <span class="facet-legend-label">{label}</span>
-    <span class="facet-summary" title="Any">Any</span>
+    <Icon name={icon} />
+    <span aria-label="Any" class="facet-summary" role="img">·</span>
   </legend>
   <div class="facet-options">
     {
@@ -40,7 +48,14 @@ const { counts, facet, label, options } = Astro.props;
             type="button"
           >
             <span aria-hidden="true" class="tri-glyph">{GLYPHS.off}</span>
-            <span class="tri-name">{option.name}</span>
+            {option.mark === undefined ? (
+              <span class="tri-name">{option.name}</span>
+            ) : (
+              <span class:list={["tri-mark", { "tri-inferred": inferred }]}>
+                <Icon name={icon} />
+                {option.mark}
+              </span>
+            )}
             <span class="tri-count">{count}</span>
           </button>
         );

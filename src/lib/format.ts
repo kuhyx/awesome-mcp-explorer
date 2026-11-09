@@ -19,6 +19,22 @@ export const RATE_LABELS: Readonly<Record<Tri, string>> = {
 };
 
 /**
+ * What a cost or rate-limit chip shows next to its coin or gauge icon. Kept
+ * clear of the tri-state picker's own ☐ ✓ ✕, which mean off/include/exclude.
+ */
+export const COST_MARKS: Readonly<Record<Cost, string>> = {
+  "likely-free": "0",
+  "likely-paid": "$",
+  unknown: "?",
+};
+
+export const RATE_MARKS: Readonly<Record<Tri, string>> = {
+  no: "∞",
+  unknown: "?",
+  yes: "≤",
+};
+
+/**
  * "59.3k" — keeps the star column narrow and non-jittery.
  */
 export function formatStars(stars: number): string {
@@ -27,15 +43,15 @@ export function formatStars(stars: number): string {
 }
 
 /**
- * "3d ago", "2y ago".
+ * "3d", "2y": a number and its unit symbol, shown beside a clock icon.
  */
 export function formatAge(iso: string, now: number): string {
   const then = Date.parse(iso);
-  if (Number.isNaN(then)) return "unknown";
+  if (Number.isNaN(then)) return "?";
   const days = Math.floor((now - then) / 86_400_000);
-  if (days < 1) return "today";
-  if (days < 30) return `${days}d ago`;
-  return days < 365 ? `${Math.floor(days / 30)}mo ago` : `${Math.floor(days / 365)}y ago`;
+  if (days < 1) return "0d";
+  if (days < 30) return `${days}d`;
+  return days < 365 ? `${Math.floor(days / 30)}mo` : `${Math.floor(days / 365)}y`;
 }
 
 /**

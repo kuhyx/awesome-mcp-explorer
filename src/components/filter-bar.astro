@@ -2,6 +2,10 @@
 /**
  * The whole filter sidebar, printed in its neutral state. `<server-explorer>`
  * owns the state and patches this markup in place.
+ *
+ * Headings are icons and the groups are named by `aria-label`. The range
+ * slider's own caption (a word, printed by @kuhyx/web-ui) is hidden by CSS and
+ * replaced by the icon beside it; the `label` prop still names its thumbs.
  */
 import RangeSlider from "@kuhyx/web-ui/RangeSlider.astro";
 
@@ -10,6 +14,7 @@ import type { HomeModel } from "../lib/servers-data.ts";
 import { FACETS } from "../lib/facet-defs.ts";
 import { formatMonth, formatStars } from "../lib/format.ts";
 import GradeFilter from "./grade-filter.astro";
+import Icon from "./icon.astro";
 import TriStatePicker from "./tri-state-picker.astro";
 
 interface Props {
@@ -24,28 +29,44 @@ const countsOf = (key: keyof typeof facets): ReadonlyMap<string, number> => face
 <aside class="filters">
   <GradeFilter facets={facets} />
 
-  <fieldset class="facet">
-    <legend>Provenance</legend>
-    <button aria-pressed="false" class="chip" data-action="toggle-official" type="button">
-      🎖️ Official only <span class="tri-count" data-count="official">{facets.official}</span>
+  <fieldset aria-label="Provenance" class="facet">
+    <legend><Icon name="shield" /></legend>
+    <button aria-label="Official only" aria-pressed="false" class="chip" data-action="toggle-official" type="button">
+      <span aria-hidden="true">🎖️</span> <span class="tri-count" data-count="official">{facets.official}</span>
     </button>
-    <button aria-pressed="false" class="chip" data-action="toggle-archived" type="button">Hide archived</button>
+    <button aria-label="Hide archived" aria-pressed="false" class="chip icon-btn" data-action="toggle-archived" type="button">
+      <Icon name="archive" />
+    </button>
   </fieldset>
 
-  {FACETS.map((spec) => <TriStatePicker counts={countsOf(spec.key)} facet={spec.key} label={spec.label} options={spec.options} />)}
+  {
+    FACETS.map((spec) => {
+      return (
+        <TriStatePicker
+          counts={countsOf(spec.key)}
+          facet={spec.key}
+          icon={spec.icon}
+          inferred={spec.inferred}
+          label={spec.label}
+          options={spec.options}
+        />
+      );
+    })
+  }
 
-  <p class="facet-hint">
-    Cost and rate limits are <strong>inferred</strong> from each server’s scope and description — neither the awesome
-    list nor Glama publishes them. Values are marked <code>~</code> and can be corrected in
-    <code>data/overrides.json</code>.
-  </p>
-
-  <div data-slider="stars"><RangeSlider format={formatStars} label="Stars" values={stars} /></div>
-  <div data-slider="pushed"><RangeSlider format={formatMonth} label="Last push" values={pushed} /></div>
+  <div class="slider-row" data-slider="stars">
+    <span aria-hidden="true" class="slider-icon glyph">★</span>
+    <RangeSlider format={formatStars} label="Stars" values={stars} />
+  </div>
+  <div class="slider-row" data-slider="pushed">
+    <span class="slider-icon"><Icon name="clock" /></span>
+    <RangeSlider format={formatMonth} label="Last push" values={pushed} />
+  </div>
 
   <TriStatePicker
     counts={countsOf("categories")}
     facet="categories"
+    icon="folder"
     label="Category"
     options={categories.map((name) => ({ name, value: name }))}
   />

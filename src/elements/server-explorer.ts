@@ -24,6 +24,7 @@ import { GRADE_AXES } from "../lib/grade.ts";
 import { addPreset, loadPresets, removePreset, savePresets } from "../lib/presets.ts";
 import { cycle } from "../lib/tri-state.ts";
 import { decodeFilter } from "../lib/url-state.ts";
+import { flashCopied } from "./copy-feedback.ts";
 import { required, requiredAs } from "./dom.ts";
 import { bindKeyboard } from "./keyboard.ts";
 import { ListView } from "./list-view.ts";
@@ -73,7 +74,9 @@ export class ServerExplorer extends HTMLElement {
     const state = await loadServers();
     if (!this.isConnected) return;
     if (state.kind === "error") {
-      required(this, "[data-error-detail]").textContent = state.message;
+      // Spoken and logged only: on screen the error is an icon on a red tint.
+      console.error(`servers.json: ${state.message}`);
+      required(this, "[data-error-detail]").textContent = `servers.json: ${state.message}`;
       required(this, "[data-error]").hidden = false;
       return;
     }
@@ -93,11 +96,6 @@ export class ServerExplorer extends HTMLElement {
       this.#onSlider(target, event.detail as RangeDetail);
     } else if (target.dataset.axis !== undefined) {
       this.#onAxis(target.dataset.axis, (target as HTMLSelectElement).value);
-    } else if (target.dataset.sortKey !== undefined) {
-      this.#update(this.#filter, {
-        ...this.#sort,
-        key: (target as HTMLSelectElement).value as SortKey,
-      });
     } else if (target.dataset.export !== undefined) {
       this.#export(target as HTMLSelectElement);
     }
@@ -106,9 +104,11 @@ export class ServerExplorer extends HTMLElement {
   #onClick(event: MouseEvent): void {
     const button = (event.target as Element).closest<HTMLElement>("button");
     if (button === null) return;
-    const { action, coverage, option, preset, presetDelete } = button.dataset;
+    const { action, coverage, option, preset, presetDelete, sortKey } = button.dataset;
     const filter = this.#filter;
-    if (option !== undefined) {
+    if (sortKey !== undefined) {
+      this.#update(filter, { ...this.#sort, key: sortKey as SortKey });
+    } else if (option !== undefined) {
       const key = button.dataset.key as TriKey;
       this.#update({ ...filter, [key]: cycle(filter[key] as TriSelect<string>, option) });
     } else if (coverage !== undefined) {
@@ -123,15 +123,16 @@ export class ServerExplorer extends HTMLElement {
       this.#presets = removePreset(this.#presets, presetDelete);
       this.#persistPresets();
     } else if (action !== undefined) {
-      this.#onAction(action);
+      this.#onAction(action, button);
     }
   }
 
-  #onAction(action: string): void {
+  #onAction(action: string, button: HTMLElement): void {
     const filter = this.#filter;
     switch (action) {
       case "copy": {
         void navigator.clipboard.writeText(globalThis.location.href);
+        flashCopied(button);
         break;
       }
       case "reset": {

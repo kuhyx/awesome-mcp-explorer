@@ -3,6 +3,10 @@
  * The explorer, fully prerendered: header, controls and every server row, so
  * with JavaScript off the whole list, title and description are still there.
  * `<server-explorer>` takes over in the browser (see src/elements).
+ *
+ * Nothing here prints a word (kuhy's textgate rule): controls are icons with
+ * `aria-label`s, and the site name and the long description stay in the DOM
+ * for screen readers and crawlers but are not painted (`.sr-only`).
  */
 import type { HomeModel } from "../lib/servers-data.ts";
 
@@ -10,8 +14,11 @@ import { HOME_PAGE } from "../../scripts/lib/site/pages.ts";
 import { linkResolver, renderBlocks } from "../../scripts/lib/site/render-html.ts";
 import { SITE_NAME } from "../../scripts/lib/site/site-config.ts";
 import FilterBar from "./filter-bar.astro";
+import HelpLegend from "./help-legend.astro";
+import Icon from "./icon.astro";
 import PresetMenu from "./preset-menu.astro";
 import ServerRow from "./server-row.astro";
+import Sprite from "./sprite.astro";
 import StatBar from "./stat-bar.astro";
 
 interface Props {
@@ -23,17 +30,16 @@ const prose = renderBlocks(HOME_PAGE.blocks, linkResolver(HOME_PAGE));
 ---
 
 <main>
+  <Sprite />
   <server-explorer>
     <div class="app">
       <header class="topbar">
-        <h1>{SITE_NAME} <span class="subtitle">{model.total} servers</span></h1>
-        <input
-          aria-label="Search servers"
-          class="search"
-          data-search
-          placeholder="Fuzzy search name or description…  (/)"
-          type="search"
-        />
+        <h1 class="brand"><Icon class="icon-logo" name="logo" /><span class="sr-only">{SITE_NAME}</span></h1>
+        <div class="search-box">
+          <Icon name="search" />
+          <input aria-label="Search servers" class="search" data-search type="search" />
+          <kbd aria-hidden="true" class="keycap">/</kbd>
+        </div>
         <PresetMenu />
       </header>
 
@@ -42,32 +48,22 @@ const prose = renderBlocks(HOME_PAGE.blocks, linkResolver(HOME_PAGE));
       <div class="body">
         <FilterBar model={model} />
         <div class="list" data-list>
-          <p class="app-msg" data-error hidden>
-            Could not load servers.json: <span data-error-detail></span>. Run <code>pnpm run build:data</code> to generate it.
-          </p>
-          <p class="list-empty" data-empty hidden>No servers match these filters.</p>
+          <div class="app-msg app-error" data-error hidden role="alert">
+            <Icon class="icon-xl" name="error" />
+            <span class="sr-only" data-error-detail></span>
+          </div>
+          <div aria-label="No servers match these filters" class="list-empty" data-empty hidden role="img">
+            <Icon class="icon-empty" name="empty" />
+          </div>
           {model.rows.map((server) => <ServerRow server={server} />)}
         </div>
       </div>
     </div>
 
-    <div class="help" data-help hidden role="dialog">
-      <h2>Shortcuts</h2>
-      <dl>
-        <dt>/</dt>
-        <dd>focus search</dd>
-        <dt>a</dt>
-        <dd>toggle Triple-A</dd>
-        <dt>Esc</dt>
-        <dd>leave search / close this</dd>
-        <dt>?</dt>
-        <dd>this help</dd>
-      </dl>
-      <p>Every filter lives in the URL, so the address bar is always a shareable link.</p>
-    </div>
+    <HelpLegend />
   </server-explorer>
 
-  <section class="prerender" set:html={prose} />
+  <section class="prerender sr-only" set:html={prose} />
 </main>
 
 <script>
