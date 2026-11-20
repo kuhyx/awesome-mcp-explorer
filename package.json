@@ -20,8 +20,9 @@
     "build:data": "GITHUB_TOKEN=${GITHUB_TOKEN:-$(gh auth token)} node --experimental-strip-types scripts/build-dataset.ts"
   },
   "dependencies": {
+    "@kuhyx/kuhy-credit": "github:kuhyx/utils#kuhy-credit-v0.3.0&path:kuhy_credit/web",
     "@kuhyx/web-ui": "github:kuhyx/utils#web_ui-v0.5.0&path:/web_ui",
-    "astro": "7.4.12"
+    "astro": "7.4.13"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.12",
@@ -29,8 +30,8 @@
     "@emnapi/runtime": "1.11.3",
     "@eslint/js": "10.0.1",
     "@testing-library/dom": "10.4.2",
-    "@testing-library/jest-dom": "7.0.1",
-    "@testing-library/user-event": "14.6.12",
+    "@testing-library/jest-dom": "8.0.0",
+    "@testing-library/user-event": "14.6.13",
     "@types/node": "26.6.6",
     "@vitest/coverage-v8": "5.1.1",
     "eslint": "10.15.0",

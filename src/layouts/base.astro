@@ -30,5 +30,7 @@ const { canonical, description, jsonLd, links, title } = headModel(page, { absol
   </head>
   <body>
     <slot />
+    <footer><kuhy-credit></kuhy-credit></footer>
+    <script type="module">import "@kuhyx/kuhy-credit";</script>
   </body>
 </html>
